@@ -1,3 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystorePropertiesFile = rootProject.file("local.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -6,9 +15,10 @@ plugins {
 android {
     namespace = "com.lotusreichhart.audily"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version =
+            release(36) {
+                minorApiLevel = 1
+            }
     }
 
     defaultConfig {
@@ -21,18 +31,40 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val ksP = System.getenv("APP_KS_PATH")
+            val ksPw = System.getenv("APP_KS_PASS")
+            val ksA = System.getenv("APP_KS_ALIAS")
+            val ksKp = System.getenv("APP_KS_KEY_PASS")
+
+            if (!ksP.isNullOrEmpty()) {
+                storeFile = file(ksP)
+                storePassword = ksPw
+                keyAlias = ksA
+                keyPassword = ksKp
+            } else if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") ?: "")
+                storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = keystoreProperties.getProperty("KEY_ALIAS") ?: ""
+                keyPassword = keystoreProperties.getProperty("KEY_PASSWORD") ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
