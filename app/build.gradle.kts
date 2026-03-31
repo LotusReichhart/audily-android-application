@@ -1,3 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystorePropertiesFile = rootProject.file("local.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -21,18 +30,40 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val envPath = System.getenv("KEYSTORE_PATH")
+            val envStorePass = System.getenv("KEYSTORE_PASSWORD")
+            val envAlias = System.getenv("KEY_ALIAS")
+            val envKeyPass = System.getenv("KEY_PASSWORD")
+
+            if (!envPath.isNullOrEmpty()) {
+                storeFile = file(envPath)
+                storePassword = envStorePass
+                keyAlias = envAlias
+                keyPassword = envKeyPass
+            } else if (keystorePropertiesFile.exists() && keystoreProperties.containsKey("KEYSTORE_PATH")) {
+                storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") as String)
+                storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD") as String
+                keyAlias = keystoreProperties.getProperty("KEY_ALIAS") as String
+                keyPassword = keystoreProperties.getProperty("KEY_PASSWORD") as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true

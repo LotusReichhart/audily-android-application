@@ -1,6 +1,7 @@
 *.iml
 .gradle
 .idea
+*.jks
 /local.properties
 .DS_Store
 /build
@@ -17,9 +18,15 @@ local.properties
 /build/
 /app/build/
 /app/release/
+app/keystore/*
+
+!app/keystore/
+!app/keystore/.gitkeep
 
 # Gradle
 .gradle/
+
+app/google-services.json
 
 temps
 

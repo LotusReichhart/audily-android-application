@@ -1,0 +1,50 @@
+name: CI (Continuous Integration)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        # Đảm bảo lệnh gradlew có quyền thực thi trên môi trường Ubuntu
+
+      - name: Run Android Lint
+        run: ./gradlew lint
+        # Bước này kiểm tra các lỗi tiềm ẩn trong code Android
+
+      # - name: Run Unit Tests
+      #   run: ./gradlew test
+      #   # Tạm thời comment vì chưa viết unit test
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+        # Build ra file APK debug để kiểm tra
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7

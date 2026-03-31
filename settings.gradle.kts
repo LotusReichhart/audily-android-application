@@ -24,4 +24,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Audily"
 include(":app")
- 
