@@ -1,3 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystorePropertiesFile = rootProject.file("local.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -21,18 +30,40 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val ks_p = System.getenv("APP_KS_PATH")
+            val ks_pw = System.getenv("APP_KS_PASS")
+            val ks_a = System.getenv("APP_KS_ALIAS")
+            val ks_kp = System.getenv("APP_KS_KEY_PASS")
+
+            if (!ks_p.isNullOrEmpty()) {
+                storeFile = file(ks_p)
+                storePassword = ks_pw
+                keyAlias = ks_a
+                keyPassword = ks_kp
+            } else if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties.getProperty("KEYSTORE_PATH") ?: "")
+                storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = keystoreProperties.getProperty("KEY_ALIAS") ?: ""
+                keyPassword = keystoreProperties.getProperty("KEY_PASSWORD") ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
