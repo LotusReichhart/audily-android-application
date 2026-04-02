@@ -49,3 +49,34 @@ jobs:
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: internal
           status: completed
+
+      - name: Create GitHub Release
+        id: create_release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/bundle/release/*.aab
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *Audily CD Report - Production Release*
+            
+            *Status:* ${{ job.status == 'success' && '✅ Deployed' || '❌ Failed' }}
+            *Version:* `${{ github.ref_name }}`
+            *Action:* `${{ github.workflow }}`
+            
+            [Download Release](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }})
+            [View Build Results](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

@@ -32,6 +32,9 @@ jobs:
       - name: Run Android Lint
         run: ./gradlew lint
 
+      - name: Run Unit Tests
+        run: ./gradlew testDevDebugUnitTest
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
@@ -41,3 +44,22 @@ jobs:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 7
+
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *Audily CI Report*
+            
+            *Status:* ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+            *Project:* Audily
+            *Action:* `${{ github.workflow }}`
+            *Commit:* `${{ github.sha }}`
+            *Branch:* `${{ github.ref_name }}`
+            *Author:* ${{ github.actor }}
+            
+            [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
