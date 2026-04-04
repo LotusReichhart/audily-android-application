@@ -86,8 +86,11 @@ fun AudilyTheme(
         fontScale = clampedFontScale
     )
 
+    val dimensions = Dimensions()
+
     CompositionLocalProvider(
-        LocalDensity provides customDensity
+        LocalDensity provides customDensity,
+        LocalDimensions provides dimensions
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
