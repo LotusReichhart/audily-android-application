@@ -3,6 +3,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
+import kotlin.text.get
 
 class HiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -11,6 +12,13 @@ class HiltConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "ksp"(libs.findLibrary("hilt.compiler").get())
+                "ksp"(libs.findLibrary("kotlin.metadata").get())
+            }
+
+            pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+                dependencies {
+                    "implementation"(libs.findLibrary("hilt.core").get())
+                }
             }
 
             pluginManager.withPlugin("com.android.base") {

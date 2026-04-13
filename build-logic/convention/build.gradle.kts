@@ -7,13 +7,13 @@ plugins {
 group = "com.lotusreichhart.buildlogic"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 
@@ -69,9 +69,13 @@ gradlePlugin {
             implementationClass = "AndroidRoomConventionPlugin"
         }
         // Android Feature ( Sử dụng cho các Feature Module như Home, Auth, ... )
-        register("androidFeature") {
-            id = libs.plugins.audily.android.feature.get().pluginId
-            implementationClass = "AndroidFeatureConventionPlugin"
+        register("androidFeatureApi") {
+            id = libs.plugins.audily.android.feature.api.get().pluginId
+            implementationClass = "AndroidFeatureApiConventionPlugin"
+        }
+        register("androidFeatureImpl") {
+            id = libs.plugins.audily.android.feature.impl.get().pluginId
+            implementationClass = "AndroidFeatureImplConventionPlugin"
         }
     }
 }

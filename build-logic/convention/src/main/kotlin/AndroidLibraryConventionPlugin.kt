@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import kotlin.text.get
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -31,6 +32,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("androidx-core-ktx").get())
                 "implementation"(libs.findLibrary("kotlinx.coroutines.android").get())
                 "implementation"(libs.findLibrary("timber").get())
+
+                "implementation"(libs.findLibrary("androidx.tracing.ktx").get())
+
                 "testImplementation"(libs.findLibrary("kotlin.test").get())
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
             }

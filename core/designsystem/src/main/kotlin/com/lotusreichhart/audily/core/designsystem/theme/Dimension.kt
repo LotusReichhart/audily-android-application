@@ -19,7 +19,7 @@ data class Dimensions(
 
     // Kích thước phần tử UI
     val buttonHeight: Dp = 48.dp,   // Chuẩn Accessibility
-    val bottomBarHeight: Dp = 80.dp,
+    val bottomBarHeight: Dp = 60.dp,
     val miniPlayerHeight: Dp = 64.dp,
 
     // Bo góc (Corner Radius) - Dùng nếu bạn không muốn dùng MaterialTheme.shapes

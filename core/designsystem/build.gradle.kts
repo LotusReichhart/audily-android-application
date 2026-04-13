@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.audily.android.library)
     alias(libs.plugins.audily.android.library.compose)
+    alias(libs.plugins.audily.hilt)
 }
 
 android {
