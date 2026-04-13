@@ -28,5 +28,16 @@ rootProject.name = "Audily"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
-include(":core")
+
 include(":core:designsystem")
+include(":core:navigation")
+include(":core:common")
+include(":core:network")
+include(":core:data")
+include(":core:domain")
+
+include(":feature:home:api")
+include(":feature:focus:api")
+include(":feature:settings:api")
+
+

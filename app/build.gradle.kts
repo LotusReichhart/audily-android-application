@@ -60,10 +60,20 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
+    implementation(projects.core.common)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
+
+    implementation(projects.feature.home.api)
+    implementation(projects.feature.focus.api)
+    implementation(projects.feature.settings.api)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewModel.navigation3)
+    implementation(libs.androidx.compose.foundation)
 
     implementation(libs.androidx.core.splashscreen)
 
