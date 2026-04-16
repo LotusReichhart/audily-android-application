@@ -5,3 +5,9 @@ plugins {
 android {
     namespace = "com.lotusreichhart.audily.core.domain"
 }
+
+dependencies{
+    implementation(projects.core.model)
+
+    implementation(libs.javax.inject)
+}

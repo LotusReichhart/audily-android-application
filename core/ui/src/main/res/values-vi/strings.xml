@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_ui_permission_title">Yêu cầu quyền truy cập bộ nhớ</string>
+    <string name="core_ui_permission_description_rationale">Audily cần quyền truy cập vào các tệp âm thanh trên thiết bị để bạn có thể nghe nhạc của mình. Vui lòng cấp quyền để tiếp tục.</string>
+    <string name="core_ui_permission_description_denied">Bạn đã từ chối quyền truy cập. Vui lòng bấm \'Cấp quyền\' bên dưới, sau đó chọn mục \'Quyền\' và bật \'Nhạc và âm thanh\' để ứng dụng có thể hoạt động.</string>
+    <string name="core_ui_permission_button_text">Cấp quyền</string>
+</resources>
