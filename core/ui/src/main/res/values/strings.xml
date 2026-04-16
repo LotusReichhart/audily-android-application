@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="permission_title">Storage Access Request</string>
-    <string name="permission_description_rationale">Audily needs access to audio files on your device so you can listen to your music. Please grant permission to continue.</string>
-    <string name="permission_description_denied">Access was denied. Please tap \'Grant Permission\' below, then select \'Permissions\' and enable \'Music and audio\' for the app to function.</string>
-    <string name="permission_button_text">Grant Permission</string>
+    <string name="core_ui_permission_title">Storage Access Request</string>
+    <string name="core_ui_permission_description_rationale">Audily needs access to audio files on your device so you can listen to your music. Please grant permission to continue.</string>
+    <string name="core_ui_permission_description_denied">Access was denied. Please tap \'Grant Permission\' below, then select \'Permissions\' and enable \'Music and audio\' for the app to function.</string>
+    <string name="core_ui_permission_button_text">Grant Permission</string>
 </resources>
