@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.model
+package com.lotusreichhart.audily.core.model.song
 
 /**
  * Enum đại diện cho tiêu chí sắp xếp bài hát ở tầng Domain/Shared.

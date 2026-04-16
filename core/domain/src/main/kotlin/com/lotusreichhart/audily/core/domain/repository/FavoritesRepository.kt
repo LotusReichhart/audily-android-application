@@ -1,6 +1,6 @@
 package com.lotusreichhart.audily.core.domain.repository
 
-import com.lotusreichhart.audily.core.model.Song
+import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 
 interface FavoritesRepository {

@@ -2,7 +2,7 @@ package com.lotusreichhart.audily.core.mediastore
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.lotusreichhart.audily.core.mediastore.datasource.MediaStoreDataSource
+import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertNotNull
 import org.junit.Test
