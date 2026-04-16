@@ -50,7 +50,7 @@ fun PermissionScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = stringResource(R.string.permission_title),
+            text = stringResource(R.string.core_ui_permission_title),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
@@ -59,9 +59,9 @@ fun PermissionScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         val descriptionKey = if (shouldShowRationale) {
-            R.string.permission_description_rationale
+            R.string.core_ui_permission_description_rationale
         } else {
-            R.string.permission_description_denied
+            R.string.core_ui_permission_description_denied
         }
 
         Text(
@@ -74,7 +74,7 @@ fun PermissionScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         AudilyButton(
-            text = stringResource(R.string.permission_button_text),
+            text = stringResource(R.string.core_ui_permission_button_text),
             onClick = onRequestPermission
         )
     }
