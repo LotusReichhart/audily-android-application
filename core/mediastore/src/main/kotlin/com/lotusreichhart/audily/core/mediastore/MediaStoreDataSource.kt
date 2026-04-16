@@ -1,0 +1,61 @@
+package com.lotusreichhart.audily.core.mediastore
+
+import android.content.ContentResolver
+import android.database.ContentObserver
+import android.net.Uri
+import android.provider.MediaStore
+import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
+import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortOrder
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+class MediaStoreDataSource @Inject constructor(
+    private val contentResolver: ContentResolver,
+    @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+) {
+    /**
+     * Lấy luồng toàn bộ ID bài hát có trên thiết bị.
+     * Tự động phát lại khi MediaStore thay đổi.
+     */
+    fun getSongIds(
+        searchQuery: String? = null,
+        sortOrder: MediaStoreSortOrder = MediaStoreSortOrder.TITLE_ASC
+    ): Flow<List<Long>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.querySongIds(musicUri, searchQuery, sortOrder))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(
+            musicUri,
+            true,
+            observer
+        )
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.querySongIds(musicUri, searchQuery, sortOrder))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy đầy đủ thông tin của một bài hát (MediaStore query).
+     */
+    fun getSong(id: Long): MediaStoreSong? {
+        return contentResolver.querySongById(musicUri, id)
+    }
+}

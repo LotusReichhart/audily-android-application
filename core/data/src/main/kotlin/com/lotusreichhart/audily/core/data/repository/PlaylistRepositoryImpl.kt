@@ -1,8 +1,8 @@
 package com.lotusreichhart.audily.core.data.repository
 
 import com.lotusreichhart.audily.core.domain.repository.PlaylistRepository
-import com.lotusreichhart.audily.core.model.Playlist
-import com.lotusreichhart.audily.core.model.Song
+import com.lotusreichhart.audily.core.model.playlist.Playlist
+import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

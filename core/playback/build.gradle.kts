@@ -4,5 +4,5 @@ plugins {
 }
 
 android {
-    namespace = "com.lotusreichhart.audily.core.mediaplayer"
+    namespace = "com.lotusreichhart.audily.core.playback"
 }

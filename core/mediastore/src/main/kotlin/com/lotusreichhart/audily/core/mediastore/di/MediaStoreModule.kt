@@ -4,7 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
 import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
-import com.lotusreichhart.audily.core.mediastore.datasource.MediaStoreDataSource
+import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

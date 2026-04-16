@@ -1,0 +1,33 @@
+package com.lotusreichhart.audily.core.mediastore.model
+
+/**
+ * Dữ liệu bài hát cơ bản từ MediaStore (dùng cho danh sách).
+ */
+data class BasicMediaStoreMetadata(
+    val title: String,
+    val artist: String,
+    val album: String,
+    val albumId: Long,
+    val duration: Long,
+    val path: String,
+    val dateModified: Long
+)
+
+/**
+ * Dữ liệu bài hát mở rộng từ MediaStore (dùng cho chi tiết).
+ */
+data class ExtendedMediaStoreMetadata(
+    val track: Int? = null,
+    val year: Int? = null,
+    val size: Long = 0,
+    val composer: String? = null
+)
+
+/**
+ * Model bài hát tại tầng MediaStore (Data Layer).
+ */
+data class MediaStoreSong(
+    val id: Long,
+    val basic: BasicMediaStoreMetadata,
+    val extended: ExtendedMediaStoreMetadata? = null
+)

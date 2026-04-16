@@ -1,7 +1,7 @@
 package com.lotusreichhart.audily.core.domain.usecase
 
 import com.lotusreichhart.audily.core.domain.repository.PlaylistRepository
-import com.lotusreichhart.audily.core.model.PlaylistWithSongs
+import com.lotusreichhart.audily.core.model.playlist.PlaylistWithSongs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
