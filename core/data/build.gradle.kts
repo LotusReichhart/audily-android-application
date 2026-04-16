@@ -8,6 +8,11 @@ android {
 }
 
 dependencies{
+    implementation(projects.core.model)
     implementation(projects.core.domain)
     implementation(projects.core.common)
+    implementation(projects.core.mediastore)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
+    implementation(projects.core.network)
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.AudilyTheme
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
+import com.lotusreichhart.audily.core.ui.permission.PermissionHandler
+import com.lotusreichhart.audily.core.ui.permission.PermissionScreen
 import com.lotusreichhart.audily.ui.AudilyApp
 import com.lotusreichhart.audily.ui.rememberAudilyAppState
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +37,7 @@ class MainActivity : ComponentActivity() {
     lateinit var networkMonitor: NetworkMonitor
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -41,27 +45,37 @@ class MainActivity : ComponentActivity() {
                 networkMonitor = networkMonitor,
             )
             AudilyTheme {
-                AudilyApp(
-                    appState = appState,
-                    miniPlayer = { alpha ->
-                        FakeMiniPlayer(
-                            alpha = alpha,
-                            onClick = {
-                                appState.expandPanel()
+                PermissionHandler(
+                    onPermissionGranted = {
+                        AudilyApp(
+                            appState = appState,
+                            miniPlayer = { alpha ->
+                                FakeMiniPlayer(
+                                    alpha = alpha,
+                                    onClick = {
+                                        appState.expandPanel()
+                                    }
+                                )
+                            },
+                            fullPlayer = { alpha ->
+                                FakeFullPlayer(
+                                    alpha = alpha,
+                                    onClose = {
+                                        appState.collapsePanel()
+                                    }
+                                )
                             }
-                        )
+                        ) {
+                            FakeContent()
+                        }
                     },
-                    fullPlayer = { alpha ->
-                        FakeFullPlayer(
-                            alpha = alpha,
-                            onClose = {
-                                appState.collapsePanel()
-                            }
+                    deniedContent = { shouldShowRationale, onRequestPermission ->
+                        PermissionScreen(
+                            shouldShowRationale = shouldShowRationale,
+                            onRequestPermission = onRequestPermission
                         )
                     }
-                ) {
-                    FakeContent()
-                }
+                )
             }
         }
     }
@@ -72,7 +86,7 @@ fun FakeMiniPlayer(alpha: Float, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(50.dp)
             .alpha(alpha)
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { onClick() },

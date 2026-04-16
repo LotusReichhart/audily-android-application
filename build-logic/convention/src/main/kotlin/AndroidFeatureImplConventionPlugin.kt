@@ -12,7 +12,6 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
         with(target) {
             apply(plugin = "audily.android.library")
             apply(plugin = "audily.hilt")
-            apply(plugin = "org.jetbrains.kotlin.plugin.compose")
 
             extensions.configure<LibraryExtension> {
                 testOptions.animationsDisabled = true
@@ -31,8 +30,6 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("androidx.navigation3.runtime").get())
                 "implementation"(libs.findLibrary("androidx.navigation3.ui").get())
                 "implementation"(libs.findLibrary("androidx.tracing.ktx").get())
-
-                "testImplementation"(libs.findLibrary("androidx.navigation.testing").get())
             }
         }
     }

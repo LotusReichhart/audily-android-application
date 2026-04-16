@@ -63,6 +63,7 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.core.ui)
 
     implementation(projects.feature.home.api)
     implementation(projects.feature.focus.api)
