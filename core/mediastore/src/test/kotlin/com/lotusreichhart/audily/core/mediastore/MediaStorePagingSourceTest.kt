@@ -3,14 +3,11 @@ package com.lotusreichhart.audily.core.mediastore
 import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.paging.PagingSource
 import com.lotusreichhart.audily.core.mediastore.model.BasicMediaStoreMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
-import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortOrder
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
