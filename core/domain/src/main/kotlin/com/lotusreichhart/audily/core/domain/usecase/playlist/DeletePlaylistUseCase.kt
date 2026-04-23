@@ -1,6 +1,6 @@
-package com.lotusreichhart.audily.core.domain.usecase
+package com.lotusreichhart.audily.core.domain.usecase.playlist
 
-import com.lotusreichhart.audily.core.domain.repository.PlaylistRepository
+import com.lotusreichhart.audily.core.domain.repository.playlist.PlaylistRepository
 import javax.inject.Inject
 
 class DeletePlaylistUseCase @Inject constructor(

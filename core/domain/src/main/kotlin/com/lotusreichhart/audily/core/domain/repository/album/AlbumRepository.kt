@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.domain.repository
+package com.lotusreichhart.audily.core.domain.repository.album
 
 import com.lotusreichhart.audily.core.model.album.Album
 import kotlinx.coroutines.flow.Flow

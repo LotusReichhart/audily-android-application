@@ -1,6 +1,6 @@
-package com.lotusreichhart.audily.core.domain.usecase
+package com.lotusreichhart.audily.core.domain.usecase.favorite
 
-import com.lotusreichhart.audily.core.domain.repository.FavoritesRepository
+import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
 import javax.inject.Inject
 
 class ToggleFavoriteUseCase @Inject constructor(
