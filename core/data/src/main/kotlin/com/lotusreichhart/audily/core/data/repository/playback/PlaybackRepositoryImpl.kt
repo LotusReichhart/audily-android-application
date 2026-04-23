@@ -1,12 +1,12 @@
-package com.lotusreichhart.audily.core.data.repository
+package com.lotusreichhart.audily.core.data.repository.playback
 
-import com.lotusreichhart.audily.core.domain.repository.MediaPlayerRepository
+import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
 import com.lotusreichhart.audily.core.model.song.Song
 import javax.inject.Inject
 
-class MediaPlayerRepositoryImpl @Inject constructor(
+internal class PlaybackRepositoryImpl @Inject constructor(
 
-) : MediaPlayerRepository {
+) : PlaybackRepository {
     override suspend fun play(song: Song) {
         TODO("Not yet implemented")
     }

@@ -1,11 +1,11 @@
-package com.lotusreichhart.audily.core.data.repository
+package com.lotusreichhart.audily.core.data.repository.album
 
-import com.lotusreichhart.audily.core.domain.repository.AlbumRepository
+import com.lotusreichhart.audily.core.domain.repository.album.AlbumRepository
 import com.lotusreichhart.audily.core.model.album.Album
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AlbumRepositoryImpl @Inject constructor(
+internal class AlbumRepositoryImpl @Inject constructor(
 
 ) : AlbumRepository {
     override fun getAlbums(): Flow<List<Album>> {
