@@ -7,4 +7,15 @@ data class BasicSongMetadata(
     val albumId: Long,
     val duration: Long,
     val path: String
-)
+) {
+    companion object {
+        val EMPTY = BasicSongMetadata(
+            title = "",
+            artist = "",
+            album = "",
+            albumId = -1L,
+            duration = 0L,
+            path = ""
+        )
+    }
+}

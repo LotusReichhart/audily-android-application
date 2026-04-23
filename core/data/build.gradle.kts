@@ -17,4 +17,9 @@ dependencies{
     implementation(projects.core.network)
 
     implementation(libs.androidx.paging.runtime)
+    
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.test.core.ktx)
 }
