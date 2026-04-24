@@ -1,9 +1,9 @@
 package com.lotusreichhart.audily.core.data.repository.song
 
-import android.content.ContentResolver
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.model.BasicMediaStoreMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortMetadata
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import io.mockk.coEvery
 import io.mockk.every
@@ -17,25 +17,27 @@ import org.junit.Test
 
 class SongRepositoryImplTest {
 
-    private lateinit var contentResolver: ContentResolver
     private lateinit var mediaStoreDataSource: MediaStoreDataSource
     private lateinit var repository: SongRepositoryImpl
 
     @Before
     fun setup() {
-        contentResolver = mockk()
         mediaStoreDataSource = mockk()
-        repository = SongRepositoryImpl(contentResolver, mediaStoreDataSource)
+        repository = SongRepositoryImpl(mediaStoreDataSource)
     }
 
     @Test
-    fun `getSongIds returns ids from data source`() = runTest {
-        val ids = listOf(1L, 2L)
-        every { mediaStoreDataSource.getSongIds(any(), any()) } returns flowOf(ids)
+    fun `getSongIds returns sorted ids from metadata`() = runTest {
+        val metadata = listOf(
+            MediaStoreSortMetadata(1L, "B Song", "Artist", 0L),
+            MediaStoreSortMetadata(2L, "A Song", "Artist", 0L)
+        )
+        every { mediaStoreDataSource.getSongsSortMetadata(any()) } returns flowOf(metadata)
 
         val result = repository.getSongIds(null, SongSortOrder.TITLE_ASC).first()
 
-        assertEquals(ids, result)
+        // Phải được sắp xếp lại bởi SongSorter trong Repository
+        assertEquals(listOf(2L, 1L), result)
     }
 
     @Test
@@ -52,7 +54,7 @@ class SongRepositoryImplTest {
                 dateModified = 0
             )
         )
-        coEvery { mediaStoreDataSource.getSong(1L) } returns mediaStoreSong
+        every { mediaStoreDataSource.getSong(1L) } returns mediaStoreSong
 
         val result = repository.getSong(1L).first()
 
