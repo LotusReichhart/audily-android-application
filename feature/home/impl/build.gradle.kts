@@ -13,4 +13,11 @@ dependencies {
 
     implementation(projects.feature.home.api)
     implementation(projects.feature.songs.api)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
