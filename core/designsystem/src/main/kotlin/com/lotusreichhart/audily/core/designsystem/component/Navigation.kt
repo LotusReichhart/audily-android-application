@@ -1,5 +1,6 @@
 package com.lotusreichhart.audily.core.designsystem.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,16 +30,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
-/**
- * Thẻ diều hướng cấp cao nhất (Bottom Navigation) được tùy chỉnh cho Audily.
- * Loại bỏ các hiệu ứng focus và khoảng cách mặc định của Material 3.
- */
 @Composable
 fun AudilyNavigationBar(
     modifier: Modifier = Modifier,
@@ -47,11 +45,20 @@ fun AudilyNavigationBar(
     windowInsets: WindowInsets = NavigationBarDefaults.windowInsets,
     content: @Composable RowScope.() -> Unit,
 ) {
+    val backgroundBrush = remember(containerColor) {
+        Brush.verticalGradient(
+            0.0f to containerColor.copy(alpha = 0.85f),
+            0.4f to containerColor.copy(alpha = 0.85f), // Top 50% fixed alpha 0.9
+            0.6f to containerColor.copy(alpha = 1.0f), // Start solid at 60% from top (40% from bottom)
+            1.0f to containerColor.copy(alpha = 1.0f)  // Solid bottom 30%
+        )
+    }
+
     Surface(
-        color = containerColor,
+        color = Color.Transparent,
         contentColor = contentColor,
         tonalElevation = 0.dp,
-        modifier = modifier
+        modifier = modifier.background(backgroundBrush)
     ) {
         Row(
             modifier = Modifier
@@ -66,12 +73,6 @@ fun AudilyNavigationBar(
     }
 }
 
-/**
- * Item cho thanh điều hướng dưới cùng.
- * - Icon và Title cách nhau 4dp.
- * - Cùng nhận một màu khi được chọn hoặc không.
- * - Không có hiệu ứng focus pill của Material 3.
- */
 @Composable
 fun RowScope.AudilyNavigationBarItem(
     selected: Boolean,
@@ -118,9 +119,6 @@ fun RowScope.AudilyNavigationBarItem(
     }
 }
 
-/**
- * Thanh điều hướng dọc (Navigation Rail) cho màn hình ngang / Tablet.
- */
 @Composable
 fun AudilyNavigationRail(
     modifier: Modifier = Modifier,

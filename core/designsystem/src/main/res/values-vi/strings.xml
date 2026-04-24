@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_designsystem_song_is_missing">Tệp đã bị xóa hoặc di chuyển</string>
+    <string name="core_designsystem_unknown_artist">Nghệ sĩ vô danh</string>
+    <string name="core_designsystem_unknown_album">Album không rõ</string>
+</resources>
