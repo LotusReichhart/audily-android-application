@@ -2,7 +2,7 @@ package com.lotusreichhart.audily.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,17 +40,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationBar
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationBarItem
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRail
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRailItem
-import com.lotusreichhart.audily.navigation.TOP_LEVEL_NAV_ITEMS
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
+import com.lotusreichhart.audily.core.navigation.toEntries
+import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
+import com.lotusreichhart.audily.feature.home.impl.navigation.homeEntry
+import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
+import com.lotusreichhart.audily.feature.songs.impl.navigation.songsEntry
+import com.lotusreichhart.audily.navigation.TOP_LEVEL_NAV_ITEMS
 import kotlin.math.roundToInt
 
 @Composable
@@ -58,14 +68,10 @@ fun AudilyApp(
     modifier: Modifier = Modifier,
     miniPlayer: @Composable (alpha: Float) -> Unit,
     fullPlayer: @Composable (alpha: Float) -> Unit,
-    content: @Composable () -> Unit
 ) {
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
-
-    // Khởi tạo Snackbar để hiển thị thông báo
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Side-effect: Bắn thông báo khi mất mạng
     LaunchedEffect(isOffline) {
         if (isOffline) {
             snackbarHostState.showSnackbar(
@@ -75,20 +81,16 @@ fun AudilyApp(
         }
     }
 
-    // Tính toán thông tin màn hình (Adaptive Info)
     val configuration = LocalConfiguration.current
-    val isLandscape =
-        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-    // Truyền tất cả dữ liệu xuống hàm UI nội bộ
     AudilyApp(
         appState = appState,
         isLandscape = isLandscape,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
         miniPlayer = miniPlayer,
-        fullPlayer = fullPlayer,
-        content = content
+        fullPlayer = fullPlayer
     )
 }
 
@@ -101,12 +103,10 @@ internal fun AudilyApp(
     modifier: Modifier = Modifier,
     miniPlayer: @Composable (alpha: Float) -> Unit,
     fullPlayer: @Composable (alpha: Float) -> Unit,
-    content: @Composable () -> Unit
 ) {
     var fullHeight by remember { mutableIntStateOf(0) }
-    var miniPlayerHeight by remember { mutableIntStateOf(0) }
-    var bottomBarHeight by remember { mutableIntStateOf(0) }
-    
+    val density = LocalDensity.current
+
     val flingBehavior = AnchoredDraggableDefaults.flingBehavior<AudilyPanelState>(
         state = appState.draggableState,
         positionalThreshold = { distance: Float -> distance * 0.5f },
@@ -115,17 +115,16 @@ internal fun AudilyApp(
             stiffness = Spring.StiffnessMediumLow
         )
     )
-    
-    // Cập nhật mốc Anchors (Giới hạn vuốt) khi màn hình thay đổi kích thước
-    LaunchedEffect(fullHeight, miniPlayerHeight, bottomBarHeight, isLandscape) {
+
+    LaunchedEffect(fullHeight, appState.miniPlayerAlpha, appState.bottomBarHeightPx, isLandscape) {
         if (fullHeight > 0) {
             val expandedY = 0f
             val collapsedY = if (isLandscape) {
-                (fullHeight - miniPlayerHeight).toFloat().coerceAtLeast(0f)
+                (fullHeight - appState.panelHeightPx).coerceAtLeast(0f)
             } else {
-                (fullHeight - bottomBarHeight - miniPlayerHeight).toFloat().coerceAtLeast(0f)
+                (fullHeight - appState.bottomBarHeightPx - appState.panelHeightPx).coerceAtLeast(0f)
             }
-            
+
             val anchors = DraggableAnchors {
                 AudilyPanelState.COLLAPSED at collapsedY
                 AudilyPanelState.EXPANDED at expandedY
@@ -136,7 +135,13 @@ internal fun AudilyApp(
 
     val progress = appState.expandProgress
 
-    // Xử lý nút Back của hệ thống
+    // Animation ẩn/hiện NavigationBar thủ công
+    val nvaBarVisibilityProgress by animateFloatAsState(
+        targetValue = if (appState.isBottomBarShown) 1f else 0f,
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+        label = "NavBarVisibility"
+    )
+
     BackHandler(enabled = appState.isExpanded) {
         appState.collapsePanel()
     }
@@ -145,61 +150,131 @@ internal fun AudilyApp(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (isLandscape) {
-        // ==========================================
-        // MÀN HÌNH NGANG / TABLET
-        // ==========================================
-        Box(modifier = modifier
-            .fillMaxSize()
-            .onSizeChanged { fullHeight = it.height }
-        ) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                // LỚP 1: Navigation Rail (Luôn hiển thị bên trái)
-                AudilyNavigationRail {
-                    TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
-                        val selected = appState.navigationState.currentTopLevelKey == navKey
-                        AudilyNavigationRailItem(
-                            selected = selected,
-                            onClick = { appState.navigator.navigate(navKey) },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = navItem.unselectedIcon),
-                                    contentDescription = stringResource(id = navItem.iconTextId),
-                                    modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                )
-                            },
-                            selectedIcon = {
-                                Icon(
-                                    painter = painterResource(id = navItem.selectedIcon),
-                                    contentDescription = stringResource(id = navItem.iconTextId),
-                                    modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = navItem.iconTextId),
-                                    style = MaterialTheme.typography.labelSmall
+        val entryProvider = entryProvider {
+            homeEntry(appState.navigator)
+            songsEntry(appState.navigator)
+            entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
+            entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
+        }
+
+        val dynamicPadding = appState.getContentBottomPadding(density)
+
+        CompositionLocalProvider(LocalDynamicBottomPadding provides dynamicPadding) {
+            if (isLandscape) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .onSizeChanged { fullHeight = it.height }
+                ) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        AudilyNavigationRail {
+                            TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
+                                val selected = appState.navigationState.currentTopLevelKey == navKey
+                                AudilyNavigationRailItem(
+                                    selected = selected,
+                                    onClick = { appState.navigator.navigate(navKey) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = navItem.unselectedIcon),
+                                            contentDescription = stringResource(id = navItem.iconTextId),
+                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        )
+                                    },
+                                    selectedIcon = {
+                                        Icon(
+                                            painter = painterResource(id = navItem.selectedIcon),
+                                            contentDescription = stringResource(id = navItem.iconTextId),
+                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = navItem.iconTextId),
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
                                 )
                             }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = LocalDimensions.current.paddingSmall)
+                                    .padding(horizontal = LocalDimensions.current.paddingMedium)
+                                    .windowInsetsPadding(
+                                        WindowInsets.safeDrawing.only(
+                                            WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                                        )
+                                    )
+                            ) {
+                                NavDisplay(
+                                    entries = appState.navigationState.toEntries(entryProvider),
+                                    onBack = { appState.navigator.goBack() }
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .offset {
+                                        IntOffset(x = 0, y = appState.currentPanelOffsetY.roundToInt())
+                                    }
+                                    .anchoredDraggable(
+                                        state = appState.draggableState,
+                                        orientation = Orientation.Vertical,
+                                        flingBehavior = flingBehavior
+                                    )
+                            ) {
+                                Box(modifier = Modifier.onSizeChanged {
+                                    appState.panelHeightPx = it.height.toFloat()
+                                    appState.isPanelVisible = it.height > 0
+                                }) {
+                                    miniPlayer(appState.miniPlayerAlpha)
+                                }
+
+                                Box {
+                                    fullPlayer(appState.fullPlayerAlpha)
+                                }
+                            }
+                        }
+                    }
+
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .onSizeChanged { fullHeight = it.height }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = LocalDimensions.current.paddingSmall)
+                            .padding(horizontal = LocalDimensions.current.paddingMedium)
+                            .windowInsetsPadding(
+                                WindowInsets.safeDrawing.only(
+                                    WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                                )
+                            )
+                    ) {
+                        NavDisplay(
+                            entries = appState.navigationState.toEntries(entryProvider),
+                            onBack = { appState.navigator.goBack() }
                         )
                     }
-                }
 
-                // Vùng nội dung chính
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                ) {
-                    // Nội dung gốc (NavHost) - Thêm padding để tránh tai thỏ
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
-                    ) {
-                        content()
-                    }
-
-                    // Panel mở rộng (Mini / Full Player) nhận sự kiện vuốt
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -212,8 +287,10 @@ internal fun AudilyApp(
                                 flingBehavior = flingBehavior
                             )
                     ) {
-                        // Wrap MiniPlayer để đo chiều cao tự động
-                        Box(modifier = Modifier.onSizeChanged { miniPlayerHeight = it.height }) {
+                        Box(modifier = Modifier.onSizeChanged {
+                            appState.panelHeightPx = it.height.toFloat()
+                            appState.isPanelVisible = it.height > 0
+                        }) {
                             miniPlayer(appState.miniPlayerAlpha)
                         }
 
@@ -221,114 +298,73 @@ internal fun AudilyApp(
                             fullPlayer(appState.fullPlayerAlpha)
                         }
                     }
-                }
-            }
 
-            // Snackbar nổi lên trên cùng
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            )
-        }
-    } else {
-        // ==========================================
-        // MÀN HÌNH DỌC (Z-Axis Layering)
-        // ==========================================
-        Box(modifier = modifier
-            .fillMaxSize()
-            .onSizeChanged { fullHeight = it.height }
-        ) {
-
-            // LỚP 1: NỘI DUNG GỐC (NavHost)
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
-            ) {
-                content()
-            }
-
-            // LỚP 2: PANEL MỞ RỘNG (Player)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset {
-                        IntOffset(x = 0, y = appState.currentPanelOffsetY.roundToInt())
-                    }
-                    .anchoredDraggable(
-                        state = appState.draggableState,
-                        orientation = Orientation.Vertical,
-                        flingBehavior = flingBehavior
-                    )
-            ) {
-                // Đo chiều cao MiniPlayer
-                Box(modifier = Modifier.onSizeChanged { miniPlayerHeight = it.height }) {
-                    miniPlayer(appState.miniPlayerAlpha)
-                }
-
-                // Full player
-                Box {
-                    fullPlayer(appState.fullPlayerAlpha)
-                }
-            }
-
-            // LỚP 3: LỚP ĐIỀU HƯỚNG (Bottom Bar)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset {
-                        val yOffset = (progress * appState.bottomBarHeightPx).roundToInt()
-                        IntOffset(x = 0, y = yOffset)
-                    }
-                    .alpha(1f - progress)
-                    .onSizeChanged { 
-                        bottomBarHeight = it.height 
-                        appState.bottomBarHeightPx = it.height.toFloat()
-                    }
-            ) {
-                AudilyNavigationBar(
-                    containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
-                ) {
-                    TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
-                        val selected = appState.navigationState.currentTopLevelKey == navKey
-                        AudilyNavigationBarItem(
-                            selected = selected,
-                            onClick = { appState.navigator.navigate(navKey) },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = navItem.unselectedIcon),
-                                    contentDescription = stringResource(id = navItem.iconTextId),
-                                    modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                )
-                            },
-                            selectedIcon = {
-                                Icon(
-                                    painter = painterResource(id = navItem.selectedIcon),
-                                    contentDescription = stringResource(id = navItem.iconTextId),
-                                    modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = navItem.iconTextId),
-                                    style = MaterialTheme.typography.labelSmall
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset {
+                                // Kết hợp cả animation thủ công và animation Player
+                                val combinedVisibility = nvaBarVisibilityProgress * (1f - progress)
+                                val yOffset = ((1f - combinedVisibility) * appState.bottomBarHeightPx).roundToInt()
+                                IntOffset(x = 0, y = yOffset)
+                            }
+                            .alpha(nvaBarVisibilityProgress * (1f - progress))
+                            .onSizeChanged {
+                                appState.bottomBarHeightPx = it.height.toFloat()
+                                appState.isBottomBarVisible = it.height > 0
+                            }
+                    ) {
+                        AudilyNavigationBar(
+                            containerColor = MaterialTheme.colorScheme.background
+                        ) {
+                            TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
+                                val selected = appState.navigationState.currentTopLevelKey == navKey
+                                AudilyNavigationBarItem(
+                                    selected = selected,
+                                    onClick = { appState.navigator.navigate(navKey) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = navItem.unselectedIcon),
+                                            contentDescription = stringResource(id = navItem.iconTextId),
+                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        )
+                                    },
+                                    selectedIcon = {
+                                        Icon(
+                                            painter = painterResource(id = navItem.selectedIcon),
+                                            contentDescription = stringResource(id = navItem.iconTextId),
+                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = navItem.iconTextId),
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
                                 )
                             }
-                        )
+                        }
                     }
+
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = dynamicPadding + 16.dp)
+                    )
                 }
             }
-
-            // LỚP 4: SNACKBAR (Nằm trên cùng để luôn nhìn thấy)
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    // Đẩy Snackbar lên trên BottomBar
-                    .padding(bottom = 80.dp)
-            )
         }
     }
 }
+
+@Composable
+private fun SamplePlaceholder(name: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = "$name Placeholder", style = MaterialTheme.typography.headlineMedium)
+    }
 }

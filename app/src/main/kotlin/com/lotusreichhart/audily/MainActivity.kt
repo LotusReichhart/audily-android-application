@@ -65,9 +65,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
-                        ) {
-                            FakeContent()
-                        }
+                        )
                     },
                     deniedContent = { shouldShowRationale, onRequestPermission ->
                         PermissionScreen(
@@ -112,17 +110,5 @@ fun FakeFullPlayer(alpha: Float, onClose: () -> Unit) {
                 Text("Close")
             }
         }
-    }
-}
-
-@Composable
-fun FakeContent() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Main Content (Songs/Playlists)", color = MaterialTheme.colorScheme.onBackground)
     }
 }
