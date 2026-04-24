@@ -1,18 +1,17 @@
 package com.lotusreichhart.audily.core.data.repository.playlist
 
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.lotusreichhart.audily.core.data.mapper.playlist.toPlaylist
 import com.lotusreichhart.audily.core.data.mapper.playlist.toPlaylistDaoSortOrder
 import com.lotusreichhart.audily.core.data.mapper.song.toSong
+import com.lotusreichhart.audily.core.data.paging.AudilyPagingConfig
 import com.lotusreichhart.audily.core.database.dao.PlaylistDao
 import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistSongCrossRef
 import com.lotusreichhart.audily.core.domain.repository.playlist.PlaylistRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
-import com.lotusreichhart.audily.core.mediastore.MediaStorePagingSource
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
@@ -85,12 +84,7 @@ internal class PlaylistRepositoryImpl @Inject constructor(
 
     override fun getPlaylistSongsPaged(id: Long): Flow<PagingData<Song>> {
         return Pager(
-            config = PagingConfig(
-                pageSize = MediaStorePagingSource.PAGE_SIZE,
-                prefetchDistance = MediaStorePagingSource.PAGE_SIZE / 2,
-                enablePlaceholders = true,
-                initialLoadSize = MediaStorePagingSource.PAGE_SIZE * 2
-            ),
+            config = AudilyPagingConfig.defaultConfig(enablePlaceholders = true),
             pagingSourceFactory = {
                 playlistDao.getPlaylistSongsPaging(id)
             }
