@@ -1,144 +1,28 @@
 package com.lotusreichhart.audily.core.mediastore
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
 import android.provider.MediaStore
 import com.lotusreichhart.audily.core.mediastore.model.BasicMediaStoreMetadata
 import com.lotusreichhart.audily.core.mediastore.model.ExtendedMediaStoreMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
-import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortOrder
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSongsSummary
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortMetadata
+import androidx.core.net.toUri
 
 /**
  * Các hàm helper nội bộ để truy vấn MediaStore
  */
 
-internal fun ContentResolver.queryBasicSongs(
-    uri: Uri,
-    searchQuery: String? = null,
-    sortOrder: MediaStoreSortOrder = MediaStoreSortOrder.TITLE_ASC,
-    limit: Int? = null,
-    offset: Int? = null
-): List<MediaStoreSong> {
-    val songs = mutableListOf<MediaStoreSong>()
-    val projection = arrayOf(
-        MediaStore.Audio.Media._ID,
-        MediaStore.Audio.Media.TITLE,
-        MediaStore.Audio.Media.ARTIST,
-        MediaStore.Audio.Media.ALBUM,
-        MediaStore.Audio.Media.DURATION,
-        MediaStore.Audio.Media.DATA,
-        MediaStore.Audio.Media.ALBUM_ID,
-        MediaStore.Audio.Media.DATE_MODIFIED
-    )
-
-    val selection = StringBuilder("${MediaStore.Audio.Media.IS_MUSIC} != 0")
-    val selectionArgs = mutableListOf<String>()
-
-    if (!searchQuery.isNullOrBlank()) {
-        selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
-        selectionArgs.add("%$searchQuery%")
-        selectionArgs.add("%$searchQuery%")
-    }
-
-    val queryUri = uri
-    
-    val cursor = if (limit != null && offset != null) {
-        // Phân trang
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val queryArgs = Bundle().apply {
-                putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
-                putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
-                putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection.toString())
-                if (selectionArgs.isNotEmpty()) {
-                    putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs.toTypedArray())
-                }
-                putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, sortOrder.sqlOrder)
-            }
-            this.query(queryUri, projection, queryArgs, null)
-        } else {
-            val legacySortOrder = "${sortOrder.sqlOrder} LIMIT $limit OFFSET $offset"
-            this.query(
-                queryUri,
-                projection,
-                selection.toString(),
-                if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(),
-                legacySortOrder
-            )
-        }
-    } else {
-        // Không phân trang
-        this.query(
-            queryUri,
-            projection,
-            selection.toString(),
-            if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(),
-            sortOrder.sqlOrder
-        )
-    }
-
-    cursor?.use { c ->
-        val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-        val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-        val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-        val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-        val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-        val dataCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-        val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-        val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
-
-        while (c.moveToNext()) {
-            songs.add(
-                MediaStoreSong(
-                    id = c.getLong(idCol),
-                    basic = BasicMediaStoreMetadata(
-                        title = c.getString(titleCol),
-                        artist = c.getString(artistCol),
-                        album = c.getString(albumCol),
-                        duration = c.getLong(durationCol),
-                        path = c.getString(dataCol),
-                        albumId = c.getLong(albumIdCol),
-                        dateModified = c.getLong(dateModCol)
-                    ),
-                    extended = null
-                )
-            )
-        }
-    }
-    return songs
-}
-
-internal fun ContentResolver.querySongIds(
-    uri: Uri,
-    searchQuery: String? = null,
-    sortOrder: MediaStoreSortOrder = MediaStoreSortOrder.TITLE_ASC
-): List<Long> {
-    val ids = mutableListOf<Long>()
-    val projection = arrayOf(MediaStore.Audio.Media._ID)
-
-    val selection = StringBuilder("${MediaStore.Audio.Media.IS_MUSIC} != 0")
-    val selectionArgs = mutableListOf<String>()
-
-    if (!searchQuery.isNullOrBlank()) {
-        selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
-        selectionArgs.add("%$searchQuery%")
-        selectionArgs.add("%$searchQuery%")
-    }
-
-    this.query(
-        uri,
-        projection,
-        selection.toString(),
-        if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(),
-        sortOrder.sqlOrder
-    )?.use { c ->
-        val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-        while (c.moveToNext()) {
-            ids.add(c.getLong(idCol))
-        }
-    }
-    return ids
+/**
+ * Tạo URI cho ảnh album từ albumId.
+ */
+private fun getArtworkUri(albumId: Long): String {
+    return ContentUris.withAppendedId(
+        "content://media/external/audio/albumart".toUri(),
+        albumId
+    ).toString()
 }
 
 internal fun ContentResolver.querySongById(
@@ -181,24 +65,111 @@ internal fun ContentResolver.querySongById(
             val sizeCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
             val composerCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
 
+            val albumId = c.getLong(albumIdCol)
             MediaStoreSong(
                 id = c.getLong(idCol),
                 basic = BasicMediaStoreMetadata(
-                    title = c.getString(titleCol),
-                    artist = c.getString(artistCol),
-                    album = c.getString(albumCol),
+                    title = c.getString(titleCol) ?: "Unknown Title",
+                    artist = c.getString(artistCol) ?: "Unknown Artist",
+                    album = c.getString(albumCol) ?: "Unknown Album",
                     duration = c.getLong(durationCol),
-                    path = c.getString(dataCol),
-                    albumId = c.getLong(albumIdCol),
-                    dateModified = c.getLong(dateModCol)
+                    path = c.getString(dataCol) ?: "",
+                    albumId = albumId,
+                    dateModified = c.getLong(dateModCol),
+                    artworkUri = getArtworkUri(albumId)
                 ),
                 extended = ExtendedMediaStoreMetadata(
                     track = c.getInt(trackCol),
                     year = c.getInt(yearCol),
                     size = c.getLong(sizeCol),
-                    composer = c.getString(composerCol)
+                    composer = c.getString(composerCol) ?: "Unknown Composer"
                 )
             )
         } else null
     }
+}
+
+internal fun ContentResolver.querySongsSortMetadata(
+    uri: Uri,
+    searchQuery: String? = null
+): List<MediaStoreSortMetadata> {
+    val metadataList = mutableListOf<MediaStoreSortMetadata>()
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.DATE_MODIFIED
+    )
+
+    val selection = StringBuilder("${MediaStore.Audio.Media.IS_MUSIC} != 0")
+    val selectionArgs = mutableListOf<String>()
+
+    if (!searchQuery.isNullOrBlank()) {
+        selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
+        selectionArgs.add("%$searchQuery%")
+        selectionArgs.add("%$searchQuery%")
+    }
+
+    this.query(
+        uri,
+        projection,
+        selection.toString(),
+        if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(),
+        "${MediaStore.Audio.Media.TITLE} ASC"
+    )?.use { c ->
+        val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+        val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+        val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+        val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
+
+        while (c.moveToNext()) {
+            metadataList.add(
+                MediaStoreSortMetadata(
+                    id = c.getLong(idCol),
+                    title = c.getString(titleCol) ?: "Unknown Title",
+                    artist = c.getString(artistCol) ?: "Unknown Artist",
+                    dateModified = c.getLong(dateModCol)
+                )
+            )
+        }
+    }
+    return metadataList
+}
+
+internal fun ContentResolver.querySongsSummary(
+    uri: Uri,
+    searchQuery: String? = null
+): MediaStoreSongsSummary {
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.DURATION
+    )
+
+    val selection = StringBuilder("${MediaStore.Audio.Media.IS_MUSIC} != 0")
+    val selectionArgs = mutableListOf<String>()
+
+    if (!searchQuery.isNullOrBlank()) {
+        selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
+        selectionArgs.add("%$searchQuery%")
+        selectionArgs.add("%$searchQuery%")
+    }
+
+    var count = 0
+    var totalDuration = 0L
+
+    this.query(
+        uri,
+        projection,
+        selection.toString(),
+        if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(),
+        null
+    )?.use { c ->
+        count = c.count
+        val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+        while (c.moveToNext()) {
+            totalDuration += c.getLong(durationCol)
+        }
+    }
+    
+    return MediaStoreSongsSummary(count, totalDuration)
 }

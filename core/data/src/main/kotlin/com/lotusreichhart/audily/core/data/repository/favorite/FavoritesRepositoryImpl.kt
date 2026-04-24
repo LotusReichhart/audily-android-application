@@ -1,15 +1,15 @@
 package com.lotusreichhart.audily.core.data.repository.favorite
 
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.lotusreichhart.audily.core.data.mapper.song.toSong
+import com.lotusreichhart.audily.core.data.paging.AudilyPagingConfig
 import com.lotusreichhart.audily.core.database.dao.FavoritesDao
 import com.lotusreichhart.audily.core.database.entity.FavoriteEntity
 import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
-import com.lotusreichhart.audily.core.mediastore.MediaStorePagingSource
+import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -47,19 +47,22 @@ internal class FavoritesRepositoryImpl @Inject constructor(
 
     override fun getFavoriteSongsPaged(): Flow<PagingData<Song>> {
         return Pager(
-            config = PagingConfig(
-                pageSize = MediaStorePagingSource.PAGE_SIZE,
-                prefetchDistance = MediaStorePagingSource.PAGE_SIZE / 2,
-                enablePlaceholders = true,
-                initialLoadSize = MediaStorePagingSource.PAGE_SIZE * 2
-            ),
+            config = AudilyPagingConfig.defaultConfig(enablePlaceholders = true),
             pagingSourceFactory = {
                 favoritesDao.getFavoriteEntitiesPaging()
             }
         ).flow.map { pagingData ->
             pagingData.map { favorite ->
-                mediaStoreDataSource.getSong(favorite.songId)?.toSong(position = favorite.position)?.copy(isFavorite = true) 
-                    ?: Song.EMPTY
+                mediaStoreDataSource.getSong(favorite.songId)
+                    ?.toSong(position = favorite.position)
+                    ?.copy(isFavorite = true)
+                    ?: Song(
+                        id = favorite.songId,
+                        basic = BasicSongMetadata.EMPTY,
+                        isFavorite = true,
+                        isMissing = true,
+                        position = favorite.position
+                    )
             }
         }
     }

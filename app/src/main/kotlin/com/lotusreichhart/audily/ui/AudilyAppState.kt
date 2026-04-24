@@ -7,6 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.navigation.NavigationState
 import com.lotusreichhart.audily.core.navigation.Navigator
@@ -91,8 +97,33 @@ class AudilyAppState(
     val currentPanelOffsetY: Float
         get() = draggableState.offset.takeIf { !it.isNaN() } ?: 2000f
 
-    var bottomBarHeightPx: Float = 200f
+    var bottomBarHeightPx by mutableFloatStateOf(0f)
         internal set
+
+    var panelHeightPx by mutableFloatStateOf(0f)
+        internal set
+
+    var isBottomBarShown by mutableStateOf(true)
+
+    var isBottomBarVisible by mutableStateOf(true)
+
+    var isPanelVisible by mutableStateOf(false)
+
+    /**
+     * Tính toán padding dưới cùng cho nội dung (NavDisplay).
+     * Bao gồm: Chiều cao BottomBar (nếu hiện) + Chiều cao MiniPlayer (nếu hiện).
+     */
+    fun getContentBottomPadding(density: Density): Dp {
+        var totalHeightPx = 0f
+        if (isBottomBarShown && isBottomBarVisible) {
+            totalHeightPx += bottomBarHeightPx
+        }
+        if (isPanelVisible) {
+            totalHeightPx += panelHeightPx
+        }
+        
+        return with(density) { totalHeightPx.toDp() }
+    }
 
     // Công thức tính Alpha (Độ trong suốt)
     val miniPlayerAlpha: Float
