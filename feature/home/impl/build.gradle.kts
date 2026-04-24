@@ -8,5 +8,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.navigation)
+    implementation(projects.core.model)
+
     implementation(projects.feature.home.api)
+    implementation(projects.feature.songs.api)
 }

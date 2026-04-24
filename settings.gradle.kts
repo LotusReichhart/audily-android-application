@@ -44,7 +44,12 @@ include(":core:mediastore")
 
 include(":feature:home:api")
 include(":feature:home:impl")
+
 include(":feature:focus:api")
+
 include(":feature:settings:api")
+
+include(":feature:songs:api")
+include(":feature:songs:impl")
 
 
