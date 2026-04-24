@@ -10,7 +10,8 @@ data class BasicMediaStoreMetadata(
     val albumId: Long,
     val duration: Long,
     val path: String,
-    val dateModified: Long
+    val dateModified: Long,
+    val artworkUri: String? = null
 )
 
 /**
@@ -30,4 +31,22 @@ data class MediaStoreSong(
     val id: Long,
     val basic: BasicMediaStoreMetadata,
     val extended: ExtendedMediaStoreMetadata? = null
+)
+
+/**
+ * Dữ liệu cực nhẹ chỉ phục vụ mục đích sorting trong bộ nhớ.
+ */
+data class MediaStoreSortMetadata(
+    val id: Long,
+    val title: String,
+    val artist: String,
+    val dateModified: Long
+)
+
+/**
+ * Dữ liệu tóm tắt thô từ MediaStore.
+ */
+data class MediaStoreSongsSummary(
+    val count: Int,
+    val totalDuration: Long
 )

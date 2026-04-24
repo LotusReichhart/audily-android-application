@@ -10,6 +10,7 @@ import com.lotusreichhart.audily.core.database.entity.FavoriteEntity
 import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.MediaStorePagingSource
+import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -58,8 +59,16 @@ internal class FavoritesRepositoryImpl @Inject constructor(
             }
         ).flow.map { pagingData ->
             pagingData.map { favorite ->
-                mediaStoreDataSource.getSong(favorite.songId)?.toSong(position = favorite.position)?.copy(isFavorite = true) 
-                    ?: Song.EMPTY
+                mediaStoreDataSource.getSong(favorite.songId)
+                    ?.toSong(position = favorite.position)
+                    ?.copy(isFavorite = true)
+                    ?: Song(
+                        id = favorite.songId,
+                        basic = BasicSongMetadata.EMPTY,
+                        isFavorite = true,
+                        isMissing = true,
+                        position = favorite.position
+                    )
             }
         }
     }

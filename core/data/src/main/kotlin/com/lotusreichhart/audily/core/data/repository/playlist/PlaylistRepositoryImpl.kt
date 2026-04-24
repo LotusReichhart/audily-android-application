@@ -15,6 +15,7 @@ import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.MediaStorePagingSource
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
+import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -96,7 +97,12 @@ internal class PlaylistRepositoryImpl @Inject constructor(
         ).flow.map { pagingData ->
             pagingData.map { crossRef ->
                 mediaStoreDataSource.getSong(crossRef.songId)?.toSong(position = crossRef.position)
-                    ?: Song.EMPTY
+                    ?: Song(
+                        id = crossRef.songId,
+                        basic = BasicSongMetadata.EMPTY,
+                        isMissing = true,
+                        position = crossRef.position
+                    )
             }
         }
     }

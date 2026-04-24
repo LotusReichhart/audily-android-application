@@ -1,9 +1,11 @@
 package com.lotusreichhart.audily.core.data.mapper.song
 
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSongsSummary
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.ExtendedSongMetadata
 import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.core.model.song.SongsSummary
 
 internal fun MediaStoreSong.toSong(position: Int? = null): Song {
     return Song(
@@ -15,7 +17,8 @@ internal fun MediaStoreSong.toSong(position: Int? = null): Song {
             album = this.basic.album,
             albumId = this.basic.albumId,
             duration = this.basic.duration,
-            path = this.basic.path
+            path = this.basic.path,
+            artworkUri = this.basic.artworkUri
         ),
         extended = this.extended?.let { extended ->
             ExtendedSongMetadata(

@@ -3,9 +3,17 @@ package com.lotusreichhart.audily.core.domain.repository.song
 import androidx.paging.PagingData
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
+import com.lotusreichhart.audily.core.model.song.SongsSummary
 import kotlinx.coroutines.flow.Flow
 
 interface SongRepository {
+    /**
+     * Luồng thông tin tóm tắt của danh sách bài hát (số lượng, tổng thời lượng).
+     */
+    fun getSongsSummary(
+        searchQuery: String? = null
+    ): Flow<SongsSummary>
+
     /**
      * Luồng tất cả ID bài hát có trên thiết bị theo tiêu chí tìm kiếm và sắp xếp.
      */

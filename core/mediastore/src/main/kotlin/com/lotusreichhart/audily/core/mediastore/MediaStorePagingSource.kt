@@ -53,10 +53,12 @@ class MediaStorePagingSource(
                 offset = offset
             )
 
+            Timber.d("Loaded ${songs.size} songs at offset $offset")
+
             LoadResult.Page(
                 data = songs,
                 prevKey = if (offset == 0) null else offset - limit,
-                nextKey = if (songs.isEmpty()) null else offset + limit
+                nextKey = if (songs.size < limit) null else offset + limit
             )
         } catch (e: Exception) {
             Timber.e(e, "Error loading MediaStore songs paging")
