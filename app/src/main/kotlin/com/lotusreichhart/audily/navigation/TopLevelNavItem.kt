@@ -5,7 +5,7 @@ import com.lotusreichhart.audily.R
 import com.lotusreichhart.audily.feature.home.api.R as homeApiR
 import com.lotusreichhart.audily.feature.focus.api.R as focusApiR
 import com.lotusreichhart.audily.feature.settings.api.R as settingsApiR
-import com.lotusreichhart.audily.core.designsystem.icon.AudilyIcons
+import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.api.navigation.HomeNavKey
 import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey

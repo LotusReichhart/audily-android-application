@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.lotusreichhart.audily.core.designsystem.icon.AudilyIcons
+import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
 @Composable
