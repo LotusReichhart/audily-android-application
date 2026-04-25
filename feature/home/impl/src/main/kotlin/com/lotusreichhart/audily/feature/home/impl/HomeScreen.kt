@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
-import com.lotusreichhart.audily.core.designsystem.icon.AudilyIcons
+import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
-import com.lotusreichhart.audily.core.designsystem.theme.BackgroundLight // Dùng để lấy màu text đậm nếu cần
 
 @Composable
 internal fun HomeScreen(
@@ -103,7 +102,7 @@ private fun HomeTopBar(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             Text(
                 text = "Audily",

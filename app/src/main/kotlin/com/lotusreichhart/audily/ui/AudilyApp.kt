@@ -135,7 +135,7 @@ internal fun AudilyApp(
 
     val progress = appState.expandProgress
 
-    // Animation ẩn/hiện NavigationBar thủ công
+    // Animation ẩn/hiện NavigationBar
     val nvaBarVisibilityProgress by animateFloatAsState(
         targetValue = if (appState.isBottomBarShown) 1f else 0f,
         animationSpec = spring(stiffness = Spring.StiffnessLow),
@@ -261,7 +261,7 @@ internal fun AudilyApp(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = LocalDimensions.current.paddingSmall)
+                            .padding(top = LocalDimensions.current.paddingExtraSmall)
                             .padding(horizontal = LocalDimensions.current.paddingMedium)
                             .windowInsetsPadding(
                                 WindowInsets.safeDrawing.only(
@@ -303,7 +303,6 @@ internal fun AudilyApp(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .offset {
-                                // Kết hợp cả animation thủ công và animation Player
                                 val combinedVisibility = nvaBarVisibilityProgress * (1f - progress)
                                 val yOffset = ((1f - combinedVisibility) * appState.bottomBarHeightPx).roundToInt()
                                 IntOffset(x = 0, y = yOffset)
