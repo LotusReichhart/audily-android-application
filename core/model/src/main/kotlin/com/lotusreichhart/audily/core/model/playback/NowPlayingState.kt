@@ -1,6 +1,6 @@
 package com.lotusreichhart.audily.core.model.playback
 
-enum class PlayerState {
+enum class NowPlayingState {
     PLAYING,
     PAUSED,
     BUFFERING,

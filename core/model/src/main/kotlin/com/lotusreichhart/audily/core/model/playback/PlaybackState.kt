@@ -4,22 +4,26 @@ package com.lotusreichhart.audily.core.model.playback
  * Phản ánh chính xác những gì đang diễn ra trong Player.
  */
 data class PlaybackState(
-    val playerState: PlayerState,
+    val nowPlayingState: NowPlayingState,
     val currentSongId: Long?,
+    val queueIds: List<Long> = emptyList(),
     val isShuffleOn: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF,
     val playbackPosition: Long = 0,
+    val bufferedPosition: Long = 0,
     val duration: Long = 0,
     val speed: Float = 1.0f,
     val pitch: Float = 1.0f
 ) {
     companion object {
         val INITIAL = PlaybackState(
-            playerState = PlayerState.IDLE,
+            nowPlayingState = NowPlayingState.IDLE,
             currentSongId = null,
+            queueIds = emptyList(),
             isShuffleOn = false,
             repeatMode = RepeatMode.OFF,
             playbackPosition = 0,
+            bufferedPosition = 0,
             duration = 0,
             speed = 1.0f,
             pitch = 1.0f

@@ -6,5 +6,5 @@ package com.lotusreichhart.audily.core.model.prefs
 data class UserPreferences(
     val librarySettings: LibrarySettings = LibrarySettings(),
     val uiSettings: UiSettings = UiSettings(),
-    val playerSettings: PlayerSettings = PlayerSettings()
+    val playbackSettings: PlaybackSettings = PlaybackSettings()
 )

@@ -14,4 +14,9 @@ sealed class PlaybackEvent {
     data class SetRepeatMode(val mode: RepeatMode) : PlaybackEvent()
     data class SetSpeed(val speed: Float) : PlaybackEvent()
     data class SetPitch(val pitch: Float) : PlaybackEvent()
+
+    // Điều khiển Queue chuyên sâu
+    data class PlayFromQueue(val songId: Long, val queueIds: List<Long>) : PlaybackEvent()
+    data class RemoveFromQueue(val songId: Long) : PlaybackEvent()
+    data class MoveQueueItem(val from: Int, val to: Int) : PlaybackEvent()
 }
