@@ -14,11 +14,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +35,6 @@ class SongsViewModelTest {
     private lateinit var getSongsSummaryUseCase: GetSongsSummaryUseCase
     private lateinit var viewModel: SongsViewModel
     
-    // Sử dụng MutableStateFlow để mô phỏng dữ liệu thay đổi thực tế
     private val summaryFlow = MutableStateFlow(SongsSummary(totalCount = 0, totalDuration = 0L))
 
     @Before
@@ -41,7 +43,6 @@ class SongsViewModelTest {
         getSongsPagedUseCase = mockk()
         getSongsSummaryUseCase = mockk()
         
-        // Mặc định trả về flow động để test có thể nhận thay đổi
         every { getSongsPagedUseCase(any()) } returns flowOf(PagingData.empty())
         every { getSongsSummaryUseCase() } returns summaryFlow
         
@@ -58,39 +59,55 @@ class SongsViewModelTest {
     }
 
     @Test
-    fun `State starts as Loading`() = runTest {
-        assertEquals(SongsUiState.Loading, viewModel.uiState.value)
+    fun `State starts with isLoading true`() = runTest {
+        assertTrue(viewModel.uiState.value.isLoading)
     }
 
     @Test
-    fun `State becomes Success after metadata is loaded`() = runTest {
+    fun `State becomes isLoading false after 3 seconds`() = runTest {
+        viewModel.uiState.test {
+            assertTrue(awaitItem().isLoading)
+            
+            advanceTimeBy(3001)
+            runCurrent()
+
+            val finalState = expectMostRecentItem()
+            assertFalse(finalState.isLoading)
+        }
+    }
+
+    @Test
+    fun `State contains correct metadata after loading`() = runTest {
         val summary = SongsSummary(totalCount = 10, totalDuration = 3600L)
         summaryFlow.value = summary
-
-        viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.TITLE_DESC))
+        runCurrent()
         
         viewModel.uiState.test {
-            assertEquals(SongsUiState.Loading, awaitItem())
+            assertTrue(awaitItem().isLoading)
             
-            val state = awaitItem()
-            assertTrue("Expected Success but was $state", state is SongsUiState.Success)
-            val success = state as SongsUiState.Success
-            assertEquals(summary, success.summary)
-            assertEquals(SongSortOrder.TITLE_DESC, success.sortOrder)
+            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.TITLE_DESC))
+            advanceTimeBy(3001)
+            runCurrent()
+            
+            val state = expectMostRecentItem()
+            assertFalse(state.isLoading)
+            assertEquals(summary, state.summary)
+            assertEquals(SongSortOrder.TITLE_DESC, state.sortOrder)
         }
     }
 
     @Test
     fun `SortOrderChanged updates state correctly`() = runTest {
         viewModel.uiState.test {
-            assertEquals(SongsUiState.Loading, awaitItem())
+            assertTrue(awaitItem().isLoading)
             
             viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.ARTIST_ASC))
+            advanceTimeBy(3001)
+            runCurrent()
             
-            val state = awaitItem()
-            if (state is SongsUiState.Success) {
-                assertEquals(SongSortOrder.ARTIST_ASC, state.sortOrder)
-            }
+            val lastState = expectMostRecentItem()
+            assertFalse(lastState.isLoading)
+            assertEquals(SongSortOrder.ARTIST_ASC, lastState.sortOrder)
         }
     }
 
@@ -102,7 +119,6 @@ class SongsViewModelTest {
         assertEquals(songId, viewModel.playingSongId.value)
         assertEquals(false, viewModel.isPaused.value)
 
-        // Toggle pause
         viewModel.onEvent(SongsUiEvent.SongClicked(songId))
         assertEquals(true, viewModel.isPaused.value)
     }
@@ -110,29 +126,23 @@ class SongsViewModelTest {
     @Test
     fun `Paging flow reference is stable across metadata updates`() = runTest {
         summaryFlow.value = SongsSummary(totalCount = 5)
-        
-        var firstFlowReference : Any? = null
+        runCurrent()
         
         viewModel.uiState.test {
-            assertEquals(SongsUiState.Loading, awaitItem()) 
+            assertTrue(awaitItem().isLoading) 
             
-            // Trigger 1st emission
-            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.TITLE_ASC))
+            advanceTimeBy(3001)
+            runCurrent()
             
-            val state1 = awaitItem()
-            assertTrue(state1 is SongsUiState.Success)
-            firstFlowReference = (state1 as SongsUiState.Success).songs
+            val state1 = expectMostRecentItem()
+            assertFalse(state1.isLoading)
+            val firstFlowReference = state1.songs
 
-            // Cập nhật giá trị flow mới (dữ liệu thay đổi nhưng SORT giữ nguyên)
             summaryFlow.value = SongsSummary(totalCount = 10)
+            runCurrent()
             
-            // Flow của uiState sẽ tự phát ra emission mới vì nó đang collect summaryFlow
-            val state2 = awaitItem()
-            assertTrue(state2 is SongsUiState.Success)
-            
-            // KIỂM TRA QUAN TRỌNG: Instance của Paging flow (_songs) PHẢI giống nhau 
-            // để LazyPagingItems trong UI không bị reset về đầu trang.
-            assertEquals("Paging Flow instance should be stable", firstFlowReference, (state2 as SongsUiState.Success).songs)
+            val state2 = expectMostRecentItem()
+            assertEquals("Paging Flow instance should be stable", firstFlowReference, state2.songs)
             assertEquals(10, state2.summary.totalCount)
         }
     }

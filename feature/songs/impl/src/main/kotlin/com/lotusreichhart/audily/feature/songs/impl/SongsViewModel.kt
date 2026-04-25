@@ -10,14 +10,15 @@ import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsSummaryUseCase
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,44 +39,37 @@ internal class SongsViewModel @Inject constructor(
     private val _isPaused = savedStateHandle.getStateFlow("isPaused", false)
     val isPaused: StateFlow<Boolean> = _isPaused
 
-    init {
-        Timber.d("SongsViewModel Created 🟢")
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Timber.d("SongsViewModel Cleared 🔴")
-    }
-
-    /**
-     * Luồng Paging ổn định, được giữ private vì chỉ được truy cập qua uiState.
-     */
     private val _songs: Flow<PagingData<Song>> = sortOrder
         .flatMapLatest { sort ->
-            Timber.d("Creating new Pager for sortOrder: $sort")
             getSongsPagedUseCase(sortOrder = sort)
         }
         .cachedIn(viewModelScope)
+    private val _isInitialLoading = MutableStateFlow(true)
 
-    val uiState: StateFlow<SongsUiState> = sortOrder
-        .flatMapLatest { sort ->
-            getSongsSummaryUseCase()
-                .onEach { summary ->
-                    Timber.d("Songs metadata summary fetched: ${summary.totalCount} songs")
-                }
-                .map { summary ->
-                    SongsUiState.Success(
-                        songs = _songs,
-                        summary = summary,
-                        sortOrder = sort
-                    )
-                }
+    init {
+        viewModelScope.launch {
+            delay(3_000)
+            _isInitialLoading.value = false
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = SongsUiState.Loading
+    }
+
+    val uiState: StateFlow<SongsUiState> = combine(
+        sortOrder,
+        getSongsSummaryUseCase(),
+        _isInitialLoading
+    ) { sort, summary, isLoading ->
+        SongsUiState(
+            songs = _songs,
+            summary = summary,
+            sortOrder = sort,
+            isLoading = isLoading
         )
+    }
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = SongsUiState()
+    )
 
     fun onEvent(event: SongsUiEvent) {
         when (event) {
