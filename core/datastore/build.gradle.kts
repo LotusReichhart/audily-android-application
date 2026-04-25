@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.audily.android.library)
     alias(libs.plugins.audily.hilt)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -9,6 +10,7 @@ android {
 
 dependencies{
     implementation(libs.androidx.dataStore)
+    implementation(libs.protobuf.kotlin.lite)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -19,4 +21,20 @@ dependencies{
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin")
+            }
+        }
+    }
 }

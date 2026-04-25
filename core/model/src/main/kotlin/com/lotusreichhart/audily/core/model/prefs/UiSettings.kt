@@ -5,7 +5,7 @@ package com.lotusreichhart.audily.core.model.prefs
  */
 data class UiSettings(
     val appTheme: AppTheme = AppTheme.FOLLOW_SYSTEM,
-    val playerTheme: PlayerTheme = PlayerTheme.DEFAULT,
+    val nowPlayingTheme: NowPlayingTheme = NowPlayingTheme.DEFAULT,
     val useAmoledBlack: Boolean = false,
     val accentColor: Int? = null,
     val showMiniPlayerExtraControls: Boolean = true
