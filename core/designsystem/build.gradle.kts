@@ -20,6 +20,8 @@ roborazzi {
 }
 
 dependencies {
+    implementation(libs.coil.compose)
+
     testImplementation(libs.junit)
     testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.mockk)

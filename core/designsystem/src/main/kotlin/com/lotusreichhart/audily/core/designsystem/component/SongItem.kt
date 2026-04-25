@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.R
-import com.lotusreichhart.audily.core.designsystem.icon.AudilyIcons
+import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
 /**
@@ -213,7 +213,7 @@ private fun SongMenuButton(onClick: () -> Unit) {
             contentDescription = null,
             modifier = Modifier
                 .size(24.dp)
-                .offset(x = 6.dp),
+                .offset(x = 8.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
         )
     }
