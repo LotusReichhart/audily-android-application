@@ -6,6 +6,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.lotusreichhart.audily.core.mediastore.model.BasicMediaStoreMetadata
 import com.lotusreichhart.audily.core.mediastore.model.ExtendedMediaStoreMetadata
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbum
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbumSortMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSongsSummary
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortMetadata
@@ -98,6 +100,8 @@ internal fun ContentResolver.querySongsSortMetadata(
         MediaStore.Audio.Media._ID,
         MediaStore.Audio.Media.TITLE,
         MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.DURATION,
         MediaStore.Audio.Media.DATE_MODIFIED
     )
 
@@ -120,6 +124,8 @@ internal fun ContentResolver.querySongsSortMetadata(
         val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
         val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
         val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+        val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+        val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
         val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
 
         while (c.moveToNext()) {
@@ -128,6 +134,8 @@ internal fun ContentResolver.querySongsSortMetadata(
                     id = c.getLong(idCol),
                     title = c.getString(titleCol) ?: "Unknown Title",
                     artist = c.getString(artistCol) ?: "Unknown Artist",
+                    album = c.getString(albumCol) ?: "Unknown Album",
+                    duration = c.getLong(durationCol),
                     dateModified = c.getLong(dateModCol)
                 )
             )
@@ -172,4 +180,85 @@ internal fun ContentResolver.querySongsSummary(
     }
     
     return MediaStoreSongsSummary(count, totalDuration)
+}
+
+internal fun ContentResolver.queryAlbums(
+    uri: Uri,
+    searchQuery: String? = null
+): List<MediaStoreAlbumSortMetadata> {
+    val albums = mutableListOf<MediaStoreAlbumSortMetadata>()
+    val projection = arrayOf(
+        MediaStore.Audio.Albums._ID,
+        MediaStore.Audio.Albums.ALBUM,
+        MediaStore.Audio.Albums.ARTIST,
+        MediaStore.Audio.Albums.NUMBER_OF_SONGS
+    )
+
+    val selection = if (!searchQuery.isNullOrBlank()) {
+        "${MediaStore.Audio.Albums.ALBUM} LIKE ? OR ${MediaStore.Audio.Albums.ARTIST} LIKE ?"
+    } else null
+    val selectionArgs = if (!searchQuery.isNullOrBlank()) {
+        arrayOf("%$searchQuery%", "%$searchQuery%")
+    } else null
+
+    this.query(
+        uri,
+        projection,
+        selection,
+        selectionArgs,
+        "${MediaStore.Audio.Albums.ALBUM} ASC"
+    )?.use { c ->
+        val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID)
+        val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM)
+        val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)
+        val countCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.NUMBER_OF_SONGS)
+
+        while (c.moveToNext()) {
+            albums.add(
+                MediaStoreAlbumSortMetadata(
+                    id = c.getLong(idCol),
+                    title = c.getString(albumCol) ?: "Unknown Album",
+                    artist = c.getString(artistCol) ?: "Unknown Artist",
+                    songCount = c.getInt(countCol)
+                )
+            )
+        }
+    }
+    return albums
+}
+
+internal fun ContentResolver.queryAlbumById(
+    uri: Uri,
+    id: Long
+): MediaStoreAlbum? {
+    val projection = arrayOf(
+        MediaStore.Audio.Albums._ID,
+        MediaStore.Audio.Albums.ALBUM,
+        MediaStore.Audio.Albums.ARTIST,
+        MediaStore.Audio.Albums.NUMBER_OF_SONGS
+    )
+
+    return this.query(
+        uri,
+        projection,
+        "${MediaStore.Audio.Albums._ID} = ?",
+        arrayOf(id.toString()),
+        null
+    )?.use { c ->
+        if (c.moveToFirst()) {
+            val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID)
+            val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM)
+            val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)
+            val countCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.NUMBER_OF_SONGS)
+
+            val albumId = c.getLong(idCol)
+            MediaStoreAlbum(
+                id = albumId,
+                title = c.getString(albumCol) ?: "Unknown Album",
+                artist = c.getString(artistCol) ?: "Unknown Artist",
+                albumArtUri = getArtworkUri(albumId),
+                songCount = c.getInt(countCol)
+            )
+        } else null
+    }
 }

@@ -6,6 +6,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
 import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbum
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbumSortMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortMetadata
 import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSongsSummary
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class MediaStoreDataSource @Inject constructor(
     private val contentResolver: ContentResolver,
     @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-    private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    private val albumsUri: Uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 ) {
     /**
      * Lấy luồng thông tin tóm tắt của danh sách bài hát (số lượng, tổng thời lượng).
@@ -77,5 +80,37 @@ class MediaStoreDataSource @Inject constructor(
      */
     fun getSong(id: Long): MediaStoreSong? {
         return contentResolver.querySongById(musicUri, id)
+    }
+
+    /**
+     * Lấy luồng Metadata nhẹ phục vụ cho việc sorting Album.
+     */
+    fun getAlbumsSortMetadata(
+        searchQuery: String? = null
+    ): Flow<List<MediaStoreAlbumSortMetadata>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.queryAlbums(albumsUri, searchQuery))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(albumsUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.queryAlbums(albumsUri, searchQuery))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy đầy đủ thông tin của một Album.
+     */
+    fun getAlbum(id: Long): MediaStoreAlbum? {
+        return contentResolver.queryAlbumById(albumsUri, id)
     }
 }

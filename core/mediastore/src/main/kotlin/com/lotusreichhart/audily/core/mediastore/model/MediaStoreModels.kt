@@ -40,7 +40,30 @@ data class MediaStoreSortMetadata(
     val id: Long,
     val title: String,
     val artist: String,
+    val album: String,
+    val duration: Long,
     val dateModified: Long
+)
+
+/**
+ * Model Album tại tầng MediaStore (Data Layer).
+ */
+data class MediaStoreAlbum(
+    val id: Long,
+    val title: String,
+    val artist: String,
+    val albumArtUri: String,
+    val songCount: Int
+)
+
+/**
+ * Metadata nhẹ phục vụ sorting Album.
+ */
+data class MediaStoreAlbumSortMetadata(
+    val id: Long,
+    val title: String,
+    val artist: String,
+    val songCount: Int
 )
 
 /**
