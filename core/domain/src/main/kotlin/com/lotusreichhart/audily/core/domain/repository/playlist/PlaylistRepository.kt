@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.domain.repository.playlist
 
 import androidx.paging.PagingData
 import com.lotusreichhart.audily.core.model.playlist.Playlist
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +13,8 @@ interface PlaylistRepository {
      */
     fun getPlaylists(
         searchQuery: String = "",
-        sortOrder: PlaylistSortOrder = PlaylistSortOrder.CREATED_DATE_DESC
+        sortOrder: PlaylistSortOrder = PlaylistSortOrder.CREATED_DATE,
+        sortType: SortOrderType = SortOrderType.DESC
     ): Flow<List<Playlist>>
 
     fun getPlaylistById(id: Long): Flow<Playlist?>

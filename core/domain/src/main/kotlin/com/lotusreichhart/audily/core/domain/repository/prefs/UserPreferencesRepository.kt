@@ -1,9 +1,13 @@
 package com.lotusreichhart.audily.core.domain.repository.prefs
 
+import com.lotusreichhart.audily.core.model.album.AlbumSortOrder
+import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.playback.RepeatMode
+import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
-import com.lotusreichhart.audily.core.model.playback.RepeatMode
+import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 
 interface UserPreferencesRepository {
@@ -25,6 +29,16 @@ interface UserPreferencesRepository {
     suspend fun updateMinAudioDuration(duration: Long)
     suspend fun updateFilterSmallFiles(enabled: Boolean)
     suspend fun updateAlbumGridSize(size: Int)
+    
+    // Sort preferences
+    suspend fun updateSongSortOrder(order: SongSortOrder)
+    suspend fun updateSongSortType(type: SortOrderType)
+    
+    suspend fun updateAlbumSortOrder(order: AlbumSortOrder)
+    suspend fun updateAlbumSortType(type: SortOrderType)
+    
+    suspend fun updatePlaylistSortOrder(order: PlaylistSortOrder)
+    suspend fun updatePlaylistSortType(type: SortOrderType)
 
     // === Playback Settings ===
     suspend fun updateJumpInterval(interval: Int)

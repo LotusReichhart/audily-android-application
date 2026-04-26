@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.domain.repository.song
 
 import androidx.paging.PagingData
 import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,8 @@ interface SongRepository {
      */
     fun getSongIds(
         searchQuery: String? = null,
-        sortOrder: SongSortOrder = SongSortOrder.TITLE_ASC
+        sortOrder: SongSortOrder = SongSortOrder.TITLE,
+        sortType: SortOrderType = SortOrderType.ASC
     ): Flow<List<Long>>
 
     /**
@@ -27,7 +29,8 @@ interface SongRepository {
      */
     fun getSongsPaged(
         searchQuery: String? = null,
-        sortOrder: SongSortOrder = SongSortOrder.TITLE_ASC
+        sortOrder: SongSortOrder = SongSortOrder.TITLE,
+        sortType: SortOrderType = SortOrderType.ASC
     ): Flow<PagingData<Song>>
 
     /**
