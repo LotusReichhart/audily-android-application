@@ -9,4 +9,39 @@ message LibrarySettingsProto {
     int64 min_audio_duration = 2; // milliseconds, default 30000
     bool filter_small_files = 3;
     int32 album_grid_size = 4;
+
+    // Sort preferences
+    SongSortOrderProto song_sort_order = 5;
+    SortOrderTypeProto song_sort_type = 6;
+    
+    AlbumSortOrderProto album_sort_order = 7;
+    SortOrderTypeProto album_sort_type = 8;
+    
+    PlaylistSortOrderProto playlist_sort_order = 9;
+    SortOrderTypeProto playlist_sort_type = 10;
+}
+
+enum SongSortOrderProto {
+    SONG_SORT_ORDER_TITLE = 0;
+    SONG_SORT_ORDER_ARTIST = 1;
+    SONG_SORT_ORDER_ALBUM = 2;
+    SONG_SORT_ORDER_DATE_ADDED = 3;
+    SONG_SORT_ORDER_DURATION = 4;
+}
+
+enum AlbumSortOrderProto {
+    ALBUM_SORT_ORDER_NAME = 0;
+    ALBUM_SORT_ORDER_ARTIST = 1;
+    ALBUM_SORT_ORDER_NUMBER_OF_SONGS = 2;
+}
+
+enum PlaylistSortOrderProto {
+    PLAYLIST_SORT_ORDER_NAME = 0;
+    PLAYLIST_SORT_ORDER_CREATED_DATE = 1;
+    PLAYLIST_SORT_ORDER_NUMBER_OF_SONGS = 2;
+}
+
+enum SortOrderTypeProto {
+    SORT_ORDER_TYPE_ASC = 0;
+    SORT_ORDER_TYPE_DESC = 1;
 }
