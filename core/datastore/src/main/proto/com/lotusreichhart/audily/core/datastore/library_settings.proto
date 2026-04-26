@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.lotusreichhart.audily.core.datastore";
+option java_multiple_files = true;
+
+// Thiết lập thư viện nhạc.
+message LibrarySettingsProto {
+    repeated string excluded_folders = 1;
+    int64 min_audio_duration = 2; // milliseconds, default 30000
+    bool filter_small_files = 3;
+    int32 album_grid_size = 4;
+}
