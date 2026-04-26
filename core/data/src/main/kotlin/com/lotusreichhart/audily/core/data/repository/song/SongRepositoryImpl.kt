@@ -68,4 +68,10 @@ internal class SongRepositoryImpl @Inject constructor(
             emit(mediaStoreDataSource.getSong(id)?.toSong())
         }
     }
+
+    override fun getSongs(ids: List<Long>): Flow<List<Song>> {
+        return flow {
+            emit(ids.mapNotNull { id -> mediaStoreDataSource.getSong(id)?.toSong() })
+        }
+    }
 }
