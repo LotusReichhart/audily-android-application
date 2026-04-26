@@ -5,6 +5,7 @@ import androidx.paging.PagingData
 import app.cash.turbine.test
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsPagedUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsSummaryUseCase
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import io.mockk.every
@@ -85,14 +86,16 @@ class SongsViewModelTest {
         viewModel.uiState.test {
             assertTrue(awaitItem().isLoading)
             
-            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.TITLE_DESC))
+            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.TITLE))
+            viewModel.onEvent(SongsUiEvent.SortTypeChanged(SortOrderType.DESC))
             advanceTimeBy(3001)
             runCurrent()
             
             val state = expectMostRecentItem()
             assertFalse(state.isLoading)
             assertEquals(summary, state.summary)
-            assertEquals(SongSortOrder.TITLE_DESC, state.sortOrder)
+            assertEquals(SongSortOrder.TITLE, state.sortOrder)
+            assertEquals(SortOrderType.DESC, state.sortType)
         }
     }
 
@@ -101,13 +104,15 @@ class SongsViewModelTest {
         viewModel.uiState.test {
             assertTrue(awaitItem().isLoading)
             
-            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.ARTIST_ASC))
+            viewModel.onEvent(SongsUiEvent.SortOrderChanged(SongSortOrder.ARTIST))
+            viewModel.onEvent(SongsUiEvent.SortTypeChanged(SortOrderType.ASC))
             advanceTimeBy(3001)
             runCurrent()
             
             val lastState = expectMostRecentItem()
             assertFalse(lastState.isLoading)
-            assertEquals(SongSortOrder.ARTIST_ASC, lastState.sortOrder)
+            assertEquals(SongSortOrder.ARTIST, lastState.sortOrder)
+            assertEquals(SortOrderType.ASC, lastState.sortType)
         }
     }
 

@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.core.data.repository.playlist
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.lotusreichhart.audily.core.data.mapper.playlist.toDaoSortOrderType
 import com.lotusreichhart.audily.core.data.mapper.playlist.toPlaylist
 import com.lotusreichhart.audily.core.data.mapper.playlist.toPlaylistDaoSortOrder
 import com.lotusreichhart.audily.core.data.mapper.song.toSong
@@ -12,6 +13,7 @@ import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistSongCrossRef
 import com.lotusreichhart.audily.core.domain.repository.playlist.PlaylistRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
@@ -28,11 +30,13 @@ internal class PlaylistRepositoryImpl @Inject constructor(
 
     override fun getPlaylists(
         searchQuery: String,
-        sortOrder: PlaylistSortOrder
+        sortOrder: PlaylistSortOrder,
+        sortType: SortOrderType
     ): Flow<List<Playlist>> {
         return playlistDao.getPlaylists(
             searchQuery = searchQuery,
-            sortOrder = sortOrder.toPlaylistDaoSortOrder()
+            sortOrder = sortOrder.toPlaylistDaoSortOrder(),
+            sortType = sortType.toDaoSortOrderType()
         ).map { entities ->
             entities.map { withCount ->
                 withCount.playlist.toPlaylist(songCount = withCount.songCount)

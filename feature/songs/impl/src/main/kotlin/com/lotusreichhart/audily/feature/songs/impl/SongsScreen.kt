@@ -44,6 +44,8 @@ internal fun SongsScreen(
                 SongsScreenContent(
                     songs = songs,
                     summary = uiState.summary,
+                    sortOrder = uiState.sortOrder,
+                    sortType = uiState.sortType,
                     playingSongId = playingSongId,
                     isPaused = isPaused,
                     onEvent = { viewModel.onEvent(it) },

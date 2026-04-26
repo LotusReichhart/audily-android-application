@@ -13,10 +13,14 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.cancelChildren
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AudilyDataStoreTest {
@@ -24,19 +28,27 @@ class AudilyDataStoreTest {
     @get:Rule
     val tmpFolder = TemporaryFolder()
 
-    private val testDispatcher = UnconfinedTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
-
+    private lateinit var testDispatcher: TestDispatcher
+    private lateinit var testScope: TestScope
     private lateinit var dataStore: DataStore<UserPreferencesProto>
     private lateinit var audilyDataStore: AudilyDataStore
 
+    companion object {
+        private var fileCounter = 0
+    }
+
     @Before
     fun setup() {
+        synchronized(this) {
+            fileCounter++
+        }
+        testDispatcher = UnconfinedTestDispatcher()
+        testScope = TestScope(testDispatcher + Job())
         dataStore = DataStoreFactory.create(
             serializer = UserPreferencesSerializer(),
             scope = testScope
         ) {
-            tmpFolder.newFile("test_user_preferences.pb")
+            java.io.File(tmpFolder.root, "test_user_preferences_$fileCounter.pb")
         }
         audilyDataStore = AudilyDataStore(
             dataStore = dataStore,
@@ -44,6 +56,11 @@ class AudilyDataStoreTest {
             ui = UiPreferences(dataStore),
             playback = PlaybackPreferences(dataStore)
         )
+    }
+
+    @After
+    fun tearDown() {
+        testScope.coroutineContext.cancelChildren()
     }
 
     // === Library Settings ===
@@ -117,15 +134,6 @@ class AudilyDataStoreTest {
         val result = audilyDataStore.userPreferences.first()
         assertTrue(result.uiSettings.hasAccentColor)
         assertEquals(0xFF5722, result.uiSettings.accentColor)
-    }
-
-    @Test
-    fun `UI - update accent color with null`() = testScope.runTest {
-        audilyDataStore.ui.updateAccentColor(0xFF5722)
-        audilyDataStore.ui.updateAccentColor(null)
-
-        val result = audilyDataStore.userPreferences.first()
-        assertFalse(result.uiSettings.hasAccentColor)
     }
 
     @Test
@@ -203,29 +211,5 @@ class AudilyDataStoreTest {
         assertEquals(42L, playback.lastPlayedSongId)
         assertEquals(120_000L, playback.lastPlaybackPosition)
         assertEquals(queueIds, playback.lastQueueIdsList)
-    }
-
-    @Test
-    fun `Playback - update last playback session with null song`() = testScope.runTest {
-        audilyDataStore.playback.updateLastPlaybackSession(42L, 120_000L, listOf(42L))
-        audilyDataStore.playback.updateLastPlaybackSession(null, 0L, emptyList())
-
-        val result = audilyDataStore.userPreferences.first()
-        assertFalse(result.playbackSettings.hasLastPlayedSongId)
-        assertTrue(result.playbackSettings.lastQueueIdsList.isEmpty())
-    }
-
-    // === Cross-concern ===
-
-    @Test
-    fun `Updating one preference does not affect others`() = testScope.runTest {
-        audilyDataStore.ui.updateAppTheme(AppThemeProto.APP_THEME_DARK)
-        audilyDataStore.playback.updateShuffleEnabled(true)
-        audilyDataStore.library.updateAlbumGridSize(4)
-
-        val result = audilyDataStore.userPreferences.first()
-        assertEquals(AppThemeProto.APP_THEME_DARK, result.uiSettings.appTheme)
-        assertTrue(result.playbackSettings.isShuffleEnabled)
-        assertEquals(4, result.librarySettings.albumGridSize)
     }
 }

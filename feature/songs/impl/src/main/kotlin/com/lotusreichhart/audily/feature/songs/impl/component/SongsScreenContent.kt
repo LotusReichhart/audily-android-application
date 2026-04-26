@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -21,11 +22,14 @@ import com.lotusreichhart.audily.core.designsystem.component.SongItem
 import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import com.lotusreichhart.audily.feature.songs.impl.SongsScreenConstants
 import com.lotusreichhart.audily.feature.songs.impl.SongsUiEvent
 import com.lotusreichhart.audily.feature.songs.impl.rememberSongsScreenState
+import com.lotusreichhart.audily.feature.songs.impl.util.labelResId
 
 /**
  * Nội dung chính của màn hình danh sách bài hát (khi đã tải xong).
@@ -34,6 +38,8 @@ import com.lotusreichhart.audily.feature.songs.impl.rememberSongsScreenState
 internal fun SongsScreenContent(
     songs: LazyPagingItems<Song>,
     summary: SongsSummary,
+    sortOrder: SongSortOrder,
+    sortType: SortOrderType,
     playingSongId: Long?,
     isPaused: Boolean,
     onEvent: (SongsUiEvent) -> Unit,
@@ -49,10 +55,12 @@ internal fun SongsScreenContent(
             .padding(innerPadding)
             .nestedScroll(screenState.nestedScrollConnection)
     ) {
+        val sortText = "${stringResource(sortOrder.labelResId())} - ${stringResource(sortType.labelResId())}"
+
         SongsHeader(
             songCount = summary.totalCount,
             totalDuration = TimeUtils.formatDuration(summary.totalDuration),
-            sortText = "Title - Ascending",
+            sortText = sortText,
             onSortClick = { },
             modifier = Modifier
                 .zIndex(1f)

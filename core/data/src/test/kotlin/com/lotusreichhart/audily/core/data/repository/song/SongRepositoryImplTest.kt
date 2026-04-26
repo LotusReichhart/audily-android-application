@@ -29,12 +29,12 @@ class SongRepositoryImplTest {
     @Test
     fun `getSongIds returns sorted ids from metadata`() = runTest {
         val metadata = listOf(
-            MediaStoreSortMetadata(1L, "B Song", "Artist", 0L),
-            MediaStoreSortMetadata(2L, "A Song", "Artist", 0L)
+            MediaStoreSortMetadata(1L, "B Song", "Artist", "Album", 100L, 0L),
+            MediaStoreSortMetadata(2L, "A Song", "Artist", "Album", 100L, 0L)
         )
         every { mediaStoreDataSource.getSongsSortMetadata(any()) } returns flowOf(metadata)
 
-        val result = repository.getSongIds(null, SongSortOrder.TITLE_ASC).first()
+        val result = repository.getSongIds(null, SongSortOrder.TITLE, com.lotusreichhart.audily.core.model.common.SortOrderType.ASC).first()
 
         // Phải được sắp xếp lại bởi SongSorter trong Repository
         assertEquals(listOf(2L, 1L), result)

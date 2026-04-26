@@ -20,7 +20,8 @@ class MediaStoreDataSourceTest {
     private lateinit var contentResolver: ContentResolver
     private lateinit var dataSource: MediaStoreDataSource
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val mockUri = mockk<Uri>(relaxed = true)
+    private val mockMusicUri = mockk<Uri>(relaxed = true)
+    private val mockAlbumUri = mockk<Uri>(relaxed = true)
 
     @Before
     fun setup() {
@@ -28,7 +29,8 @@ class MediaStoreDataSourceTest {
         dataSource = MediaStoreDataSource(
             contentResolver = contentResolver,
             ioDispatcher = testDispatcher,
-            musicUri = mockUri
+            musicUri = mockMusicUri,
+            albumsUri = mockAlbumUri
         )
     }
 
@@ -41,7 +43,7 @@ class MediaStoreDataSourceTest {
 
         verify {
             contentResolver.query(
-                eq(mockUri),
+                eq(mockMusicUri),
                 any(),
                 eq("${MediaStore.Audio.Media._ID} = ?"),
                 match { it[0] == songId.toString() },

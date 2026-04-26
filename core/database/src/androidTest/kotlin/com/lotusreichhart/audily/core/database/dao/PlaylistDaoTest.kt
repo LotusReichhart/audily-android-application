@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lotusreichhart.audily.core.database.AudilyDatabase
 import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistSongCrossRef
+import com.lotusreichhart.audily.core.database.model.DaoSortOrderType
 import com.lotusreichhart.audily.core.database.model.PlaylistDaoSortOrder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -45,7 +46,8 @@ class PlaylistDaoTest {
         
         val searchRock = playlistDao.getPlaylists(
             searchQuery = "Rock", 
-            sortOrder = PlaylistDaoSortOrder.NAME_ASC
+            sortOrder = PlaylistDaoSortOrder.NAME,
+            sortType = DaoSortOrderType.ASC
         ).first()
         assertEquals(1, searchRock.size)
         assertEquals("Rock Music", searchRock[0].playlist.name)
@@ -62,7 +64,8 @@ class PlaylistDaoTest {
         playlistDao.insertPlaylist(p3)
         
         val sorted = playlistDao.getPlaylists(
-            sortOrder = PlaylistDaoSortOrder.NAME_ASC
+            sortOrder = PlaylistDaoSortOrder.NAME,
+            sortType = DaoSortOrderType.ASC
         ).first()
         assertEquals("Anh", sorted[0].playlist.name)
         assertEquals("Ăn", sorted[1].playlist.name)
@@ -76,7 +79,7 @@ class PlaylistDaoTest {
         )
         
         // Ban đầu count = 0
-        val initial = playlistDao.getPlaylists(sortOrder = PlaylistDaoSortOrder.NAME_ASC).first()
+        val initial = playlistDao.getPlaylists(sortOrder = PlaylistDaoSortOrder.NAME, sortType = DaoSortOrderType.ASC).first()
         assertEquals(0, initial[0].songCount)
         
         // Thêm bài hát
@@ -85,7 +88,7 @@ class PlaylistDaoTest {
         )
         
         // Sau khi thêm count = 1
-        val updated = playlistDao.getPlaylists(sortOrder = PlaylistDaoSortOrder.NAME_ASC).first()
+        val updated = playlistDao.getPlaylists(sortOrder = PlaylistDaoSortOrder.NAME, sortType = DaoSortOrderType.ASC).first()
         assertEquals(1, updated[0].songCount)
     }
 

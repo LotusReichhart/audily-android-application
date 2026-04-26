@@ -10,6 +10,7 @@ import com.lotusreichhart.audily.core.data.paging.AudilyPagingConfig
 import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.MediaStoreIdPagingSource
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
@@ -31,20 +32,22 @@ internal class SongRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getSongIds(
         searchQuery: String?,
-        sortOrder: SongSortOrder
+        sortOrder: SongSortOrder,
+        sortType: SortOrderType
     ): Flow<List<Long>> {
         return mediaStoreDataSource.getSongsSortMetadata(searchQuery).map { metadataList ->
-            SongSorter.sort(metadataList, sortOrder).map { it.id }
+            SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getSongsPaged(
         searchQuery: String?,
-        sortOrder: SongSortOrder
+        sortOrder: SongSortOrder,
+        sortType: SortOrderType
     ): Flow<PagingData<Song>> {
         return mediaStoreDataSource.getSongsSortMetadata(searchQuery).flatMapLatest { metadataList ->
-            val sortedIds = SongSorter.sort(metadataList, sortOrder).map { it.id }
+            val sortedIds = SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
             
             Pager(
                 config = AudilyPagingConfig.defaultConfig(),

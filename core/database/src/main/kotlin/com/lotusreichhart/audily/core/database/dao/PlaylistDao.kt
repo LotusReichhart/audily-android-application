@@ -6,6 +6,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistSongCrossRef
+import com.lotusreichhart.audily.core.database.model.DaoSortOrderType
 import com.lotusreichhart.audily.core.database.model.PlaylistDaoSortOrder
 import com.lotusreichhart.audily.core.database.model.PlaylistWithCount
 import kotlinx.coroutines.flow.Flow
@@ -18,13 +19,16 @@ abstract class PlaylistDao {
 
     fun getPlaylists(
         searchQuery: String = "",
-        sortOrder: PlaylistDaoSortOrder = PlaylistDaoSortOrder.CREATED_DATE_DESC
+        sortOrder: PlaylistDaoSortOrder = PlaylistDaoSortOrder.CREATED_DATE,
+        sortType: DaoSortOrderType = DaoSortOrderType.DESC
     ): Flow<List<PlaylistWithCount>> {
+        val order = sortType.sqlKey
+        val column = sortOrder.column
         val queryStr = """
             SELECT *, (SELECT COUNT(*) FROM playlist_song_cross_ref WHERE playlist_id = playlists.id) as song_count 
             FROM playlists 
             WHERE name LIKE ? 
-            ORDER BY ${sortOrder.sqlOrder}
+            ORDER BY $column $order
         """.trimIndent()
         return getPlaylistsRaw(SimpleSQLiteQuery(queryStr, arrayOf("%$searchQuery%")))
     }
