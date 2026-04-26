@@ -10,10 +10,13 @@ import com.lotusreichhart.audily.core.domain.repository.playlist.PlaylistReposit
 import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
+import com.lotusreichhart.audily.core.data.repository.playback.PlaybackStateListenerImpl
+import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -42,4 +45,10 @@ internal abstract class DataModule {
     internal abstract fun bindsUserPreferencesRepository(
         userPreferencesRepository: UserPreferencesRepositoryImpl,
     ): UserPreferencesRepository
-}
+
+    @Binds
+    @IntoSet
+    internal abstract fun bindsPlaybackStateListener(
+        playbackStateListener: PlaybackStateListenerImpl,
+    ): PlaybackStateListener
+}

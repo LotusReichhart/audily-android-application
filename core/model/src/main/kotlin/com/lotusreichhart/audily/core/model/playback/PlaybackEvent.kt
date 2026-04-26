@@ -1,5 +1,7 @@
 package com.lotusreichhart.audily.core.model.playback
 
+import com.lotusreichhart.audily.core.model.song.Song
+
 /**
  * Các sự kiện điều khiển trình phát nhạc (Commands).
  * Đại diện cho ý định của người dùng hoặc hệ thống muốn tác động lên trình phát.
@@ -19,4 +21,7 @@ sealed class PlaybackEvent {
     data class PlayFromQueue(val songId: Long, val queueIds: List<Long>) : PlaybackEvent()
     data class RemoveFromQueue(val songId: Long) : PlaybackEvent()
     data class MoveQueueItem(val from: Int, val to: Int) : PlaybackEvent()
+
+    // Event nội bộ dùng để truyền dữ liệu Song đã được resolve
+    data class SetQueue(val songs: List<Song>, val startIndex: Int) : PlaybackEvent()
 }
