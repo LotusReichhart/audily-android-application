@@ -3,65 +3,13 @@ syntax = "proto3";
 option java_package = "com.lotusreichhart.audily.core.datastore";
 option java_multiple_files = true;
 
+import "com/lotusreichhart/audily/core/datastore/library_settings.proto";
+import "com/lotusreichhart/audily/core/datastore/ui_settings.proto";
+import "com/lotusreichhart/audily/core/datastore/playback_settings.proto";
+
 // Root message: Tổng hợp toàn bộ tùy chọn người dùng.
 message UserPreferencesProto {
     LibrarySettingsProto library_settings = 1;
     UiSettingsProto ui_settings = 2;
     PlaybackSettingsProto playback_settings = 3;
-}
-
-// Thiết lập thư viện nhạc.
-message LibrarySettingsProto {
-    repeated string excluded_folders = 1;
-    int64 min_audio_duration = 2; // milliseconds, default 30000
-    bool filter_small_files = 3;
-    int32 album_grid_size = 4;
-}
-
-// Thiết lập giao diện người dùng.
-message UiSettingsProto {
-    AppThemeProto app_theme = 1;
-    NowPlayingThemeProto now_playing_theme = 2;
-    bool use_amoled_black = 3;
-    int32 accent_color = 4;
-    bool has_accent_color = 5; // Hỗ trợ nullable: true nếu accent_color được đặt
-    bool show_mini_player_extra_controls = 6;
-}
-
-// Thiết lập trình phát nhạc (bao gồm trạng thái phiên cuối cùng).
-message PlaybackSettingsProto {
-    int32 jump_interval = 1; // milliseconds, default 10000
-    bool pause_on_unplug = 2;
-    float playback_speed = 3;
-    bool volume_normalization = 4;
-
-    // Trạng thái phiên phát nhạc cuối cùng (Resume)
-    int64 last_played_song_id = 5;
-    bool has_last_played_song_id = 6; // Hỗ trợ nullable
-    int64 last_playback_position = 7;
-    repeated int64 last_queue_ids = 8;
-    bool is_shuffle_enabled = 9;
-    RepeatModeProto repeat_mode = 10;
-}
-
-// === Enums ===
-
-enum AppThemeProto {
-    APP_THEME_FOLLOW_SYSTEM = 0;
-    APP_THEME_LIGHT = 1;
-    APP_THEME_DARK = 2;
-    APP_THEME_DYNAMIC = 3;
-}
-
-enum NowPlayingThemeProto {
-    NOW_PLAYING_THEME_DEFAULT = 0;
-    NOW_PLAYING_THEME_BLUR = 1;
-    NOW_PLAYING_THEME_MINIMAL = 2;
-    NOW_PLAYING_THEME_FULL_SCREEN_ART = 3;
-}
-
-enum RepeatModeProto {
-    REPEAT_MODE_OFF = 0;
-    REPEAT_MODE_ONE = 1;
-    REPEAT_MODE_ALL = 2;
 }

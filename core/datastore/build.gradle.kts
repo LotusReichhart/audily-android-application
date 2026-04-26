@@ -10,7 +10,7 @@ android {
 
 dependencies{
     implementation(libs.androidx.dataStore)
-    implementation(libs.protobuf.kotlin.lite)
+    api(libs.protobuf.kotlin.lite)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
