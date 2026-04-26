@@ -4,9 +4,16 @@ import com.lotusreichhart.audily.core.database.model.PlaylistDaoSortOrder
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 
 
+import com.lotusreichhart.audily.core.database.model.DaoSortOrderType
+import com.lotusreichhart.audily.core.model.common.SortOrderType
+
 internal fun PlaylistSortOrder.toPlaylistDaoSortOrder(): PlaylistDaoSortOrder = when (this) {
-    PlaylistSortOrder.NAME_ASC -> PlaylistDaoSortOrder.NAME_ASC
-    PlaylistSortOrder.NAME_DESC -> PlaylistDaoSortOrder.NAME_DESC
-    PlaylistSortOrder.CREATED_DATE_ASC -> PlaylistDaoSortOrder.CREATED_DATE_ASC
-    PlaylistSortOrder.CREATED_DATE_DESC -> PlaylistDaoSortOrder.CREATED_DATE_DESC
+    PlaylistSortOrder.NAME -> PlaylistDaoSortOrder.NAME
+    PlaylistSortOrder.CREATED_DATE -> PlaylistDaoSortOrder.CREATED_DATE
+    PlaylistSortOrder.NUMBER_OF_SONGS -> PlaylistDaoSortOrder.NUMBER_OF_SONGS
+}
+
+internal fun SortOrderType.toDaoSortOrderType(): DaoSortOrderType = when (this) {
+    SortOrderType.ASC -> DaoSortOrderType.ASC
+    SortOrderType.DESC -> DaoSortOrderType.DESC
 }

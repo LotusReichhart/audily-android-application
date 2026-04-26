@@ -4,10 +4,14 @@ import com.lotusreichhart.audily.core.data.mapper.prefs.toDomain
 import com.lotusreichhart.audily.core.data.mapper.prefs.toProto
 import com.lotusreichhart.audily.core.datastore.AudilyDataStore
 import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
+import com.lotusreichhart.audily.core.model.album.AlbumSortOrder
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
+import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
+import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -58,6 +62,30 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updateAlbumGridSize(size: Int) {
         audilyDataStore.library.updateAlbumGridSize(size)
+    }
+
+    override suspend fun updateSongSortOrder(order: SongSortOrder) {
+        audilyDataStore.library.updateSongSortOrder(order.toProto())
+    }
+
+    override suspend fun updateSongSortType(type: SortOrderType) {
+        audilyDataStore.library.updateSongSortType(type.toProto())
+    }
+
+    override suspend fun updateAlbumSortOrder(order: AlbumSortOrder) {
+        audilyDataStore.library.updateAlbumSortOrder(order.toProto())
+    }
+
+    override suspend fun updateAlbumSortType(type: SortOrderType) {
+        audilyDataStore.library.updateAlbumSortType(type.toProto())
+    }
+
+    override suspend fun updatePlaylistSortOrder(order: PlaylistSortOrder) {
+        audilyDataStore.library.updatePlaylistSortOrder(order.toProto())
+    }
+
+    override suspend fun updatePlaylistSortType(type: SortOrderType) {
+        audilyDataStore.library.updatePlaylistSortType(type.toProto())
     }
 
     // === Playback Settings ===
