@@ -78,4 +78,54 @@ class UpdateLibrarySettingsUseCaseTest {
 
         coVerify { repository.updateAlbumGridSize(3) }
     }
+
+    // === Sort Preferences ===
+
+    @Test
+    fun `UpdateSongSortOrderUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updateSongSortOrder(any()) }
+        val useCase = UpdateSongSortOrderUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.song.SongSortOrder.TITLE)
+        coVerify { repository.updateSongSortOrder(com.lotusreichhart.audily.core.model.song.SongSortOrder.TITLE) }
+    }
+
+    @Test
+    fun `UpdateSongSortTypeUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updateSongSortType(any()) }
+        val useCase = UpdateSongSortTypeUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.common.SortOrderType.ASC)
+        coVerify { repository.updateSongSortType(com.lotusreichhart.audily.core.model.common.SortOrderType.ASC) }
+    }
+
+    @Test
+    fun `UpdateAlbumSortOrderUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updateAlbumSortOrder(any()) }
+        val useCase = UpdateAlbumSortOrderUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.album.AlbumSortOrder.ARTIST)
+        coVerify { repository.updateAlbumSortOrder(com.lotusreichhart.audily.core.model.album.AlbumSortOrder.ARTIST) }
+    }
+
+    @Test
+    fun `UpdateAlbumSortTypeUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updateAlbumSortType(any()) }
+        val useCase = UpdateAlbumSortTypeUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.common.SortOrderType.DESC)
+        coVerify { repository.updateAlbumSortType(com.lotusreichhart.audily.core.model.common.SortOrderType.DESC) }
+    }
+
+    @Test
+    fun `UpdatePlaylistSortOrderUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updatePlaylistSortOrder(any()) }
+        val useCase = UpdatePlaylistSortOrderUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder.NUMBER_OF_SONGS)
+        coVerify { repository.updatePlaylistSortOrder(com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder.NUMBER_OF_SONGS) }
+    }
+
+    @Test
+    fun `UpdatePlaylistSortTypeUseCase delegates correctly`() = runTest {
+        coJustRun { repository.updatePlaylistSortType(any()) }
+        val useCase = UpdatePlaylistSortTypeUseCase(repository)
+        useCase(com.lotusreichhart.audily.core.model.common.SortOrderType.ASC)
+        coVerify { repository.updatePlaylistSortType(com.lotusreichhart.audily.core.model.common.SortOrderType.ASC) }
+    }
 }

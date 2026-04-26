@@ -1,10 +1,12 @@
 package com.lotusreichhart.audily.core.data.repository.playlist
 
 import com.lotusreichhart.audily.core.database.dao.PlaylistDao
+import com.lotusreichhart.audily.core.database.model.DaoSortOrderType
 import com.lotusreichhart.audily.core.database.model.PlaylistDaoSortOrder
 import com.lotusreichhart.audily.core.database.model.PlaylistWithCount
 import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -36,10 +38,10 @@ class PlaylistRepositoryImplTest {
         val withCount = PlaylistWithCount(entity, 5)
 
         every { 
-            playlistDao.getPlaylists(any(), PlaylistDaoSortOrder.NAME_ASC) 
+            playlistDao.getPlaylists(any(), PlaylistDaoSortOrder.NAME, DaoSortOrderType.ASC) 
         } returns flowOf(listOf(withCount))
 
-        val result = repository.getPlaylists("", PlaylistSortOrder.NAME_ASC).first()
+        val result = repository.getPlaylists("", PlaylistSortOrder.NAME, SortOrderType.ASC).first()
 
         assertEquals(1, result.size)
         assertEquals("Test", result[0].name)
