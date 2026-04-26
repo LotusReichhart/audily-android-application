@@ -1,10 +1,14 @@
 package com.lotusreichhart.audily.core.domain.repository.playback
 
-import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
+import com.lotusreichhart.audily.core.model.playback.PlaybackState
+import kotlinx.coroutines.flow.StateFlow
 
 interface PlaybackRepository {
-    suspend fun play(song: Song)
-    suspend fun pause()
-    suspend fun resume()
-    suspend fun stop()
+    val playbackState: StateFlow<PlaybackState>
+
+    /**
+     * Điểm nhận lệnh tập trung cho trình phát nhạc.
+     */
+    suspend fun handleEvent(event: PlaybackEvent)
 }
