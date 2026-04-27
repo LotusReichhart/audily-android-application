@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.playback.repository
 
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
 import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
+import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.playback.PlaybackManager
@@ -13,7 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class PlaybackRepositoryImpl @Inject constructor(
     private val playbackManager: PlaybackManager,
-    private val songRepository: SongRepository
+    private val songRepository: SongRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : PlaybackRepository {
 
     override val playbackState: StateFlow<PlaybackState> = playbackManager.playbackState
@@ -23,10 +25,22 @@ class PlaybackRepositoryImpl @Inject constructor(
             is PlaybackEvent.PlayFromQueue -> {
                 val songs = songRepository.getSongs(event.queueIds).first()
                 val startIndex = songs.indexOfFirst { it.id == event.songId }.coerceAtLeast(0)
-                // Gửi event đã được resolve dữ liệu xuống Manager
                 playbackManager.handleEvent(PlaybackEvent.SetQueue(songs, startIndex))
             }
-            // Với các event khác, ta chuyển tiếp trực tiếp xuống manager
+
+            is PlaybackEvent.AddSongsToQueue -> playbackManager.handleEvent(event)
+            is PlaybackEvent.FastForward -> {
+                val jumpMs = userPreferencesRepository.getUserPreferences()
+                    .first().playbackSettings.jumpInterval.toLong()
+                playbackManager.seekBy(jumpMs)
+            }
+
+            is PlaybackEvent.FastRewind -> {
+                val jumpMs = userPreferencesRepository.getUserPreferences()
+                    .first().playbackSettings.jumpInterval.toLong()
+                playbackManager.seekBy(-jumpMs)
+            }
+            // Với các event khác chuyển tiếp trực tiếp xuống manager
             else -> playbackManager.handleEvent(event)
         }
     }

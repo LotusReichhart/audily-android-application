@@ -87,6 +87,34 @@ class PlaybackManagerTest {
     }
 
     @Test
+    fun `handleEvent AddSongsToQueue should append items correctly`() {
+        val song1 = createTestSong(1L)
+        val song2 = createTestSong(2L)
+        playbackManager.handleEvent(PlaybackEvent.SetQueue(listOf(song1), 0))
+        
+        playbackManager.handleEvent(PlaybackEvent.AddSongsToQueue(listOf(song2)))
+        
+        assertEquals(2, playbackManager.player.mediaItemCount)
+        assertEquals("1", playbackManager.player.getMediaItemAt(0).mediaId)
+        assertEquals("2", playbackManager.player.getMediaItemAt(1).mediaId)
+    }
+
+    @Test
+    fun `seekBy should adjust current position correctly`() {
+        val song = createTestSong(1L)
+        playbackManager.handleEvent(PlaybackEvent.SetQueue(listOf(song), 0))
+        val player = playbackManager.player
+        
+        // Giả sử đang ở 30s, nhảy thêm 10s
+        player.seekTo(30000L)
+        playbackManager.seekBy(10000L)
+        
+        // Lưu ý: Trong Robolectric, nếu không load thực tế media, duration vẫn có thể là 0 hoặc unset
+        // Nhưng seekTo(30000) sẽ set currentPosition nếu player cho phép
+        assertEquals(40000L, player.currentPosition)
+    }
+
+    @Test
     fun `onSessionEnded should notify listeners with current state`() = runTest {
         playbackManager.player 
         
