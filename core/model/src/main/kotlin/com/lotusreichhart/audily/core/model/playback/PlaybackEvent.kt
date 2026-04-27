@@ -12,6 +12,8 @@ sealed class PlaybackEvent {
     object Next : PlaybackEvent()
     object Previous : PlaybackEvent()
     data class SeekTo(val position: Long) : PlaybackEvent()
+    object FastForward : PlaybackEvent()
+    object FastRewind : PlaybackEvent()
     data class SetShuffle(val on: Boolean) : PlaybackEvent()
     data class SetRepeatMode(val mode: RepeatMode) : PlaybackEvent()
     data class SetSpeed(val speed: Float) : PlaybackEvent()
