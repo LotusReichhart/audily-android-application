@@ -153,6 +153,7 @@ class PlaybackManager @Inject constructor(
             }
             is PlaybackEvent.RemoveFromQueue -> removeFromQueue(event.songId)
             is PlaybackEvent.MoveQueueItem -> moveQueueItem(event.from, event.to)
+            is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs)
             else -> { /* Other complex events handled at Repository level */ }
         }
     }
@@ -169,6 +170,11 @@ class PlaybackManager @Inject constructor(
 
     fun moveQueueItem(from: Int, to: Int) {
         exoPlayer?.moveMediaItem(from, to)
+    }
+
+    fun addSongsToQueue(songs: List<Song>) {
+        val player = getOrCreatePlayer()
+        player.addMediaItems(MediaItemMapper.toMediaItems(songs))
     }
 
     fun setQueue(songs: List<Song>, startIndex: Int = 0, startPosition: Long = 0) {

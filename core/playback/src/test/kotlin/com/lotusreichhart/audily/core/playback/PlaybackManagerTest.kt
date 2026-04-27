@@ -87,6 +87,19 @@ class PlaybackManagerTest {
     }
 
     @Test
+    fun `handleEvent AddSongsToQueue should append items correctly`() {
+        val song1 = createTestSong(1L)
+        val song2 = createTestSong(2L)
+        playbackManager.handleEvent(PlaybackEvent.SetQueue(listOf(song1), 0))
+        
+        playbackManager.handleEvent(PlaybackEvent.AddSongsToQueue(listOf(song2)))
+        
+        assertEquals(2, playbackManager.player.mediaItemCount)
+        assertEquals("1", playbackManager.player.getMediaItemAt(0).mediaId)
+        assertEquals("2", playbackManager.player.getMediaItemAt(1).mediaId)
+    }
+
+    @Test
     fun `onSessionEnded should notify listeners with current state`() = runTest {
         playbackManager.player 
         
