@@ -1,6 +1,9 @@
 package com.lotusreichhart.audily.core.playback.repository
 
+import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
+import com.lotusreichhart.audily.core.model.prefs.PlaybackSettings
+import com.lotusreichhart.audily.core.model.prefs.UserPreferences
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
@@ -21,6 +24,7 @@ class PlaybackRepositoryImplTest {
 
     private val playbackManager: PlaybackManager = mockk(relaxed = true)
     private val songRepository: SongRepository = mockk()
+    private val userPreferencesRepository: UserPreferencesRepository = mockk()
     
     // Ta không initialize ở setup để có thể stub playbackManager.playbackState trước
     private lateinit var repository: PlaybackRepositoryImpl
@@ -34,7 +38,8 @@ class PlaybackRepositoryImplTest {
     private fun initRepository() {
         repository = PlaybackRepositoryImpl(
             playbackManager = playbackManager,
-            songRepository = songRepository
+            songRepository = songRepository,
+            userPreferencesRepository = userPreferencesRepository
         )
     }
 
@@ -72,6 +77,34 @@ class PlaybackRepositoryImplTest {
         initRepository()
         repository.handleEvent(PlaybackEvent.Pause)
         coVerify { playbackManager.handleEvent(PlaybackEvent.Pause) }
+    }
+
+    @Test
+    fun `handleEvent FastForward should resolve jumpInterval and call manager seekBy`() = runTest {
+        val jumpInterval = 15000
+        val userPrefs = UserPreferences(
+            playbackSettings = PlaybackSettings(jumpInterval = jumpInterval)
+        )
+        coEvery { userPreferencesRepository.getUserPreferences() } returns flowOf(userPrefs)
+        
+        initRepository()
+        repository.handleEvent(PlaybackEvent.FastForward)
+        
+        coVerify { playbackManager.seekBy(jumpInterval.toLong()) }
+    }
+
+    @Test
+    fun `handleEvent FastRewind should resolve jumpInterval and call manager seekBy with negative value`() = runTest {
+        val jumpInterval = 10000
+        val userPrefs = UserPreferences(
+            playbackSettings = PlaybackSettings(jumpInterval = jumpInterval)
+        )
+        coEvery { userPreferencesRepository.getUserPreferences() } returns flowOf(userPrefs)
+        
+        initRepository()
+        repository.handleEvent(PlaybackEvent.FastRewind)
+        
+        coVerify { playbackManager.seekBy(-jumpInterval.toLong()) }
     }
 
     private fun createTestSong(id: Long) = Song(
