@@ -100,6 +100,21 @@ class PlaybackManagerTest {
     }
 
     @Test
+    fun `seekBy should adjust current position correctly`() {
+        val song = createTestSong(1L)
+        playbackManager.handleEvent(PlaybackEvent.SetQueue(listOf(song), 0))
+        val player = playbackManager.player
+        
+        // Giả sử đang ở 30s, nhảy thêm 10s
+        player.seekTo(30000L)
+        playbackManager.seekBy(10000L)
+        
+        // Lưu ý: Trong Robolectric, nếu không load thực tế media, duration vẫn có thể là 0 hoặc unset
+        // Nhưng seekTo(30000) sẽ set currentPosition nếu player cho phép
+        assertEquals(40000L, player.currentPosition)
+    }
+
+    @Test
     fun `onSessionEnded should notify listeners with current state`() = runTest {
         playbackManager.player 
         

@@ -102,6 +102,13 @@ class PlaybackManager @Inject constructor(
         exoPlayer?.seekTo(position)
     }
 
+    fun seekBy(offsetMs: Long) {
+        val player = exoPlayer ?: return
+        val duration = if (player.duration == androidx.media3.common.C.TIME_UNSET) Long.MAX_VALUE else player.duration
+        val newPosition = (player.currentPosition + offsetMs).coerceIn(0, duration)
+        player.seekTo(newPosition)
+    }
+
     fun setShuffle(enabled: Boolean) {
         exoPlayer?.shuffleModeEnabled = enabled
     }
