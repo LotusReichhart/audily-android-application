@@ -26,6 +26,7 @@ class PlaybackRepositoryImpl @Inject constructor(
                 // Gửi event đã được resolve dữ liệu xuống Manager
                 playbackManager.handleEvent(PlaybackEvent.SetQueue(songs, startIndex))
             }
+            is PlaybackEvent.AddSongsToQueue -> playbackManager.handleEvent(event)
             // Với các event khác, ta chuyển tiếp trực tiếp xuống manager
             else -> playbackManager.handleEvent(event)
         }
