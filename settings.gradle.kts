@@ -52,4 +52,5 @@ include(":feature:settings:api")
 include(":feature:songs:api")
 include(":feature:songs:impl")
 
+include(":feature:nowplaying")
 
