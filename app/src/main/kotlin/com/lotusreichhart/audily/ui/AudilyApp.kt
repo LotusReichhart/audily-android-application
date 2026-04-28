@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -55,6 +56,9 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRai
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 import com.lotusreichhart.audily.core.navigation.toEntries
+import com.lotusreichhart.audily.feature.nowplaying.NowPlayingScreen
+import com.lotusreichhart.audily.feature.nowplaying.MiniNowPlaying
+import com.lotusreichhart.audily.feature.nowplaying.NowPlayingViewModel
 import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.impl.navigation.homeEntry
 import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
@@ -66,8 +70,6 @@ import kotlin.math.roundToInt
 fun AudilyApp(
     appState: AudilyAppState,
     modifier: Modifier = Modifier,
-    miniPlayer: @Composable (alpha: Float) -> Unit,
-    fullPlayer: @Composable (alpha: Float) -> Unit,
 ) {
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -82,15 +84,14 @@ fun AudilyApp(
     }
 
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape =
+        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     AudilyApp(
         appState = appState,
         isLandscape = isLandscape,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
-        miniPlayer = miniPlayer,
-        fullPlayer = fullPlayer
     )
 }
 
@@ -101,8 +102,7 @@ internal fun AudilyApp(
     isLandscape: Boolean,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    miniPlayer: @Composable (alpha: Float) -> Unit,
-    fullPlayer: @Composable (alpha: Float) -> Unit,
+    nowPlayingViewModel: NowPlayingViewModel = hiltViewModel()
 ) {
     var fullHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
@@ -116,7 +116,17 @@ internal fun AudilyApp(
         )
     )
 
-    LaunchedEffect(fullHeight, appState.miniPlayerAlpha, appState.bottomBarHeightPx, isLandscape) {
+    val uiState by nowPlayingViewModel.uiState.collectAsStateWithLifecycle()
+    val hasSong = uiState.currentSong != null
+
+    LaunchedEffect(hasSong) {
+        if (!hasSong) {
+            appState.isPanelVisible = false
+            appState.panelHeightPx = 0f
+        }
+    }
+
+    LaunchedEffect(fullHeight, appState.miniPlayerAlpha, appState.bottomBarHeightPx, isLandscape, hasSong) {
         if (fullHeight > 0) {
             val expandedY = 0f
             val collapsedY = if (isLandscape) {
@@ -219,27 +229,39 @@ internal fun AudilyApp(
                                 )
                             }
 
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .offset {
-                                        IntOffset(x = 0, y = appState.currentPanelOffsetY.roundToInt())
+                            if (hasSong) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .offset {
+                                            IntOffset(
+                                                x = 0,
+                                                y = appState.currentPanelOffsetY.roundToInt()
+                                            )
+                                        }
+                                        .anchoredDraggable(
+                                            state = appState.draggableState,
+                                            orientation = Orientation.Vertical,
+                                            flingBehavior = flingBehavior
+                                        )
+                                ) {
+                                    Box(modifier = Modifier.onSizeChanged {
+                                        appState.panelHeightPx = it.height.toFloat()
+                                        appState.isPanelVisible = it.height > 0
+                                    }) {
+                                        MiniNowPlaying(
+                                            modifier = Modifier.alpha(appState.miniPlayerAlpha),
+                                            onClick = { appState.expandPanel() },
+                                            viewModel = nowPlayingViewModel
+                                        )
                                     }
-                                    .anchoredDraggable(
-                                        state = appState.draggableState,
-                                        orientation = Orientation.Vertical,
-                                        flingBehavior = flingBehavior
-                                    )
-                            ) {
-                                Box(modifier = Modifier.onSizeChanged {
-                                    appState.panelHeightPx = it.height.toFloat()
-                                    appState.isPanelVisible = it.height > 0
-                                }) {
-                                    miniPlayer(appState.miniPlayerAlpha)
-                                }
 
-                                Box {
-                                    fullPlayer(appState.fullPlayerAlpha)
+                                    Box {
+                                        NowPlayingScreen(
+                                            modifier = Modifier.alpha(appState.fullPlayerAlpha),
+                                            viewModel = nowPlayingViewModel
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -275,27 +297,36 @@ internal fun AudilyApp(
                         )
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset {
-                                IntOffset(x = 0, y = appState.currentPanelOffsetY.roundToInt())
+                    if (hasSong) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .offset {
+                                    IntOffset(x = 0, y = appState.currentPanelOffsetY.roundToInt())
+                                }
+                                .anchoredDraggable(
+                                    state = appState.draggableState,
+                                    orientation = Orientation.Vertical,
+                                    flingBehavior = flingBehavior
+                                )
+                        ) {
+                            Box(modifier = Modifier.onSizeChanged {
+                                appState.panelHeightPx = it.height.toFloat()
+                                appState.isPanelVisible = it.height > 0
+                            }) {
+                                MiniNowPlaying(
+                                    modifier = Modifier.alpha(appState.miniPlayerAlpha),
+                                    onClick = { appState.expandPanel() },
+                                    viewModel = nowPlayingViewModel
+                                )
                             }
-                            .anchoredDraggable(
-                                state = appState.draggableState,
-                                orientation = Orientation.Vertical,
-                                flingBehavior = flingBehavior
-                            )
-                    ) {
-                        Box(modifier = Modifier.onSizeChanged {
-                            appState.panelHeightPx = it.height.toFloat()
-                            appState.isPanelVisible = it.height > 0
-                        }) {
-                            miniPlayer(appState.miniPlayerAlpha)
-                        }
 
-                        Box {
-                            fullPlayer(appState.fullPlayerAlpha)
+                            Box {
+                                NowPlayingScreen(
+                                    modifier = Modifier.alpha(appState.fullPlayerAlpha),
+                                    viewModel = nowPlayingViewModel
+                                )
+                            }
                         }
                     }
 
@@ -304,7 +335,8 @@ internal fun AudilyApp(
                             .align(Alignment.BottomCenter)
                             .offset {
                                 val combinedVisibility = nvaBarVisibilityProgress * (1f - progress)
-                                val yOffset = ((1f - combinedVisibility) * appState.bottomBarHeightPx).roundToInt()
+                                val yOffset =
+                                    ((1f - combinedVisibility) * appState.bottomBarHeightPx).roundToInt()
                                 IntOffset(x = 0, y = yOffset)
                             }
                             .alpha(nvaBarVisibilityProgress * (1f - progress))
