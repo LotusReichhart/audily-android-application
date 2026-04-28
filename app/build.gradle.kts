@@ -65,12 +65,15 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.ui)
     implementation(projects.core.playback)
+    implementation(projects.core.model)
 
     implementation(projects.feature.home.api)
     implementation(projects.feature.home.impl)
-    implementation(projects.feature.songs.impl)
     implementation(projects.feature.focus.api)
     implementation(projects.feature.settings.api)
+    implementation(projects.feature.songs.api)
+    implementation(projects.feature.songs.impl)
+    implementation(projects.feature.nowplaying)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -78,6 +81,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.androidx.core.splashscreen)
 

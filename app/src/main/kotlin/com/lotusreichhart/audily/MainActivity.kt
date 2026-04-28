@@ -48,23 +48,7 @@ class MainActivity : ComponentActivity() {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(
-                            appState = appState,
-                            miniPlayer = { alpha ->
-                                FakeMiniPlayer(
-                                    alpha = alpha,
-                                    onClick = {
-                                        appState.expandPanel()
-                                    }
-                                )
-                            },
-                            fullPlayer = { alpha ->
-                                FakeFullPlayer(
-                                    alpha = alpha,
-                                    onClose = {
-                                        appState.collapsePanel()
-                                    }
-                                )
-                            }
+                            appState = appState
                         )
                     },
                     deniedContent = { shouldShowRationale, onRequestPermission ->
@@ -74,40 +58,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun FakeMiniPlayer(alpha: Float, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .alpha(alpha)
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Mini Player (Tap to expand)", color = MaterialTheme.colorScheme.onPrimaryContainer)
-    }
-}
-
-@Composable
-fun FakeFullPlayer(alpha: Float, onClose: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .alpha(alpha)
-            .background(MaterialTheme.colorScheme.secondaryContainer),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Full Player", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onClose) {
-                Text("Close")
             }
         }
     }
