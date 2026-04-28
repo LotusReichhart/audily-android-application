@@ -7,7 +7,7 @@ import java.text.Collator
 import java.util.Locale
 
 internal object AlbumSorter {
-    private val vietnameseCollator: Collator = Collator.getInstance(Locale("vi", "VN"))
+    private val vietnameseCollator: Collator = Collator.getInstance(Locale.forLanguageTag("vi-VN"))
 
     fun sort(
         albums: List<MediaStoreAlbumSortMetadata>,
