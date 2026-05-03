@@ -1,368 +1,267 @@
 package com.lotusreichhart.audily.feature.nowplaying
 
-import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Row
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
-import com.lotusreichhart.audily.core.designsystem.theme.AudilyTheme
-import com.lotusreichhart.audily.core.model.playback.NowPlayingState
-import com.lotusreichhart.audily.core.model.playback.PlaybackState
-import com.lotusreichhart.audily.core.model.playback.RepeatMode
-import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
-import com.lotusreichhart.audily.core.model.song.Song
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingControls
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingExtension
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingHeader
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingInfo
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Brush
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingMenu
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingProgress
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
+import com.lotusreichhart.audily.core.ui.GlobalSheetKey
+import com.lotusreichhart.audily.core.ui.GlobalUiEvent
+import com.lotusreichhart.audily.core.ui.LocalAudilyWindowSize
+import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingScreenLandscape
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingScreenPortrait
 
 @Composable
 fun NowPlayingScreen(
     modifier: Modifier = Modifier,
-    viewModel: NowPlayingViewModel = hiltViewModel(),
+    onCloseClick: () -> Unit,
+    viewModel: NowPlayingViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    NowPlayingScreenContent(
+    val globalUiEventBus = LocalGlobalUiEventBus.current
+
+    NowPlayingScreen(
+        modifier = modifier,
         uiState = uiState,
+        onOpenQueue = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    GlobalSheetKey.QUEUE,
+                    true
+                )
+            )
+        },
+        onCloseClick = onCloseClick,
         onEvent = viewModel::onEvent,
-        modifier = modifier
+        onTimerClick = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    GlobalSheetKey.TIMER,
+                    false
+                )
+            )
+        },
+        onSpeedPitchClick = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    GlobalSheetKey.SPEED_PITCH,
+                    false
+                )
+            )
+        },
+        onSkipDurationClick = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    GlobalSheetKey.SKIP_DURATION,
+                    false
+                )
+            )
+        },
+        onRingtoneClick = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    GlobalSheetKey.RINGTONE,
+                    false
+                )
+            )
+        }
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-internal fun NowPlayingScreenContent(
+internal fun NowPlayingScreen(
+    modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
+    onCloseClick: () -> Unit,
+    onOpenQueue: () -> Unit,
+    onTimerClick: () -> Unit,
+    onSpeedPitchClick: () -> Unit,
+    onSkipDurationClick: () -> Unit,
+    onRingtoneClick: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    var isLyricsVisible by remember { mutableStateOf(false) }
+    val windowSize = LocalAudilyWindowSize.current
+    val isWide = windowSize.isWide
     var isMenuVisible by remember { mutableStateOf(false) }
 
-    val defaultColor = MaterialTheme.colorScheme.background
-    var adaptiveColor by remember { mutableStateOf(defaultColor) }
+    val defaultColor = SurfaceDark
+    val adaptiveColor = uiState.paletteColors?.dominant ?: defaultColor
+    val vibrantColor = uiState.paletteColors?.vibrant ?: adaptiveColor
 
-    // Reset adaptive color when song changes
-    LaunchedEffect(uiState.currentSong?.id) {
-        adaptiveColor = defaultColor
-    }
+    val animatedDominantColor by animateColorAsState(
+        targetValue = adaptiveColor,
+        animationSpec = tween(1000),
+        label = "DominantColorAnimation"
+    )
+    val animatedVibrantColor by animateColorAsState(
+        targetValue = vibrantColor,
+        animationSpec = tween(1000),
+        label = "VibrantColorAnimation"
+    )
 
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = adaptiveColor
-    ) {
-        if (isLandscape) {
-            NowPlayingScreenLandscape(
-                uiState = uiState,
-                isLyricsVisible = isLyricsVisible,
-                onLyricsToggle = { isLyricsVisible = !isLyricsVisible },
-                isMenuVisible = isMenuVisible,
-                onMenuToggle = { isMenuVisible = !isMenuVisible },
-                onEvent = onEvent,
-                onColorExtracted = { adaptiveColor = it }
-            )
-        } else {
-            NowPlayingScreenPortrait(
-                uiState = uiState,
-                isLyricsVisible = isLyricsVisible,
-                onLyricsToggle = { isLyricsVisible = !isLyricsVisible },
-                isMenuVisible = isMenuVisible,
-                onMenuToggle = { isMenuVisible = !isMenuVisible },
-                onEvent = onEvent,
-                onColorExtracted = { adaptiveColor = it }
-            )
-        }
-    }
-}
+    val infiniteTransition = rememberInfiniteTransition(label = "BackgroundAnimation")
+    val gradientOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(15000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "GradientOffset"
+    )
 
-@Composable
-private fun NowPlayingScreenPortrait(
-    uiState: NowPlayingUiState,
-    isLyricsVisible: Boolean,
-    onLyricsToggle: () -> Unit,
-    isMenuVisible: Boolean,
-    onMenuToggle: () -> Unit,
-    onEvent: (NowPlayingUiEvent) -> Unit,
-    onColorExtracted: (Color) -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(SurfaceDark)
+            .clipToBounds()
+            .drawBehind {
+                val canvasSize = size
+                val baseRadius = canvasSize.maxDimension * 1.2f
+
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(animatedVibrantColor.copy(alpha = 0.4f), Color.Transparent),
+                        center = Offset(
+                            x = canvasSize.width * (0.1f + 0.3f * gradientOffset),
+                            y = canvasSize.height * (0.2f + 0.2f * (1f - gradientOffset))
+                        ),
+                        radius = baseRadius
+                    ),
+                    radius = baseRadius,
+                    center = Offset(
+                        x = canvasSize.width * (0.1f + 0.3f * gradientOffset),
+                        y = canvasSize.height * (0.2f + 0.2f * (1f - gradientOffset))
+                    )
+                )
+
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            animatedDominantColor.copy(alpha = 0.35f),
+                            Color.Transparent
+                        ),
+                        center = Offset(
+                            x = canvasSize.width * (0.9f - 0.3f * gradientOffset),
+                            y = canvasSize.height * (0.8f - 0.2f * (1f - gradientOffset))
+                        ),
+                        radius = baseRadius * 1.1f
+                    ),
+                    radius = baseRadius * 1.1f,
+                    center = Offset(
+                        x = canvasSize.width * (0.9f - 0.3f * gradientOffset),
+                        y = canvasSize.height * (0.8f - 0.2f * (1f - gradientOffset))
+                    )
+                )
+
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            animatedDominantColor.copy(alpha = 0.2f),
+                            Color.Transparent
+                        ),
+                        center = Offset(
+                            x = canvasSize.width * (0.5f + 0.2f * (gradientOffset * 2f - 1f)),
+                            y = canvasSize.height * 0.5f
+                        ),
+                        radius = baseRadius * 1.4f
+                    ),
+                    radius = baseRadius * 1.4f,
+                    center = Offset(
+                        x = canvasSize.width * (0.5f + 0.2f * (gradientOffset * 2f - 1f)),
+                        y = canvasSize.height * 0.5f
+                    )
+                )
+            }
     ) {
-        NowPlayingHeader(
-            onCloseClick = { onEvent(NowPlayingUiEvent.OnNavigateBack) },
-            onMenuClick = { /* TODO */ }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        AnimatedContent(
-            targetState = isLyricsVisible,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
-            },
-            modifier = Modifier.weight(1f)
-        ) { targetIsLyricsVisible ->
-            if (targetIsLyricsVisible) {
-                // TODO: Lyrics Content
+        SharedTransitionLayout {
+            if (isWide) {
+                NowPlayingScreenLandscape(
+                    uiState = uiState,
+                    onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                    isMenuVisible = isMenuVisible,
+                    onMenuToggle = { isMenuVisible = !isMenuVisible },
+                    onCloseClick = onCloseClick,
+                    onOpenQueue = onOpenQueue,
+                    onEvent = onEvent,
+                    sharedTransitionScope = this
+                )
             } else {
-                AudilyArtwork(
-                    artworkUri = uiState.currentSong?.basic?.artworkUri,
-                    modifier = Modifier.fillMaxSize(),
-                    onColorExtracted = onColorExtracted
+                NowPlayingScreenPortrait(
+                    uiState = uiState,
+                    onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                    isMenuVisible = isMenuVisible,
+                    onMenuToggle = { isMenuVisible = !isMenuVisible },
+                    onCloseClick = onCloseClick,
+                    onOpenQueue = onOpenQueue,
+                    onEvent = onEvent,
+                    sharedTransitionScope = this
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        NowPlayingInfo(
-            title = uiState.currentSong?.basic?.title ?: "Unknown Title",
-            artist = uiState.currentSong?.basic?.artist ?: "Unknown Artist",
-            isFavorite = uiState.currentSong?.isFavorite ?: false,
-            onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        NowPlayingProgress(
-            progressMs = uiState.playbackState.playbackPosition,
-            durationMs = uiState.playbackState.duration,
-            onSeek = { onEvent(NowPlayingUiEvent.OnSeekTo(it)) }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        NowPlayingControls(
-            isPlaying = uiState.playbackState.nowPlayingState == NowPlayingState.PLAYING,
-            isShuffleOn = uiState.playbackState.isShuffleOn,
-            repeatMode = uiState.playbackState.repeatMode,
-            onPlayPauseClick = { onEvent(NowPlayingUiEvent.OnPlayPauseToggle) },
-            onSkipNextClick = { onEvent(NowPlayingUiEvent.OnSkipNext) },
-            onSkipPreviousClick = { onEvent(NowPlayingUiEvent.OnSkipPrevious) },
-            onFastForwardClick = { onEvent(NowPlayingUiEvent.OnFastForward) },
-            onFastRewindClick = { onEvent(NowPlayingUiEvent.OnFastRewind) },
-            onShuffleClick = { onEvent(NowPlayingUiEvent.OnShuffleToggle) },
-            onRepeatClick = { onEvent(NowPlayingUiEvent.OnRepeatModeToggle) }
-        )
-
+        // Lớp nền mờ khi menu mở
         AnimatedVisibility(
             visible = isMenuVisible,
-            enter = expandVertically(),
-            exit = shrinkVertically()
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.fillMaxSize()
         ) {
-            NowPlayingMenu(
-                onTimerClick = { /* TODO */ },
-                onSpeedClick = { /* TODO */ },
-                onJumpClick = { /* TODO */ },
-                onRingtoneClick = { /* TODO */ }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { isMenuVisible = false }
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        NowPlayingExtension(
-            isLyricsVisible = isLyricsVisible,
-            onQueueClick = { onEvent(NowPlayingUiEvent.OnOpenQueue) },
-            onLyricsClick = onLyricsToggle,
-            onExtendClick = onMenuToggle
+        NowPlayingMenu(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = LocalDimensions.current.paddingMedium,
+                    bottom = 48.dp
+                ),
+            isVisible = isMenuVisible,
+            onTimerClick = onTimerClick,
+            onSpeedPitchClick = onSpeedPitchClick,
+            onSkipDurationClick = onSkipDurationClick,
+            onRingtoneClick = onRingtoneClick,
         )
-    }
-}
-
-@Composable
-private fun NowPlayingScreenLandscape(
-    uiState: NowPlayingUiState,
-    isLyricsVisible: Boolean,
-    onLyricsToggle: () -> Unit,
-    isMenuVisible: Boolean,
-    onMenuToggle: () -> Unit,
-    onEvent: (NowPlayingUiEvent) -> Unit,
-    onColorExtracted: (Color) -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Left Side: Artwork/Lyrics (2/5)
-        Box(modifier = Modifier.weight(2f)) {
-            AnimatedContent(
-                targetState = isLyricsVisible,
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
-                        animationSpec = tween(
-                            500
-                        )
-                    )
-                },
-                modifier = Modifier.fillMaxSize()
-            ) { targetIsLyricsVisible ->
-                if (targetIsLyricsVisible) {
-                    // TODO: Lyrics Content
-                } else {
-                    AudilyArtwork(
-                        artworkUri = uiState.currentSong?.basic?.artworkUri,
-                        modifier = Modifier.fillMaxSize(),
-                        onColorExtracted = onColorExtracted
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(24.dp))
-
-        // Right Side: Info & Controls (3/5)
-        Column(modifier = Modifier.weight(3f)) {
-            NowPlayingHeader(
-                onCloseClick = { onEvent(NowPlayingUiEvent.OnNavigateBack) },
-                onMenuClick = { /* TODO */ }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            NowPlayingInfo(
-                title = uiState.currentSong?.basic?.title ?: "Unknown Title",
-                artist = uiState.currentSong?.basic?.artist ?: "Unknown Artist",
-                isFavorite = uiState.currentSong?.isFavorite ?: false,
-                onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) },
-                maxTitleChars = 40, // Increased for landscape
-                maxArtistChars = 40
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            NowPlayingProgress(
-                progressMs = uiState.playbackState.playbackPosition,
-                durationMs = uiState.playbackState.duration,
-                onSeek = { onEvent(NowPlayingUiEvent.OnSeekTo(it)) }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            NowPlayingControls(
-                isPlaying = uiState.playbackState.nowPlayingState == NowPlayingState.PLAYING,
-                isShuffleOn = uiState.playbackState.isShuffleOn,
-                repeatMode = uiState.playbackState.repeatMode,
-                onPlayPauseClick = { onEvent(NowPlayingUiEvent.OnPlayPauseToggle) },
-                onSkipNextClick = { onEvent(NowPlayingUiEvent.OnSkipNext) },
-                onSkipPreviousClick = { onEvent(NowPlayingUiEvent.OnSkipPrevious) },
-                onFastForwardClick = { onEvent(NowPlayingUiEvent.OnFastForward) },
-                onFastRewindClick = { onEvent(NowPlayingUiEvent.OnFastRewind) },
-                onShuffleClick = { onEvent(NowPlayingUiEvent.OnShuffleToggle) },
-                onRepeatClick = { onEvent(NowPlayingUiEvent.OnRepeatModeToggle) }
-            )
-
-            AnimatedVisibility(
-                visible = isMenuVisible,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                NowPlayingMenu(
-                    onTimerClick = { /* TODO */ },
-                    onSpeedClick = { /* TODO */ },
-                    onJumpClick = { /* TODO */ },
-                    onRingtoneClick = { /* TODO */ }
-                )
-            }
-
-            NowPlayingExtension(
-                isLyricsVisible = isLyricsVisible,
-                onQueueClick = { onEvent(NowPlayingUiEvent.OnOpenQueue) },
-                onLyricsClick = onLyricsToggle,
-                onExtendClick = onMenuToggle
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-        }
-    }
-}
-
-private val MockUiState = NowPlayingUiState(
-    playbackState = PlaybackState(
-        nowPlayingState = NowPlayingState.PLAYING,
-        currentSongId = 1L,
-        duration = 180000,
-        playbackPosition = 60000,
-        isShuffleOn = true,
-        repeatMode = RepeatMode.ALL
-    ),
-    currentSong = Song(
-        id = 1L,
-        basic = BasicSongMetadata(
-            title = "Sunflower",
-            artist = "Post Malone, Swae Lee",
-            album = "Spider-Man: Into the Spider-Verse",
-            albumId = 101L,
-            duration = 180000,
-            path = "/sdcard/music/sunflower.mp3",
-            artworkUri = null
-        ),
-        isFavorite = true
-    )
-)
-
-@Preview(showBackground = true)
-@Composable
-private fun NowPlayingScreenPortraitPreview() {
-    AudilyTheme {
-        Surface {
-            NowPlayingScreenContent(
-                uiState = MockUiState,
-                onEvent = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 800, heightDp = 400)
-@Composable
-private fun NowPlayingScreenLandscapePreview() {
-    // Để preview landscape, ta cần cung cấp một LocalConfiguration giả lập hoặc dùng tham số Preview
-    // Ở đây ta mô phỏng bằng cách gọi trực tiếp NowPlayingScreenLandscape nếu cần,
-    // hoặc tin tưởng vào hệ thống Preview phối hợp với logic Configuration.ORIENTATION_LANDSCAPE.
-    AudilyTheme {
-        Surface {
-            NowPlayingScreenContent(
-                uiState = MockUiState,
-                onEvent = {}
-            )
-        }
     }
 }
