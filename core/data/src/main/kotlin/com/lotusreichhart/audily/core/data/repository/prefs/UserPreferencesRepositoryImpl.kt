@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.data.repository.prefs
 
 import com.lotusreichhart.audily.core.data.mapper.prefs.toDomain
 import com.lotusreichhart.audily.core.data.mapper.prefs.toProto
+import com.lotusreichhart.audily.core.database.dao.PlaybackDao
 import com.lotusreichhart.audily.core.datastore.AudilyDataStore
 import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.model.album.AlbumSortOrder
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 internal class UserPreferencesRepositoryImpl @Inject constructor(
-    private val audilyDataStore: AudilyDataStore
+    private val audilyDataStore: AudilyDataStore,
+    private val playbackDao: PlaybackDao
 ) : UserPreferencesRepository {
 
     override fun getUserPreferences(): Flow<UserPreferences> {
@@ -90,8 +92,8 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     // === Playback Settings ===
 
-    override suspend fun updateJumpInterval(interval: Int) {
-        audilyDataStore.playback.updateJumpInterval(interval)
+    override suspend fun updateSkipDuration(duration: Int) {
+        audilyDataStore.playback.updateSkipDuration(duration)
     }
 
     override suspend fun updatePauseOnUnplug(enabled: Boolean) {
@@ -100,6 +102,10 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updatePlaybackSpeed(speed: Float) {
         audilyDataStore.playback.updatePlaybackSpeed(speed)
+    }
+
+    override suspend fun updatePlaybackPitch(pitch: Float) {
+        audilyDataStore.playback.updatePlaybackPitch(pitch)
     }
 
     override suspend fun updateVolumeNormalization(enabled: Boolean) {
@@ -114,13 +120,47 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         audilyDataStore.playback.updateRepeatMode(mode.toProto())
     }
 
-    // === Session Persistence ===
+    // === Session Persistence (Database) ===
 
     override suspend fun savePlaybackSession(
         songId: Long?,
         position: Long,
-        queueIds: List<Long>
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long?,
+        sourceType: String?
     ) {
-        audilyDataStore.playback.updateLastPlaybackSession(songId, position, queueIds)
+        val session = com.lotusreichhart.audily.core.database.entity.PlaybackSessionEntity(
+            currentSongId = songId,
+            position = position,
+            duration = duration,
+            sourceId = sourceId,
+            sourceType = sourceType
+        )
+        val queueItems = queueIds.mapIndexed { index, id ->
+            com.lotusreichhart.audily.core.database.entity.PlayingQueueEntity(
+                songId = id,
+                orderIndex = index
+            )
+        }
+        playbackDao.saveFullPlaybackState(session, queueItems)
+    }
+
+    override fun getPlaybackSession(): Flow<com.lotusreichhart.audily.core.model.playback.PlaybackSession?> {
+        return kotlinx.coroutines.flow.combine(
+            playbackDao.getSession(),
+            playbackDao.getQueue()
+        ) { session, queue ->
+            session?.let {
+                com.lotusreichhart.audily.core.model.playback.PlaybackSession(
+                    currentSongId = it.currentSongId,
+                    position = it.position,
+                    duration = it.duration,
+                    queueIds = queue.map { item -> item.songId },
+                    sourceId = it.sourceId,
+                    sourceType = it.sourceType
+                )
+            }
+        }
     }
 }

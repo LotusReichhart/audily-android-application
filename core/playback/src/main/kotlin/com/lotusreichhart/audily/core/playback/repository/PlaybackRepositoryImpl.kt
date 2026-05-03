@@ -1,47 +1,34 @@
 package com.lotusreichhart.audily.core.playback.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
-import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
-import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.playback.PlaybackManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PlaybackRepositoryImpl @Inject constructor(
-    private val playbackManager: PlaybackManager,
-    private val songRepository: SongRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val playbackManager: PlaybackManager
 ) : PlaybackRepository {
 
     override val playbackState: StateFlow<PlaybackState> = playbackManager.playbackState
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun handleEvent(event: PlaybackEvent) {
-        when (event) {
-            is PlaybackEvent.PlayFromQueue -> {
-                val songs = songRepository.getSongs(event.queueIds).first()
-                val startIndex = songs.indexOfFirst { it.id == event.songId }.coerceAtLeast(0)
-                playbackManager.handleEvent(PlaybackEvent.SetQueue(songs, startIndex))
-            }
+        playbackManager.handleEvent(event)
+    }
 
-            is PlaybackEvent.AddSongsToQueue -> playbackManager.handleEvent(event)
-            is PlaybackEvent.FastForward -> {
-                val jumpMs = userPreferencesRepository.getUserPreferences()
-                    .first().playbackSettings.jumpInterval.toLong()
-                playbackManager.seekBy(jumpMs)
-            }
-
-            is PlaybackEvent.FastRewind -> {
-                val jumpMs = userPreferencesRepository.getUserPreferences()
-                    .first().playbackSettings.jumpInterval.toLong()
-                playbackManager.seekBy(-jumpMs)
-            }
-            // Với các event khác chuyển tiếp trực tiếp xuống manager
-            else -> playbackManager.handleEvent(event)
+    override fun observePlaybackPosition(): Flow<Long> = flow {
+        while (true) {
+            emit(playbackManager.player.currentPosition)
+            delay(500)
         }
     }
 }

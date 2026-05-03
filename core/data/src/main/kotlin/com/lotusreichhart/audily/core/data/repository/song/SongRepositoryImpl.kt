@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class SongRepositoryImpl @Inject constructor(
@@ -29,7 +30,6 @@ internal class SongRepositoryImpl @Inject constructor(
         return mediaStoreDataSource.getSongsSummary(searchQuery).map { it.toSongsSummary() }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getSongIds(
         searchQuery: String?,
         sortOrder: SongSortOrder,
@@ -40,27 +40,27 @@ internal class SongRepositoryImpl @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getSongsPaged(
         searchQuery: String?,
         sortOrder: SongSortOrder,
         sortType: SortOrderType
     ): Flow<PagingData<Song>> {
-        return mediaStoreDataSource.getSongsSortMetadata(searchQuery).flatMapLatest { metadataList ->
-            val sortedIds = SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
-            
-            Pager(
-                config = AudilyPagingConfig.defaultConfig(),
-                pagingSourceFactory = {
-                    MediaStoreIdPagingSource(
-                        dataSources = mediaStoreDataSource,
-                        sortedIds = sortedIds
-                    )
+        return mediaStoreDataSource.getSongsSortMetadata(searchQuery)
+            .flatMapLatest { metadataList ->
+                val sortedIds = SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
+
+                Pager(
+                    config = AudilyPagingConfig.defaultConfig(),
+                    pagingSourceFactory = {
+                        MediaStoreIdPagingSource(
+                            dataSources = mediaStoreDataSource,
+                            sortedIds = sortedIds
+                        )
+                    }
+                ).flow.map { pagingData ->
+                    pagingData.map { it.toSong() }
                 }
-            ).flow.map { pagingData ->
-                pagingData.map { it.toSong() }
             }
-        }
     }
 
     override fun getSong(id: Long): Flow<Song?> {
@@ -71,7 +71,14 @@ internal class SongRepositoryImpl @Inject constructor(
 
     override fun getSongs(ids: List<Long>): Flow<List<Song>> {
         return flow {
-            emit(ids.mapNotNull { id -> mediaStoreDataSource.getSong(id)?.toSong() })
+            emit(mediaStoreDataSource.getSongs(ids).map { it.toSong() })
+        }
+    }
+
+    override fun getBasicSongs(ids: List<Long>): Flow<List<Song>> {
+        Timber.d("getBasicSongs run....")
+        return flow {
+            emit(mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() })
         }
     }
 }

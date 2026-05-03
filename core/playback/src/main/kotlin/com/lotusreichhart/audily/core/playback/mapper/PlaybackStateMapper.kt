@@ -15,10 +15,10 @@ object PlaybackStateMapper {
         
         return PlaybackState(
             nowPlayingState = when {
+                player.playbackState == Player.STATE_ENDED -> NowPlayingState.IDLE
                 player.playbackState == Player.STATE_BUFFERING -> NowPlayingState.BUFFERING
                 player.isPlaying -> NowPlayingState.PLAYING
                 player.playbackState == Player.STATE_READY -> NowPlayingState.PAUSED
-                player.playbackState == Player.STATE_ENDED -> NowPlayingState.IDLE
                 else -> NowPlayingState.IDLE
             },
             currentSongId = songId,

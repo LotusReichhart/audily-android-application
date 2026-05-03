@@ -11,15 +11,37 @@ class PlaybackStateListenerImpl @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : PlaybackStateListener {
 
-    override suspend fun onPositionDiscontinuity(songId: Long?, position: Long, queueIds: List<Long>) {
-        userPreferencesRepository.savePlaybackSession(songId, position, queueIds)
+    override suspend fun onPositionDiscontinuity(
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long?,
+        sourceType: String?
+    ) {
+        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
     }
 
-    override suspend fun onPlaybackStateChanged(isPlaying: Boolean, songId: Long?, position: Long, queueIds: List<Long>) {
-        userPreferencesRepository.savePlaybackSession(songId, position, queueIds)
+    override suspend fun onPlaybackStateChanged(
+        isPlaying: Boolean,
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long?,
+        sourceType: String?
+    ) {
+        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
     }
 
-    override suspend fun onSessionEnded(songId: Long?, position: Long, queueIds: List<Long>) {
-        userPreferencesRepository.savePlaybackSession(songId, position, queueIds)
+    override suspend fun onSessionEnded(
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long?,
+        sourceType: String?
+    ) {
+        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
     }
 }

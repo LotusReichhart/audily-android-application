@@ -1,7 +1,10 @@
 package com.lotusreichhart.audily.core.playback
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.annotation.OptIn
+import androidx.annotation.RequiresApi
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -24,27 +27,43 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PlaybackManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val listeners: Set<@JvmSuppressWildcards PlaybackStateListener>,
-    @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher
+    @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher,
+    private val listeners: Set<@JvmSuppressWildcards PlaybackStateListener>
 ) {
     private val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
-
     private var exoPlayer: ExoPlayer? = null
 
     private val _playbackState = MutableStateFlow(PlaybackState.INITIAL)
     val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
+    // Lưu trữ ngữ cảnh phát nhạc (Playlist/Album)
+    var currentSourceId: Long? = null
+    var currentSourceType: String? = null
+
     val player: Player
         get() = getOrCreatePlayer()
 
+    // region Core & Initialization
+
     private fun getOrCreatePlayer(): ExoPlayer {
         return exoPlayer ?: ExoPlayer.Builder(context)
+            .setAudioAttributes(
+                androidx.media3.common.AudioAttributes.Builder()
+                    .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
+                    .setUsage(androidx.media3.common.C.USAGE_MEDIA)
+                    .build(),
+                true
+            )
+            .setHandleAudioBecomingNoisy(true)
+            .setSeekBackIncrementMs(10000)
+            .setSeekForwardIncrementMs(10000)
             .build()
             .also {
                 it.addListener(playerListener)
@@ -52,72 +71,36 @@ class PlaybackManager @Inject constructor(
             }
     }
 
-    private val playerListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(playbackState: Int) = notifyListeners()
-        override fun onIsPlayingChanged(isPlaying: Boolean) = notifyListeners()
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = notifyListeners()
-        override fun onPositionDiscontinuity(
-            oldPosition: Player.PositionInfo,
-            newPosition: Player.PositionInfo,
-            reason: Int
-        ) = notifyListeners(isDiscontinuity = true)
-    }
-
-    private fun notifyListeners(isDiscontinuity: Boolean = false) {
-        val player = exoPlayer ?: return
-        val newState = PlaybackStateMapper.map(player)
-        _playbackState.value = newState
-
-        scope.launch {
-            listeners.forEach { listener ->
-                if (isDiscontinuity) {
-                    listener.onPositionDiscontinuity(newState.currentSongId, newState.playbackPosition, newState.queueIds)
-                } else {
-                    listener.onPlaybackStateChanged(player.isPlaying, newState.currentSongId, newState.playbackPosition, newState.queueIds)
-                }
-            }
+    fun release() {
+        exoPlayer?.let {
+            it.removeListener(playerListener)
+            it.release()
         }
+        exoPlayer = null
     }
 
-    fun play(song: Song) {
+    // endregion
+
+    // region Playback Controls
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun play() {
         val player = getOrCreatePlayer()
-        player.setMediaItem(MediaItemMapper.toMediaItem(song))
-        player.prepare()
+        if (player.playbackState == Player.STATE_IDLE || player.playbackState == Player.STATE_ENDED) {
+            player.prepare()
+        }
         player.play()
+        startService()
     }
 
     fun pause() {
         exoPlayer?.pause()
     }
 
-    fun resume() {
-        exoPlayer?.play()
-    }
-
     fun stop() {
-        exoPlayer?.stop()
-    }
-
-    fun seekTo(position: Long) {
-        exoPlayer?.seekTo(position)
-    }
-
-    fun seekBy(offsetMs: Long) {
-        val player = exoPlayer ?: return
-        val duration = if (player.duration == androidx.media3.common.C.TIME_UNSET) Long.MAX_VALUE else player.duration
-        val newPosition = (player.currentPosition + offsetMs).coerceIn(0, duration)
-        player.seekTo(newPosition)
-    }
-
-    fun setShuffle(enabled: Boolean) {
-        exoPlayer?.shuffleModeEnabled = enabled
-    }
-
-    fun setRepeatMode(mode: RepeatMode) {
-        exoPlayer?.repeatMode = when (mode) {
-            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
-            RepeatMode.ALL -> Player.REPEAT_MODE_ALL
-            RepeatMode.OFF -> Player.REPEAT_MODE_OFF
+        exoPlayer?.let {
+            it.stop()
+            it.clearMediaItems()
         }
     }
 
@@ -129,39 +112,95 @@ class PlaybackManager @Inject constructor(
         exoPlayer?.seekToPrevious()
     }
 
-    fun setSpeed(speed: Float) {
-        exoPlayer?.setPlaybackSpeed(speed)
+    fun seekTo(position: Long) {
+        exoPlayer?.seekTo(position)
     }
 
-    @OptIn(UnstableApi::class)
-    fun setPitch(pitch: Float) {
-        exoPlayer?.setPlaybackParameters(
-            exoPlayer?.playbackParameters?.withPitch(pitch) ?: PlaybackParameters(
-                1f,
-                pitch
-            )
-        )
+    fun seekToIndex(index: Int) {
+        exoPlayer?.seekToDefaultPosition(index)
+        exoPlayer?.play()
     }
 
-    fun handleEvent(event: PlaybackEvent) {
-        when (event) {
-            is PlaybackEvent.Play -> resume()
-            is PlaybackEvent.Pause -> pause()
-            is PlaybackEvent.Next -> next()
-            is PlaybackEvent.Previous -> previous()
-            is PlaybackEvent.SeekTo -> seekTo(event.position)
-            is PlaybackEvent.SetShuffle -> setShuffle(event.on)
-            is PlaybackEvent.SetRepeatMode -> setRepeatMode(event.mode)
-            is PlaybackEvent.SetSpeed -> setSpeed(event.speed)
-            is PlaybackEvent.SetPitch -> setPitch(event.pitch)
-            is PlaybackEvent.SetQueue -> {
-                setQueue(event.songs, event.startIndex)
-                resume()
+    fun seekBy(offsetMs: Long) {
+        val player = exoPlayer ?: return
+        val duration =
+            if (player.duration == androidx.media3.common.C.TIME_UNSET) Long.MAX_VALUE else player.duration
+        val newPosition = (player.currentPosition + offsetMs).coerceIn(0, duration)
+        player.seekTo(newPosition)
+    }
+
+    // endregion
+
+    // region Queue Management
+
+    fun setQueue(songs: List<Song>, startIndex: Int = 0, startPosition: Long = 0) {
+        Timber.d("SetQueue Params: $songs - $startIndex - $startPosition")
+        val player = getOrCreatePlayer()
+        player.setMediaItems(MediaItemMapper.toMediaItems(songs), startIndex, startPosition)
+        player.prepare()
+    }
+
+    fun addNext(song: Song) {
+        val player = getOrCreatePlayer()
+        val songIdStr = song.id.toString()
+
+        // 1. Kiểm tra xem bài hát đã có trong hàng đợi chưa
+        var existingIndex = -1
+        for (i in 0 until player.mediaItemCount) {
+            if (player.getMediaItemAt(i).mediaId == songIdStr) {
+                existingIndex = i
+                break
             }
-            is PlaybackEvent.RemoveFromQueue -> removeFromQueue(event.songId)
-            is PlaybackEvent.MoveQueueItem -> moveQueueItem(event.from, event.to)
-            is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs)
-            else -> { /* Other complex events handled at Repository level */ }
+        }
+
+        // Nếu player đang trống, thêm vào và phát luôn
+        if (player.mediaItemCount == 0) {
+            player.setMediaItem(MediaItemMapper.toMediaItem(song))
+            player.prepare()
+            player.play()
+            return
+        }
+
+        val currentIndex = player.currentMediaItemIndex
+
+        if (existingIndex != -1) {
+            // Trường hợp đã tồn tại trong hàng đợi
+            if (existingIndex == currentIndex) return // Đang phát bài này rồi thì thôi
+
+            val targetIndex = if (existingIndex < currentIndex) currentIndex else currentIndex + 1
+            if (existingIndex != targetIndex) {
+                player.moveMediaItem(existingIndex, targetIndex)
+            }
+        } else {
+            // Trường hợp chưa có, thêm mới vào vị trí currentIndex + 1
+            player.addMediaItem(currentIndex + 1, MediaItemMapper.toMediaItem(song))
+        }
+    }
+
+    fun addSongsToQueue(songs: List<Song>, index: Int = -1) {
+        val player = getOrCreatePlayer()
+
+        songs.forEach { song ->
+            val songIdStr = song.id.toString()
+            var existingIndex = -1
+            for (i in 0 until player.mediaItemCount) {
+                if (player.getMediaItemAt(i).mediaId == songIdStr) {
+                    existingIndex = i
+                    break
+                }
+            }
+
+            if (existingIndex != -1) {
+                // Nếu đã có, di chuyển về cuối (hoặc vị trí index chỉ định)
+                val targetIndex = if (index >= 0) index else player.mediaItemCount - 1
+                if (existingIndex != targetIndex) {
+                    player.moveMediaItem(existingIndex, targetIndex)
+                }
+            } else {
+                // Nếu chưa có, thêm mới vào cuối (hoặc vị trí index chỉ định)
+                val targetIndex = if (index >= 0) index else player.mediaItemCount
+                player.addMediaItem(targetIndex, MediaItemMapper.toMediaItem(song))
+            }
         }
     }
 
@@ -179,37 +218,160 @@ class PlaybackManager @Inject constructor(
         exoPlayer?.moveMediaItem(from, to)
     }
 
-    fun addSongsToQueue(songs: List<Song>) {
-        val player = getOrCreatePlayer()
-        player.addMediaItems(MediaItemMapper.toMediaItems(songs))
+    // endregion
+
+    // region Settings & Params
+
+    fun setShuffle(enabled: Boolean) {
+        exoPlayer?.shuffleModeEnabled = enabled
     }
 
-    fun setQueue(songs: List<Song>, startIndex: Int = 0, startPosition: Long = 0) {
-        val player = getOrCreatePlayer()
-        player.setMediaItems(MediaItemMapper.toMediaItems(songs), startIndex, startPosition)
-        player.prepare()
-    }
-
-    fun release() {
-        exoPlayer?.let {
-            it.removeListener(playerListener)
-            it.release()
+    fun setRepeatMode(mode: RepeatMode) {
+        exoPlayer?.repeatMode = when (mode) {
+            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
+            RepeatMode.ALL -> Player.REPEAT_MODE_ALL
+            RepeatMode.OFF -> Player.REPEAT_MODE_OFF
         }
-        exoPlayer = null
     }
 
-    /**
-     * Gọi khi Service chuẩn bị kết thúc để thông báo cho các listener lưu lại lần cuối.
-     */
+    fun setSpeed(speed: Float) {
+        exoPlayer?.setPlaybackSpeed(speed)
+    }
+
+    @OptIn(UnstableApi::class)
+    fun setPitch(pitch: Float) {
+        exoPlayer?.playbackParameters =
+            exoPlayer?.playbackParameters?.withPitch(pitch) ?: PlaybackParameters(1f, pitch)
+    }
+
+    // endregion
+
+    // region Event Handling
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun handleEvent(event: PlaybackEvent) {
+        when (event) {
+            is PlaybackEvent.Resume -> play()
+            is PlaybackEvent.Pause -> {
+                pause()
+                notifyListeners() // Kích hoạt lưu session chủ động
+            }
+            is PlaybackEvent.Stop -> stop()
+            is PlaybackEvent.Next -> next()
+            is PlaybackEvent.Previous -> previous()
+            is PlaybackEvent.SeekTo -> seekTo(event.position)
+            is PlaybackEvent.SeekBy -> seekBy(event.offsetMs)
+            is PlaybackEvent.SetShuffle -> setShuffle(event.on)
+            is PlaybackEvent.SetRepeatMode -> setRepeatMode(event.mode)
+            is PlaybackEvent.SetSpeed -> setSpeed(event.speed)
+            is PlaybackEvent.SetPitch -> setPitch(event.pitch)
+            is PlaybackEvent.SetQueue -> {
+                this.currentSourceId = event.songs.firstOrNull()?.basic?.albumId
+                setQueue(event.songs, event.startIndex, event.startPosition)
+                play()
+            }
+            is PlaybackEvent.SeekToIndex -> seekToIndex(event.index)
+            is PlaybackEvent.RemoveFromQueue -> removeFromQueue(event.songId)
+            is PlaybackEvent.MoveQueueItem -> moveQueueItem(event.from, event.to)
+            is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs, event.index)
+            is PlaybackEvent.PlayNext -> addNext(event.song)
+            else -> { /* Handled at Repository level */ }
+        }
+    }
+
+    // endregion
+
+    // region Service & Lifecycle
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun startService() {
+        val intent = Intent(context, AudilyAudioService::class.java)
+        try {
+            context.startService(intent)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to start service")
+        }
+    }
+
     fun onSessionEnded() {
         val player = exoPlayer ?: return
         val queueIds = PlaybackStateMapper.getQueueIds(player)
         val currentMediaItem = player.currentMediaItem
         val songId = currentMediaItem?.mediaId?.toLongOrNull()
         val position = player.currentPosition
+        val duration = if (player.duration == androidx.media3.common.C.TIME_UNSET) 0L else player.duration
 
         scope.launch {
-            listeners.forEach { it.onSessionEnded(songId, position, queueIds) }
+            listeners.forEach {
+                it.onSessionEnded(
+                    songId,
+                    position,
+                    duration,
+                    queueIds,
+                    currentSourceId,
+                    currentSourceType
+                )
+            }
         }
     }
+
+    // endregion
+
+    // region Internal Logic
+
+    private val playerListener = object : Player.Listener {
+        override fun onPlaybackStateChanged(playbackState: Int) = notifyListeners()
+        override fun onIsPlayingChanged(isPlaying: Boolean) = notifyListeners()
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = notifyListeners()
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) = notifyListeners(isDiscontinuity = true)
+
+        override fun onTimelineChanged(timeline: androidx.media3.common.Timeline, reason: Int) {
+            notifyListeners()
+        }
+
+        override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+            Timber.e(error, "Player Error: ${error.errorCodeName}")
+            exoPlayer?.prepare()
+            notifyListeners()
+        }
+    }
+
+    private fun notifyListeners(isDiscontinuity: Boolean = false) {
+        val player = exoPlayer ?: return
+        val newState = PlaybackStateMapper.map(player)
+        _playbackState.value = newState
+
+        val duration = if (player.duration == androidx.media3.common.C.TIME_UNSET) 0L else player.duration
+
+        scope.launch {
+            listeners.forEach { listener ->
+                if (isDiscontinuity) {
+                    listener.onPositionDiscontinuity(
+                        newState.currentSongId,
+                        newState.playbackPosition,
+                        duration,
+                        newState.queueIds,
+                        currentSourceId,
+                        currentSourceType
+                    )
+                } else {
+                    listener.onPlaybackStateChanged(
+                        player.isPlaying,
+                        newState.currentSongId,
+                        newState.playbackPosition,
+                        duration,
+                        newState.queueIds,
+                        currentSourceId,
+                        currentSourceType
+                    )
+                }
+            }
+        }
+    }
+
+    // endregion
 }

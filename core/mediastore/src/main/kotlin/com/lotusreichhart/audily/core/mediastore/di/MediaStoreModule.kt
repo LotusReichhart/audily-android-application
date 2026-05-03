@@ -26,9 +26,9 @@ object MediaStoreModule {
     @Provides
     @Singleton
     fun provideMediaStoreDataSource(
+        @Dispatcher(AudilyDispatchers.IO) ioDispatcher: CoroutineDispatcher,
         contentResolver: ContentResolver,
-        @Dispatcher(AudilyDispatchers.IO) ioDispatcher: CoroutineDispatcher
     ): MediaStoreDataSource {
-        return MediaStoreDataSource(contentResolver, ioDispatcher)
+        return MediaStoreDataSource(ioDispatcher, contentResolver)
     }
 }
