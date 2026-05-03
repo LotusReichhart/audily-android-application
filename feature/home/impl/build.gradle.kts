@@ -12,7 +12,10 @@ dependencies {
     implementation(projects.core.model)
 
     implementation(projects.feature.home.api)
+
     implementation(projects.feature.songs.api)
+    implementation(projects.feature.playlists.api)
+    implementation(projects.feature.albums.api)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

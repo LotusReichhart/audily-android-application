@@ -59,13 +59,14 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.model)
     implementation(projects.core.designsystem)
     implementation(projects.core.common)
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.ui)
     implementation(projects.core.playback)
-    implementation(projects.core.model)
+    implementation(projects.core.palette)
 
     implementation(projects.feature.home.api)
     implementation(projects.feature.home.impl)
@@ -82,8 +83,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.hilt.navigation.compose)
-
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.compose.material3.window.size)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
