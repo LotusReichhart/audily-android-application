@@ -122,7 +122,7 @@ fun RowScope.AudilyNavigationBarItem(
 @Composable
 fun AudilyNavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color = Color.Transparent,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
     contentColor: Color = AudilyNavigationDefaults.navigationContentColor(),
     header: @Composable (() -> Unit)? = null,
     windowInsets: WindowInsets = NavigationRailDefaults.windowInsets,

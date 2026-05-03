@@ -13,15 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import android.graphics.Bitmap
-import androidx.core.graphics.drawable.toBitmap
-import androidx.palette.graphics.Palette
 import coil3.compose.AsyncImage
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyImages
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import coil3.asDrawable
 
 /**
  * @param artworkUri URI của ảnh bìa.
@@ -32,10 +25,8 @@ import coil3.asDrawable
 fun AudilyArtwork(
     artworkUri: String?,
     modifier: Modifier = Modifier,
-    contentDescription: String? = null,
-    onColorExtracted: (Color) -> Unit = {}
+    contentDescription: String? = null
 ) {
-    val context = LocalContext.current
     val isDark = isSystemInDarkTheme()
 
     val backgroundColor = if (isDark) {
@@ -57,15 +48,7 @@ fun AudilyArtwork(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 error = painterResource(id = AudilyImages.MusicalNote),
-                placeholder = painterResource(id = AudilyImages.MusicalNote),
-                onSuccess = { state ->
-                    val bitmap = state.result.image.asDrawable(context.resources).toBitmap()
-                    Palette.from(bitmap).generate { palette ->
-                        palette?.dominantSwatch?.let { swatch ->
-                            onColorExtracted(Color(swatch.rgb))
-                        }
-                    }
-                }
+                placeholder = painterResource(id = AudilyImages.MusicalNote)
             )
         } else {
             Image(

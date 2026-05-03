@@ -26,6 +26,7 @@ fun SongItemShimmer(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = LocalDimensions.current.paddingMedium)
             .padding(vertical = LocalDimensions.current.paddingSmall),
         verticalAlignment = Alignment.CenterVertically
     ) {

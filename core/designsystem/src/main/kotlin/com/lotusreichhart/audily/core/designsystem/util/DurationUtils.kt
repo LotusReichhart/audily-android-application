@@ -6,6 +6,8 @@ import java.util.Locale
  * Định dạng thời gian từ milliseconds sang chuỗi mm:ss hoặc hh:mm:ss.
  */
 fun Long.formatDuration(): String {
+    if (this <= 0) return "00:00"
+    
     val totalSeconds = this / 1000
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
