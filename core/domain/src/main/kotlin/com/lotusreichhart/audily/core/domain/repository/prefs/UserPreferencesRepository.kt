@@ -41,13 +41,26 @@ interface UserPreferencesRepository {
     suspend fun updatePlaylistSortType(type: SortOrderType)
 
     // === Playback Settings ===
-    suspend fun updateJumpInterval(interval: Int)
+    suspend fun updateSkipDuration(duration: Int)
     suspend fun updatePauseOnUnplug(enabled: Boolean)
     suspend fun updatePlaybackSpeed(speed: Float)
+    suspend fun updatePlaybackPitch(pitch: Float)
     suspend fun updateVolumeNormalization(enabled: Boolean)
     suspend fun updateShuffleEnabled(enabled: Boolean)
     suspend fun updateRepeatMode(mode: RepeatMode)
 
-    // === Session Persistence ===
-    suspend fun savePlaybackSession(songId: Long?, position: Long, queueIds: List<Long>)
+    // === Session Persistence (Database) ===
+    suspend fun savePlaybackSession(
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long? = null,
+        sourceType: String? = null
+    )
+
+    /**
+     * Lấy phiên phát nhạc đã lưu từ Database.
+     */
+    fun getPlaybackSession(): Flow<com.lotusreichhart.audily.core.model.playback.PlaybackSession?>
 }

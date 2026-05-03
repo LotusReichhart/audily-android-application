@@ -8,16 +8,38 @@ interface PlaybackStateListener {
     /**
      * Gọi khi bài hát hiện tại thay đổi hoặc vị trí phát nhạc thay đổi đáng kể.
      */
-    suspend fun onPositionDiscontinuity(songId: Long?, position: Long, queueIds: List<Long>)
+    suspend fun onPositionDiscontinuity(
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long? = null,
+        sourceType: String? = null
+    )
 
     /**
      * Gọi khi trạng thái Play/Pause thay đổi.
      */
-    suspend fun onPlaybackStateChanged(isPlaying: Boolean, songId: Long?, position: Long, queueIds: List<Long>)
+    suspend fun onPlaybackStateChanged(
+        isPlaying: Boolean,
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long? = null,
+        sourceType: String? = null
+    )
 
     /**
      * Gọi khi dịch vụ phát nhạc bị hệ thống đóng (onTaskRemoved hoặc onDestroy).
      * Đây là cơ hội cuối cùng để lưu lại phiên phát nhạc.
      */
-    suspend fun onSessionEnded(songId: Long?, position: Long, queueIds: List<Long>)
+    suspend fun onSessionEnded(
+        songId: Long?,
+        position: Long,
+        duration: Long,
+        queueIds: List<Long>,
+        sourceId: Long? = null,
+        sourceType: String? = null
+    )
 }

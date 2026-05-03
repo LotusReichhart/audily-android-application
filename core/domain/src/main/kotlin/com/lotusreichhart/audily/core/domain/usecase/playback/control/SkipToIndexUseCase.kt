@@ -4,8 +4,13 @@ import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackReposit
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import javax.inject.Inject
 
-class ResumeSongUseCase @Inject constructor(
+/**
+ * Di chuyển trình phát đến một vị trí (index) cụ thể trong hàng đợi hiện tại.
+ */
+class SkipToIndexUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
-    suspend operator fun invoke() = playbackRepository.handleEvent(PlaybackEvent.Resume)
+    suspend operator fun invoke(index: Int) {
+        playbackRepository.handleEvent(PlaybackEvent.SeekToIndex(index))
+    }
 }
