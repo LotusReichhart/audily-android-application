@@ -15,7 +15,7 @@ internal class HomeViewModel @Inject constructor(
     val songsEntry: SongsEntry,
 ) : ViewModel() {
 
-    val uiState: StateFlow<HomeUiState> = flowOf(HomeUiState.Success(HomeTab.SONGS))
+    val uiState: StateFlow<HomeUiState> = flowOf(HomeUiState.Success(HomeTab.Songs))
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
