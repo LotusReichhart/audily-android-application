@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import androidx.compose.runtime.derivedStateOf
+import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
 
 enum class AudilyPanelState {
     COLLAPSED, EXPANDED
@@ -36,7 +39,7 @@ fun rememberAudilyAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ): AudilyAppState {
     val draggableState = remember {
-        AnchoredDraggableState<AudilyPanelState>(
+        AnchoredDraggableState(
             initialValue = AudilyPanelState.COLLAPSED
         )
     }
@@ -84,18 +87,23 @@ class AudilyAppState(
     val isExpanded: Boolean
         get() = draggableState.currentValue == AudilyPanelState.EXPANDED
 
-    val expandProgress: Float
-        get() {
-            val collapsedOffset = draggableState.anchors.positionOf(AudilyPanelState.COLLAPSED).takeIf { !it.isNaN() } ?: 2000f
-            val expandedOffset = draggableState.anchors.positionOf(AudilyPanelState.EXPANDED).takeIf { !it.isNaN() } ?: 0f
-            val currentOffset = draggableState.offset.takeIf { !it.isNaN() } ?: collapsedOffset
+    val expandProgress: Float by derivedStateOf {
+        val collapsedOffset = draggableState.anchors.positionOf(AudilyPanelState.COLLAPSED)
+            .takeIf { !it.isNaN() } ?: AudilyAppConstants.DEFAULT_PANEL_OFFSET
+        val expandedOffset = draggableState.anchors.positionOf(AudilyPanelState.EXPANDED)
+            .takeIf { !it.isNaN() } ?: 0f
+        val currentOffset = draggableState.offset.takeIf { !it.isNaN() } ?: collapsedOffset
 
-            if (collapsedOffset == expandedOffset) return 0f
-            return 1f - ((currentOffset - expandedOffset) / (collapsedOffset - expandedOffset)).coerceIn(0f, 1f)
-        }
+        if (collapsedOffset == expandedOffset) 0f
+        else (1f - ((currentOffset - expandedOffset) / (collapsedOffset - expandedOffset))).coerceIn(
+            0f,
+            1f
+        )
+    }
 
     val currentPanelOffsetY: Float
-        get() = draggableState.offset.takeIf { !it.isNaN() } ?: 2000f
+        get() = draggableState.offset.takeIf { !it.isNaN() }
+            ?: AudilyAppConstants.DEFAULT_PANEL_OFFSET
 
     var bottomBarHeightPx by mutableFloatStateOf(0f)
         internal set
@@ -121,24 +129,34 @@ class AudilyAppState(
         if (isPanelVisible) {
             totalHeightPx += panelHeightPx
         }
-        
+
         return with(density) { totalHeightPx.toDp() }
     }
 
-    // Công thức tính Alpha (Độ trong suốt)
-    val miniPlayerAlpha: Float
-        get() = (1f - (expandProgress * 6.66f)).coerceIn(0f, 1f)
+    // Công thức tính Alpha (Độ trong suốt) dùng derivedStateOf để tối ưu re-composition
+    val miniPlayerAlpha: Float by derivedStateOf {
+        (1f - (expandProgress * AudilyAppConstants.MINI_PLAYER_ALPHA_THRESHOLD_MULTIPLIER)).coerceIn(
+            0f,
+            1f
+        )
+    }
 
-    val fullPlayerAlpha: Float
-        get() = ((expandProgress - 0.15f) * 2.0f).coerceIn(0f, 1f)
+    val fullPlayerAlpha: Float by derivedStateOf {
+        ((expandProgress - AudilyAppConstants.ALPHA_TRANSITION_THRESHOLD) * AudilyAppConstants.FULL_PLAYER_ALPHA_MULTIPLIER).coerceIn(
+            0f,
+            1f
+        )
+    }
 
     fun collapsePanel() {
+        Timber.d("collapsePanel Đã được gọi đã được gọi.....")
         coroutineScope.launch {
             draggableState.animateTo(AudilyPanelState.COLLAPSED)
         }
     }
 
     fun expandPanel() {
+        Timber.d("expandPanel Đã được gọi đã được gọi.....")
         coroutineScope.launch {
             draggableState.animateTo(AudilyPanelState.EXPANDED)
         }
