@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.lotusreichhart.audily.core.database.AudilyDatabase
 import com.lotusreichhart.audily.core.database.dao.FavoritesDao
+import com.lotusreichhart.audily.core.database.dao.PlaybackDao
 import com.lotusreichhart.audily.core.database.dao.PlaylistDao
 import dagger.Module
 import dagger.Provides
@@ -23,12 +24,17 @@ object DatabaseModule {
         context,
         AudilyDatabase::class.java,
         "audily-database",
-    ).build()
+    ).fallbackToDestructiveMigration(true).build()
 
     @Provides
     fun provideFavoritesDao(
         database: AudilyDatabase,
     ): FavoritesDao = database.favoritesDao()
+
+    @Provides
+    fun providePlaybackDao(
+        database: AudilyDatabase
+    ): PlaybackDao = database.playbackDao()
 
     @Provides
     fun providePlaylistDao(

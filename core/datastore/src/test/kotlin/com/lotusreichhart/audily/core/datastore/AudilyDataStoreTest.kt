@@ -147,11 +147,11 @@ class AudilyDataStoreTest {
     // === Playback Settings ===
 
     @Test
-    fun `Playback - update jump interval`() = testScope.runTest {
-        audilyDataStore.playback.updateJumpInterval(30_000)
+    fun `Playback - update skip duration`() = testScope.runTest {
+        audilyDataStore.playback.updateSkipDuration(30_000)
 
         val result = audilyDataStore.userPreferences.first()
-        assertEquals(30_000, result.playbackSettings.jumpInterval)
+        assertEquals(30_000, result.playbackSettings.skipDuration)
     }
 
     @Test
@@ -196,20 +196,4 @@ class AudilyDataStoreTest {
         assertEquals(RepeatModeProto.REPEAT_MODE_ONE, result.playbackSettings.repeatMode)
     }
 
-    @Test
-    fun `Playback - update last playback session with valid song`() = testScope.runTest {
-        val queueIds = listOf(1L, 2L, 3L, 4L, 5L)
-        audilyDataStore.playback.updateLastPlaybackSession(
-            songId = 42L,
-            position = 120_000L,
-            queueIds = queueIds
-        )
-
-        val result = audilyDataStore.userPreferences.first()
-        val playback = result.playbackSettings
-        assertTrue(playback.hasLastPlayedSongId)
-        assertEquals(42L, playback.lastPlayedSongId)
-        assertEquals(120_000L, playback.lastPlaybackPosition)
-        assertEquals(queueIds, playback.lastQueueIdsList)
-    }
 }
