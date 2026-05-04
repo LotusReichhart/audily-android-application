@@ -1,10 +1,9 @@
 package com.lotusreichhart.audily.core.domain.usecase.playback.control
 
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.SkipToIndexUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetPlaybackPitchUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetPlaybackSpeedUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetRepeatModeUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetShuffleUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetSpeedAndPitchUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.RestorePlaybackSessionUseCase
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import javax.inject.Inject
@@ -22,8 +21,7 @@ class PlaybackControlUseCases @Inject constructor(
     private val setRepeatModeUseCase: SetRepeatModeUseCase,
     private val restoreSessionUseCase: RestorePlaybackSessionUseCase,
     private val stopSongUseCase: StopSongUseCase,
-    private val setPitchUseCase: SetPlaybackPitchUseCase,
-    private val setSpeedUseCase: SetPlaybackSpeedUseCase,
+    private val setSpeedAndPitchUseCase: SetSpeedAndPitchUseCase,
     private val fastForwardUseCase: FastForwardUseCase,
     private val fastRewindUseCase: FastRewindUseCase,
     private val skipToIndexUseCase: SkipToIndexUseCase
@@ -38,8 +36,7 @@ class PlaybackControlUseCases @Inject constructor(
     suspend fun setRepeatMode(mode: RepeatMode) = setRepeatModeUseCase(mode)
     suspend fun restoreSession() = restoreSessionUseCase()
     suspend fun stop() = stopSongUseCase()
-    suspend fun setPitch(pitch: Float) = setPitchUseCase(pitch)
-    suspend fun setSpeed(speed: Float) = setSpeedUseCase(speed)
+    suspend fun setSpeedAndPitch(speed: Float, pitch: Float) = setSpeedAndPitchUseCase(speed, pitch)
     suspend fun fastForward() = fastForwardUseCase()
     suspend fun fastRewind() = fastRewindUseCase()
 }

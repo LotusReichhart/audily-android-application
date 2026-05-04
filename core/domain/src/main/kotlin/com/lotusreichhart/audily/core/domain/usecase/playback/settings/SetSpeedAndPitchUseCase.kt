@@ -5,12 +5,12 @@ import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRep
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import javax.inject.Inject
 
-class SetPlaybackSpeedUseCase @Inject constructor(
+class SetSpeedAndPitchUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository,
     private val preferencesRepository: UserPreferencesRepository
 ) {
-    suspend operator fun invoke(speed: Float) {
-        playbackRepository.handleEvent(PlaybackEvent.SetSpeed(speed))
-        preferencesRepository.updatePlaybackSpeed(speed)
+    suspend operator fun invoke(speed: Float, pitch: Float) {
+        playbackRepository.handleEvent(PlaybackEvent.SetSpeedAndPitch(speed, pitch))
+        preferencesRepository.updatePlaybackParameters(speed, pitch)
     }
 }

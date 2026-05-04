@@ -43,8 +43,7 @@ interface UserPreferencesRepository {
     // === Playback Settings ===
     suspend fun updateSkipDuration(duration: Int)
     suspend fun updatePauseOnUnplug(enabled: Boolean)
-    suspend fun updatePlaybackSpeed(speed: Float)
-    suspend fun updatePlaybackPitch(pitch: Float)
+    suspend fun updatePlaybackParameters(speed: Float, pitch: Float)
     suspend fun updateVolumeNormalization(enabled: Boolean)
     suspend fun updateShuffleEnabled(enabled: Boolean)
     suspend fun updateRepeatMode(mode: RepeatMode)

@@ -35,22 +35,12 @@ class PlaybackPreferences @Inject constructor(
         }
     }
 
-    suspend fun updatePlaybackSpeed(speed: Float) {
+    suspend fun updatePlaybackParameters(speed: Float, pitch: Float) {
         dataStore.updateData { prefs ->
             prefs.toBuilder()
                 .setPlaybackSettings(
                     prefs.playbackSettings.toBuilder()
                         .setPlaybackSpeed(speed)
-                )
-                .build()
-        }
-    }
-
-    suspend fun updatePlaybackPitch(pitch: Float) {
-        dataStore.updateData { prefs ->
-            prefs.toBuilder()
-                .setPlaybackSettings(
-                    prefs.playbackSettings.toBuilder()
                         .setPlaybackPitch(pitch)
                 )
                 .build()

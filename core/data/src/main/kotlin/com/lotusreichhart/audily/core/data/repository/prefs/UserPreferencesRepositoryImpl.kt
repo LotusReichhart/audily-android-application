@@ -100,12 +100,8 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         audilyDataStore.playback.updatePauseOnUnplug(enabled)
     }
 
-    override suspend fun updatePlaybackSpeed(speed: Float) {
-        audilyDataStore.playback.updatePlaybackSpeed(speed)
-    }
-
-    override suspend fun updatePlaybackPitch(pitch: Float) {
-        audilyDataStore.playback.updatePlaybackPitch(pitch)
+    override suspend fun updatePlaybackParameters(speed: Float, pitch: Float) {
+        audilyDataStore.playback.updatePlaybackParameters(speed, pitch)
     }
 
     override suspend fun updateVolumeNormalization(enabled: Boolean) {
