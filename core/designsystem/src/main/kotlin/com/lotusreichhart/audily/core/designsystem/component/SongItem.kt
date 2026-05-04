@@ -62,6 +62,7 @@ fun SongItem(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
     isMissing: Boolean = false,
+    isFavorite: Boolean = false,
     showDragHandle: Boolean = false,
     playbackStatus: SongPlaybackStatus = SongPlaybackStatus.NONE,
 ) {
@@ -71,12 +72,14 @@ fun SongItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .clickable(
                 onClick = onClick,
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             )
-            .padding(vertical = LocalDimensions.current.paddingSmall),
+            .padding(vertical = LocalDimensions.current.paddingSmall)
+            .padding(horizontal = LocalDimensions.current.paddingMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (showDragHandle) {
@@ -101,6 +104,7 @@ fun SongItem(
                 artist = artist,
                 isSelected = isSelected,
                 isMissing = isMissing,
+                isFavorite = isFavorite,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -154,6 +158,7 @@ private fun SongInformation(
     artist: String,
     isSelected: Boolean,
     isMissing: Boolean,
+    isFavorite: Boolean,
     modifier: Modifier = Modifier
 ) {
     val displayTitle =
@@ -181,18 +186,33 @@ private fun SongInformation(
             modifier = if (isSelected) {
                 Modifier.basicMarquee(
                     iterations = Int.MAX_VALUE,
-                    spacing = MarqueeSpacing.fractionOfContainer(0.2f)
+                    spacing = MarqueeSpacing.fractionOfContainer(0.5f),
+                    repeatDelayMillis = 0
                 )
             } else Modifier
         )
 
-        Text(
-            text = displayArtist,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            if (isFavorite) {
+                Icon(
+                    painter = painterResource(id = AudilyIcons.FavoriteFill),
+                    contentDescription = null,
+                    modifier = Modifier.size(LocalDimensions.current.iconSizeSmall),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Text(
+                text = displayArtist,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -213,7 +233,7 @@ private fun SongMenuButton(onClick: () -> Unit) {
             contentDescription = null,
             modifier = Modifier
                 .size(24.dp)
-                .offset(x = 8.dp),
+                .offset(x = 10.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
         )
     }

@@ -2,68 +2,54 @@ package com.lotusreichhart.audily.feature.nowplaying
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.FastForwardUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.FastRewindUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.PauseSongUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlaySongUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.SeekToUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.SkipToNextUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.SkipToPreviousUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetRepeatModeUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetShuffleUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
-import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
-import com.lotusreichhart.audily.core.domain.usecase.song.GetSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlaybackControlUseCases
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackPositionUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
+import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NowPlayingViewModel @Inject constructor(
-    observePlaybackStateUseCase: ObservePlaybackStateUseCase,
-    private val getSongUseCase: GetSongUseCase,
-    getUserPreferencesUseCase: GetUserPreferencesUseCase,
-    private val playSongUseCase: PlaySongUseCase,
-    private val pauseSongUseCase: PauseSongUseCase,
-    private val resumeSongUseCase: ResumeSongUseCase,
-    private val skipToNextUseCase: SkipToNextUseCase,
-    private val skipToPreviousUseCase: SkipToPreviousUseCase,
-    private val seekToUseCase: SeekToUseCase,
-    private val fastForwardUseCase: FastForwardUseCase,
-    private val fastRewindUseCase: FastRewindUseCase,
-    private val setShuffleUseCase: SetShuffleUseCase,
-    private val setRepeatModeUseCase: SetRepeatModeUseCase
+    observeNowPlaying: ObserveNowPlayingUseCase,
+    observePlaybackPosition: ObservePlaybackPositionUseCase,
+    private val controls: PlaybackControlUseCases
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NowPlayingUiState())
-    val uiState: StateFlow<NowPlayingUiState> = combine(
-        observePlaybackStateUseCase(),
-        getUserPreferencesUseCase()
-    ) { playbackState, userPrefs ->
-        _uiState.value.copy(
-            playbackState = playbackState,
-            jumpInterval = userPrefs.playbackSettings.jumpInterval
-        )
-    }.flatMapLatest { state ->
-        val songId = state.playbackState.currentSongId
-        if (songId != null) {
-            getSongUseCase(songId).map { song ->
-                state.copy(currentSong = song)
-            }
-        } else {
-            flowOf(state.copy(currentSong = null))
+    private val _isLyricsVisible = MutableStateFlow(false)
+
+    init {
+        // Khôi phục phiên phát nhạc đã lưu khi ViewModel khởi tạo
+        viewModelScope.launch {
+            controls.restoreSession()
         }
+    }
+
+    val uiState: StateFlow<NowPlayingUiState> = combine(
+        observeNowPlaying(),
+        observePlaybackPosition(),
+        _isLyricsVisible
+    ) { data, position, isLyricsVisible ->
+        NowPlayingUiState(
+            playbackState = data.playbackState,
+            playbackPositionMs = position,
+            currentSong = data.song,
+            queue = data.queue,
+            currentIndex = data.currentIndex,
+            skipDuration = data.skipDuration,
+            paletteColors = data.colors?.toUiPalette(),
+            hasNext = data.hasNext,
+            hasPrevious = data.hasPrevious,
+            isLyricsVisible = isLyricsVisible
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -73,23 +59,24 @@ class NowPlayingViewModel @Inject constructor(
     fun onEvent(event: NowPlayingUiEvent) {
         viewModelScope.launch {
             when (event) {
-                NowPlayingUiEvent.OnPlayPauseToggle -> {
+                NowPlayingUiEvent.OnResumePauseToggle -> {
                     val state = uiState.value.playbackState.nowPlayingState
                     if (state == NowPlayingState.PLAYING) {
-                        pauseSongUseCase()
-                    } else if (state == NowPlayingState.PAUSED) {
-                        resumeSongUseCase()
+                        controls.pause()
+                    } else {
+                        controls.resume()
                     }
                 }
 
-                NowPlayingUiEvent.OnSkipNext -> skipToNextUseCase()
-                NowPlayingUiEvent.OnSkipPrevious -> skipToPreviousUseCase()
-                is NowPlayingUiEvent.OnSeekTo -> seekToUseCase(event.position)
-                NowPlayingUiEvent.OnFastForward -> fastForwardUseCase()
-                NowPlayingUiEvent.OnFastRewind -> fastRewindUseCase()
+                NowPlayingUiEvent.OnSkipNext -> controls.skipToNext()
+                NowPlayingUiEvent.OnSkipPrevious -> controls.skipToPrevious()
+                is NowPlayingUiEvent.OnSkipTo -> controls.skipToIndex(event.index)
+                is NowPlayingUiEvent.OnSeekTo -> controls.seekTo(event.position)
+                NowPlayingUiEvent.OnFastForward -> controls.fastForward()
+                NowPlayingUiEvent.OnFastRewind -> controls.fastRewind()
+
                 NowPlayingUiEvent.OnShuffleToggle -> {
-                    val currentShuffle = uiState.value.playbackState.isShuffleOn
-                    setShuffleUseCase(!currentShuffle)
+                    controls.setShuffle(!uiState.value.playbackState.isShuffleOn)
                 }
 
                 NowPlayingUiEvent.OnRepeatModeToggle -> {
@@ -98,25 +85,14 @@ class NowPlayingViewModel @Inject constructor(
                         RepeatMode.ALL -> RepeatMode.ONE
                         RepeatMode.ONE -> RepeatMode.OFF
                     }
-                    setRepeatModeUseCase(nextMode)
+                    controls.setRepeatMode(nextMode)
                 }
 
                 NowPlayingUiEvent.OnToggleFavorite -> { /* TODO */
                 }
 
-                NowPlayingUiEvent.OnToggleLyrics -> { /* Handled in UI for now */
-                }
-
-                NowPlayingUiEvent.OnSetRingtone -> { /* TODO */
-                }
-
-                NowPlayingUiEvent.OnTimerClick -> { /* TODO */
-                }
-
-                NowPlayingUiEvent.OnOpenQueue -> { /* TODO */
-                }
-
-                NowPlayingUiEvent.OnNavigateBack -> { /* TODO: Close Full Player */
+                NowPlayingUiEvent.OnToggleLyrics -> {
+                    _isLyricsVisible.value = !_isLyricsVisible.value
                 }
             }
         }

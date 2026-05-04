@@ -25,6 +25,7 @@ internal fun SongsHeaderShimmer(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = LocalDimensions.current.paddingMedium)
             .padding(bottom = LocalDimensions.current.paddingSmall),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

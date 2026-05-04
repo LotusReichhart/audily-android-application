@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_nowplaying_title">Đang phát</string>
+    <string name="feature_nowplaying_no_lyrics">Chưa có lời bài hát</string>
+
+    <string name="feature_nowplaying_menu_timber">Hẹn giờ</string>
+    <string name="feature_nowplaying_menu_speed_pitch">Tốc độ &amp; Cao độ</string>
+    <string name="feature_nowplaying_menu_skip_duration">Thời gian tua</string>
+    <string name="feature_nowplaying_menu_ringtone">Nhạc chuông</string>
 </resources>

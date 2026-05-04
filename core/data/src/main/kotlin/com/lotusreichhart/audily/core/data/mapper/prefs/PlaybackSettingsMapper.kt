@@ -7,13 +7,11 @@ import com.lotusreichhart.audily.core.model.prefs.PlaybackSettings
 
 internal fun PlaybackSettingsProto.toDomain(): PlaybackSettings {
     return PlaybackSettings(
-        jumpInterval = if (jumpInterval > 0) jumpInterval else 10_000,
+        skipDuration = if (skipDuration > 0) skipDuration else 10_000,
         pauseOnUnplug = pauseOnUnplug,
         playbackSpeed = if (playbackSpeed > 0f) playbackSpeed else 1.0f,
+        playbackPitch = if (playbackPitch > 0f) playbackPitch else 1.0f,
         volumeNormalization = volumeNormalization,
-        lastPlayedSongId = if (hasLastPlayedSongId) lastPlayedSongId else null,
-        lastPlaybackPosition = lastPlaybackPosition,
-        lastQueueIds = lastQueueIdsList,
         isShuffleEnabled = isShuffleEnabled,
         repeatMode = repeatMode.toDomain()
     )

@@ -33,8 +33,6 @@ class UserPreferencesSerializerTest {
                     .setIsShuffleEnabled(true)
                     .setRepeatMode(RepeatModeProto.REPEAT_MODE_ALL)
                     .setPlaybackSpeed(1.5f)
-                    .setLastPlayedSongId(42)
-                    .setHasLastPlayedSongId(true)
             )
             .setLibrarySettings(
                 LibrarySettingsProto.newBuilder()

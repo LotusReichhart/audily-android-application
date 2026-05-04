@@ -7,5 +7,5 @@ import javax.inject.Inject
 class ResumeSongUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
-    suspend operator fun invoke() = playbackRepository.handleEvent(PlaybackEvent.Play)
+    suspend operator fun invoke() = playbackRepository.handleEvent(PlaybackEvent.Resume)
 }

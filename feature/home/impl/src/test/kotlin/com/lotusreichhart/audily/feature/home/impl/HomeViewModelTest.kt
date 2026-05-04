@@ -45,9 +45,9 @@ class HomeViewModelTest {
             val firstItem = awaitItem()
             if (firstItem is HomeUiState.Loading) {
                 val secondItem = awaitItem()
-                assertEquals(HomeTab.SONGS, (secondItem as HomeUiState.Success).selectedTab)
+                assertEquals(HomeTab.Songs, (secondItem as HomeUiState.Success).selectedTab)
             } else {
-                assertEquals(HomeTab.SONGS, (firstItem as HomeUiState.Success).selectedTab)
+                assertEquals(HomeTab.Songs, (firstItem as HomeUiState.Success).selectedTab)
             }
         }
     }

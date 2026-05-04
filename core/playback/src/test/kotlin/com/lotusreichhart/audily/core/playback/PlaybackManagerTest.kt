@@ -114,16 +114,6 @@ class PlaybackManagerTest {
         assertEquals(40000L, player.currentPosition)
     }
 
-    @Test
-    fun `onSessionEnded should notify listeners with current state`() = runTest {
-        playbackManager.player 
-        
-        playbackManager.onSessionEnded()
-        testDispatcher.scheduler.advanceUntilIdle()
-        
-        coVerify { listener.onSessionEnded(any(), any(), any()) }
-    }
-
     private fun createTestSong(id: Long) = Song(
         id = id,
         basic = BasicSongMetadata(

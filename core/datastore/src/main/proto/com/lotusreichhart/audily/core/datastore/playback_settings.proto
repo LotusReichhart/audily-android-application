@@ -4,19 +4,15 @@ option java_package = "com.lotusreichhart.audily.core.datastore";
 option java_multiple_files = true;
 
 // Thiết lập trình phát nhạc (bao gồm trạng thái phiên cuối cùng).
+// Thiết lập trình phát nhạc.
 message PlaybackSettingsProto {
-    int32 jump_interval = 1; // milliseconds, default 10000
-    bool pause_on_unplug = 2;
-    float playback_speed = 3;
-    bool volume_normalization = 4;
-
-    // Trạng thái phiên phát nhạc cuối cùng (Resume)
-    int64 last_played_song_id = 5;
-    bool has_last_played_song_id = 6; // Hỗ trợ nullable
-    int64 last_playback_position = 7;
-    repeated int64 last_queue_ids = 8;
-    bool is_shuffle_enabled = 9;
-    RepeatModeProto repeat_mode = 10;
+    int32 skip_duration = 1; // Thời gian nhảy bài (ms), mặc định 10000
+    bool pause_on_unplug = 2; // Tự động tạm dừng khi rút tai nghe
+    float playback_speed = 3; // Tốc độ phát nhạc
+    float playback_pitch = 11; // Cao độ phát nhạc
+    bool volume_normalization = 4; // Chuẩn hóa âm lượng
+    bool is_shuffle_enabled = 9; // Trạng thái phát ngẫu nhiên
+    RepeatModeProto repeat_mode = 10; // Chế độ lặp lại
 }
 
 enum RepeatModeProto {

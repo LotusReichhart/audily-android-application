@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MediaStoreDataSource @Inject constructor(
-    private val contentResolver: ContentResolver,
     @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val contentResolver: ContentResolver,
     private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
     private val albumsUri: Uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 ) {
@@ -80,6 +80,21 @@ class MediaStoreDataSource @Inject constructor(
      */
     fun getSong(id: Long): MediaStoreSong? {
         return contentResolver.querySongById(musicUri, id)
+    }
+
+    /**
+     * Lấy đầy đủ thông tin của danh sách bài hát (MediaStore batch query).
+     */
+    fun getSongs(ids: List<Long>): List<MediaStoreSong> {
+        return contentResolver.querySongsByIds(musicUri, ids)
+    }
+
+    fun getBasicSong(id: Long): MediaStoreSong? {
+        return contentResolver.queryBasicSongById(musicUri, id)
+    }
+
+    fun getBasicSongs(ids: List<Long>): List<MediaStoreSong> {
+        return contentResolver.queryBasicSongsByIds(musicUri, ids)
     }
 
     /**

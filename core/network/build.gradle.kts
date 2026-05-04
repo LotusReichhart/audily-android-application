@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.lotusreichhart.audily.core.network"
 }
+
+dependencies{
+    implementation(libs.coil.compose)
+}

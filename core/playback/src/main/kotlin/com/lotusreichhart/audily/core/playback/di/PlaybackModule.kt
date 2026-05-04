@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class PlaybackModule {
+internal abstract class PlaybackModule {
 
     @Binds
     @Singleton

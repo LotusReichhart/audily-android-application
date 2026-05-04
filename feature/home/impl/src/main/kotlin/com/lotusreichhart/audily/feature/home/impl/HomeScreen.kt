@@ -1,5 +1,6 @@
 package com.lotusreichhart.audily.feature.home.impl
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -77,7 +80,7 @@ internal fun HomeScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (currentTab) {
-                HomeTab.SONGS -> songsContent(Modifier.fillMaxSize())
+                HomeTab.Songs -> songsContent(Modifier.fillMaxSize())
                 else -> {
                     // Các tab khác đã được điều hướng đi
                 }
@@ -96,7 +99,8 @@ private fun HomeTopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = LocalDimensions.current.paddingExtraSmall),
+            .padding(horizontal = LocalDimensions.current.paddingMedium)
+            .padding(bottom = LocalDimensions.current.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
     ) {
         Row(
@@ -133,23 +137,25 @@ private fun HomeTopBar(
             }
         }
 
-        // Hàng 2: Tabs
+        // Hàng 2: Tabs (Có thể cuộn ngang)
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
         ) {
             HomeChip(
-                text = "Songs",
-                selected = selectedTab == HomeTab.SONGS,
+                titleId = HomeTab.Songs.title,
+                selected = selectedTab == HomeTab.Songs,
                 onClick = {}
             )
             HomeChip(
-                text = "Playlists",
+                titleId = HomeTab.Playlists.title,
                 selected = false,
                 onClick = onNavigateToPlaylists
             )
             HomeChip(
-                text = "Albums",
+                titleId = HomeTab.Albums.title,
                 selected = false,
                 onClick = onNavigateToAlbums
             )
@@ -159,7 +165,7 @@ private fun HomeTopBar(
 
 @Composable
 private fun HomeChip(
-    text: String,
+    titleId: Int,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -174,7 +180,7 @@ private fun HomeChip(
         shadowElevation = if (selected) 2.dp else 1.dp
     ) {
         Text(
-            text = text,
+            text = stringResource(titleId),
             modifier = Modifier.padding(
                 horizontal = LocalDimensions.current.paddingLarge,
                 vertical = LocalDimensions.current.paddingSmall

@@ -16,6 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,14 +42,26 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
 
+    private var shouldExpandPlayer by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        handleIntent(intent)
         enableEdgeToEdge()
         setContent {
             val appState = rememberAudilyAppState(
                 networkMonitor = networkMonitor,
             )
+
+            // Tự động mở NowPlaying nếu Intent yêu cầu
+            LaunchedEffect(shouldExpandPlayer) {
+                if (shouldExpandPlayer) {
+                    appState.expandPanel()
+                    shouldExpandPlayer = false
+                }
+            }
+
             AudilyTheme {
                 PermissionHandler(
                     onPermissionGranted = {
@@ -59,6 +77,17 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent?.action == "com.lotusreichhart.audily.action.OPEN_PLAYER") {
+            shouldExpandPlayer = true
         }
     }
 }

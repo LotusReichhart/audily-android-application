@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.lotusreichhart.audily.core.designsystem.R
 import com.lotusreichhart.audily.core.designsystem.component.AudilySortButton
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
@@ -33,7 +35,8 @@ internal fun SongsHeader(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
-            .padding(bottom = LocalDimensions.current.paddingExtraSmall),
+            .padding(horizontal = LocalDimensions.current.paddingMedium)
+            .padding(bottom = LocalDimensions.current.paddingSmall),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -42,7 +45,7 @@ internal fun SongsHeader(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "$songCount songs",
+                text = "$songCount ${stringResource(R.string.core_designsystem_songs)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

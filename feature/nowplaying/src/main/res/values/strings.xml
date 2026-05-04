@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_nowplaying_title">Now Playing</string>
+    <string name="feature_nowplaying_no_lyrics">No lyrics</string>
+
+    <string name="feature_nowplaying_menu_timber">Timer</string>
+    <string name="feature_nowplaying_menu_speed_pitch">Speed &amp; Pitch</string>
+    <string name="feature_nowplaying_menu_skip_duration">Skip duration</string>
+    <string name="feature_nowplaying_menu_ringtone">Ringtone</string>
 </resources>

@@ -91,6 +91,190 @@ internal fun ContentResolver.querySongById(
     }
 }
 
+internal fun ContentResolver.querySongsByIds(
+    uri: Uri,
+    ids: List<Long>
+): List<MediaStoreSong> {
+    if (ids.isEmpty()) return emptyList()
+
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.DURATION,
+        MediaStore.Audio.Media.DATA,
+        MediaStore.Audio.Media.ALBUM_ID,
+        MediaStore.Audio.Media.DATE_MODIFIED,
+        MediaStore.Audio.Media.TRACK,
+        MediaStore.Audio.Media.YEAR,
+        MediaStore.Audio.Media.SIZE,
+        MediaStore.Audio.Media.COMPOSER
+    )
+
+    // Chia nhỏ danh sách nếu quá lớn để tránh giới hạn tham số SQL
+    val chunks = ids.chunked(500)
+    val results = mutableListOf<MediaStoreSong>()
+
+    chunks.forEach { chunk ->
+        val selection = "${MediaStore.Audio.Media._ID} IN (${chunk.joinToString(",")})"
+        this.query(uri, projection, selection, null, null)?.use { c ->
+            val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val dataCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+            val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
+            val trackCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
+            val yearCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+            val sizeCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+            val composerCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
+
+            while (c.moveToNext()) {
+                val albumId = c.getLong(albumIdCol)
+                results.add(
+                    MediaStoreSong(
+                        id = c.getLong(idCol),
+                        basic = BasicMediaStoreMetadata(
+                            title = c.getString(titleCol) ?: "Unknown Title",
+                            artist = c.getString(artistCol) ?: "Unknown Artist",
+                            album = c.getString(albumCol) ?: "Unknown Album",
+                            duration = c.getLong(durationCol),
+                            path = c.getString(dataCol) ?: "",
+                            albumId = albumId,
+                            dateModified = c.getLong(dateModCol),
+                            artworkUri = getArtworkUri(albumId)
+                        ),
+                        extended = ExtendedMediaStoreMetadata(
+                            track = c.getInt(trackCol),
+                            year = c.getInt(yearCol),
+                            size = c.getLong(sizeCol),
+                            composer = c.getString(composerCol) ?: "Unknown Composer"
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    // Duy trì thứ tự của danh sách IDs truyền vào
+    val resultMap = results.associateBy { it.id }
+    return ids.mapNotNull { resultMap[it] }
+}
+
+internal fun ContentResolver.queryBasicSongById(
+    uri: Uri,
+    id: Long
+): MediaStoreSong? {
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.DURATION,
+        MediaStore.Audio.Media.ALBUM_ID
+    )
+
+    return this.query(
+        uri,
+        projection,
+        "${MediaStore.Audio.Media._ID} = ?",
+        arrayOf(id.toString()),
+        null
+    )?.use { c ->
+        if (c.moveToFirst()) {
+            val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+
+            val albumId = c.getLong(albumIdCol)
+            MediaStoreSong(
+                id = c.getLong(idCol),
+                basic = BasicMediaStoreMetadata(
+                    title = c.getString(titleCol) ?: "Unknown Title",
+                    artist = c.getString(artistCol) ?: "Unknown Artist",
+                    album = c.getString(albumCol) ?: "Unknown Album",
+                    duration = c.getLong(durationCol),
+                    path = "", // Không lấy path cho Basic query
+                    albumId = albumId,
+                    dateModified = 0L,
+                    artworkUri = getArtworkUri(albumId)
+                ),
+                extended = ExtendedMediaStoreMetadata(
+                    track = 0,
+                    year = 0,
+                    size = 0L,
+                    composer = ""
+                )
+            )
+        } else null
+    }
+}
+
+internal fun ContentResolver.queryBasicSongsByIds(
+    uri: Uri,
+    ids: List<Long>
+): List<MediaStoreSong> {
+    if (ids.isEmpty()) return emptyList()
+
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.DURATION,
+        MediaStore.Audio.Media.ALBUM_ID
+    )
+
+    val chunks = ids.chunked(500)
+    val results = mutableListOf<MediaStoreSong>()
+
+    chunks.forEach { chunk ->
+        val selection = "${MediaStore.Audio.Media._ID} IN (${chunk.joinToString(",")})"
+        this.query(uri, projection, selection, null, null)?.use { c ->
+            val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+
+            while (c.moveToNext()) {
+                val albumId = c.getLong(albumIdCol)
+                results.add(
+                    MediaStoreSong(
+                        id = c.getLong(idCol),
+                        basic = BasicMediaStoreMetadata(
+                            title = c.getString(titleCol) ?: "Unknown Title",
+                            artist = c.getString(artistCol) ?: "Unknown Artist",
+                            album = c.getString(albumCol) ?: "Unknown Album",
+                            duration = c.getLong(durationCol),
+                            path = "", // Không lấy path cho Basic query
+                            albumId = albumId,
+                            dateModified = 0L,
+                            artworkUri = getArtworkUri(albumId)
+                        ),
+                        extended = ExtendedMediaStoreMetadata(
+                            track = 0,
+                            year = 0,
+                            size = 0L,
+                            composer = ""
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    val resultMap = results.associateBy { it.id }
+    return ids.mapNotNull { resultMap[it] }
+}
+
 internal fun ContentResolver.querySongsSortMetadata(
     uri: Uri,
     searchQuery: String? = null
@@ -178,7 +362,7 @@ internal fun ContentResolver.querySongsSummary(
             totalDuration += c.getLong(durationCol)
         }
     }
-    
+
     return MediaStoreSongsSummary(count, totalDuration)
 }
 

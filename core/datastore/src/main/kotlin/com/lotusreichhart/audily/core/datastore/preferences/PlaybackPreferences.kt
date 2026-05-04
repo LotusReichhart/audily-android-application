@@ -13,12 +13,12 @@ class PlaybackPreferences @Inject constructor(
 ) {
     // === Playback Settings ===
 
-    suspend fun updateJumpInterval(interval: Int) {
+    suspend fun updateSkipDuration(duration: Int) {
         dataStore.updateData { prefs ->
             prefs.toBuilder()
                 .setPlaybackSettings(
                     prefs.playbackSettings.toBuilder()
-                        .setJumpInterval(interval)
+                        .setSkipDuration(duration)
                 )
                 .build()
         }
@@ -35,12 +35,13 @@ class PlaybackPreferences @Inject constructor(
         }
     }
 
-    suspend fun updatePlaybackSpeed(speed: Float) {
+    suspend fun updatePlaybackParameters(speed: Float, pitch: Float) {
         dataStore.updateData { prefs ->
             prefs.toBuilder()
                 .setPlaybackSettings(
                     prefs.playbackSettings.toBuilder()
                         .setPlaybackSpeed(speed)
+                        .setPlaybackPitch(pitch)
                 )
                 .build()
         }
@@ -76,29 +77,6 @@ class PlaybackPreferences @Inject constructor(
                 .setPlaybackSettings(
                     prefs.playbackSettings.toBuilder()
                         .setRepeatMode(mode)
-                )
-                .build()
-        }
-    }
-
-    /**
-     * Lưu trạng thái phát nhạc hiện tại để phục hồi sau khi app bị kill.
-     * Nên gọi khi: Pause, mỗi 10s đang phát, hoặc khi thay đổi Queue.
-     */
-    suspend fun updateLastPlaybackSession(
-        songId: Long?,
-        position: Long,
-        queueIds: List<Long>
-    ) {
-        dataStore.updateData { prefs ->
-            prefs.toBuilder()
-                .setPlaybackSettings(
-                    prefs.playbackSettings.toBuilder()
-                        .setHasLastPlayedSongId(songId != null)
-                        .setLastPlayedSongId(songId ?: 0)
-                        .setLastPlaybackPosition(position)
-                        .clearLastQueueIds()
-                        .addAllLastQueueIds(queueIds)
                 )
                 .build()
         }

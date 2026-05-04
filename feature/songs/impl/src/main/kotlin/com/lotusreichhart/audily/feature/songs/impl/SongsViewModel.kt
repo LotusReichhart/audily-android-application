@@ -1,113 +1,146 @@
 package com.lotusreichhart.audily.feature.songs.impl
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.lotusreichhart.audily.core.domain.usecase.favorite.ToggleFavoriteUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayNextUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.control.PauseSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateSongSortOrderUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateSongSortTypeUseCase
+import com.lotusreichhart.audily.core.domain.usecase.song.GetSongIdsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsPagedUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsSummaryUseCase
-import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
-import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SongsViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val getSongsPagedUseCase: GetSongsPagedUseCase,
-    private val getSongsSummaryUseCase: GetSongsSummaryUseCase,
+    getSongsSummaryUseCase: GetSongsSummaryUseCase,
+    private val getSongIdsUseCase: GetSongIdsUseCase,
+    getUserPreferencesUseCase: GetUserPreferencesUseCase,
+    private val updateSongSortOrderUseCase: UpdateSongSortOrderUseCase,
+    private val updateSongSortTypeUseCase: UpdateSongSortTypeUseCase,
+    private val playFromQueueUseCase: PlayFromQueueUseCase,
+    private val playNextUseCase: PlayNextUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val resumeSongUseCase: ResumeSongUseCase,
+    private val pauseSongUseCase: PauseSongUseCase,
+    observePlaybackStateUseCase: ObservePlaybackStateUseCase
 ) : ViewModel() {
 
-    private val sortOrder = savedStateHandle.getStateFlow<SongSortOrder>("sortOrder", SongSortOrder.TITLE)
-    private val sortType = savedStateHandle.getStateFlow<SortOrderType>("sortType", SortOrderType.ASC)
+    private val _userPrefs = getUserPreferencesUseCase()
+        .map { it.librarySettings }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null
+        )
 
-    // TODO: Sprint 2.3 - Thay thế bằng logic thực tế từ core:playback
-    private val _playingSongId = savedStateHandle.getStateFlow<Long?>("playingSongId", null)
-    val playingSongId: StateFlow<Long?> = _playingSongId
+    private val _sortOrder = _userPrefs.map { it?.songSortOrder ?: SongsUiState().sortOrder }
+    private val _sortType = _userPrefs.map { it?.songSortType ?: SongsUiState().sortType }
 
-    // TODO: Sprint 2.3 - Mock trạng thái tạm dừng
-    private val _isPaused = savedStateHandle.getStateFlow("isPaused", false)
-    val isPaused: StateFlow<Boolean> = _isPaused
+    private val _songs: Flow<PagingData<Song>> = combine(_sortOrder, _sortType) { order, type ->
+        order to type
+    }.flatMapLatest { (order, type) ->
+        getSongsPagedUseCase(sortOrder = order, sortType = type)
+    }.cachedIn(viewModelScope)
 
-    private val _songs: Flow<PagingData<Song>> = combine(sortOrder, sortType, ::Pair)
-        .flatMapLatest { (order, type) ->
-            getSongsPagedUseCase(sortOrder = order, sortType = type)
-        }
-        .cachedIn(viewModelScope)
+    // Danh sách ID toàn bộ bài hát theo sort hiện tại (dùng cho Queue)
+    private val _allSongIds: StateFlow<List<Long>> = combine(_sortOrder, _sortType) { order, type ->
+        order to type
+    }.flatMapLatest { (order, type) ->
+        getSongIdsUseCase(sortOrder = order, sortType = type)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
     private val _isInitialLoading = MutableStateFlow(true)
 
     init {
         viewModelScope.launch {
-            delay(3_000)
+            delay(3500)
             _isInitialLoading.value = false
         }
     }
 
     val uiState: StateFlow<SongsUiState> = combine(
-        sortOrder,
-        sortType,
+        _sortOrder,
+        _sortType,
         getSongsSummaryUseCase(),
-        _isInitialLoading
-    ) { sort, type, summary, isLoading ->
+        observePlaybackStateUseCase(),
+        combine(_allSongIds, _isInitialLoading) { ids, loading -> ids to loading }
+    ) { sort, type, summary, playback, (allSongIds, isLoading) ->
         SongsUiState(
             songs = _songs,
             summary = summary,
             sortOrder = sort,
             sortType = type,
+            playbackState = playback,
+            allSongIds = allSongIds,
             isLoading = isLoading
         )
-    }
-    .stateIn(
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SongsUiState()
     )
 
     fun onEvent(event: SongsUiEvent) {
-        when (event) {
-            is SongsUiEvent.SortOrderChanged -> handleSortOrderChanged(event.sortOrder)
-            is SongsUiEvent.SortTypeChanged -> handleSortTypeChanged(event.sortType)
-            is SongsUiEvent.SongClicked -> handleSongClicked(event.songId)
+        viewModelScope.launch {
+            when (event) {
+                is SongsUiEvent.SortOrderChanged -> updateSongSortOrderUseCase(event.sortOrder)
+                is SongsUiEvent.SortTypeChanged -> updateSongSortTypeUseCase(event.sortType)
+                is SongsUiEvent.SongClicked -> handleSongClicked(event.songId)
+                is SongsUiEvent.PlayNextClicked -> handlePlayNext(event.song)
+                is SongsUiEvent.ToggleFavoriteClicked -> toggleFavoriteUseCase(event.songId)
+            }
         }
     }
 
-    private fun handleSortOrderChanged(newSortOrder: SongSortOrder) {
-        Timber.d("Sort order changed to: $newSortOrder")
-        savedStateHandle["sortOrder"] = newSortOrder
-    }
-
-    private fun handleSortTypeChanged(newSortType: SortOrderType) {
-        Timber.d("Sort type changed to: $newSortType")
-        savedStateHandle["sortType"] = newSortType
-    }
-
-    // TODO: Sprint 2.3 - Xóa bỏ khi tích hợp Playback thật
-    private fun handleSongClicked(songId: Long) {
-        val current = _playingSongId.value
-        if (current == songId) {
-            savedStateHandle["isPaused"] = !_isPaused.value
+    private suspend fun handleSongClicked(songId: Long) {
+        val state = uiState.value
+        val currentPlayback = state.playbackState
+        Timber.d("Current Playback: $currentPlayback")
+        if (currentPlayback.currentSongId == songId) {
+            if (currentPlayback.nowPlayingState == NowPlayingState.PLAYING) {
+                pauseSongUseCase()
+            } else {
+                resumeSongUseCase()
+            }
         } else {
-            savedStateHandle["playingSongId"] = songId
-            savedStateHandle["isPaused"] = false
+            Timber.d("Start New Playing")
+            playFromQueueUseCase(songId, state.allSongIds)
         }
-        Timber.d(
-            "Faking song click for visual testing: $songId (Paused: ${
-                savedStateHandle.get<Boolean>(
-                    "isPaused"
-                )
-            })"
-        )
+    }
+
+    private suspend fun handlePlayNext(song: Song) {
+        // Nếu là bài đang phát -> không làm gì
+        if (uiState.value.playbackState.currentSongId == song.id) return
+
+        playNextUseCase(song)
     }
 }

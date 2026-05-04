@@ -24,9 +24,6 @@ internal fun SongsScreen(
     viewModel: SongsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playingSongId by viewModel.playingSongId.collectAsStateWithLifecycle()
-    val isPaused by viewModel.isPaused.collectAsStateWithLifecycle()
-
     val songs = uiState.songs.collectAsLazyPagingItems()
 
     AudilyScaffold(
@@ -46,8 +43,7 @@ internal fun SongsScreen(
                     summary = uiState.summary,
                     sortOrder = uiState.sortOrder,
                     sortType = uiState.sortType,
-                    playingSongId = playingSongId,
-                    isPaused = isPaused,
+                    playbackState = uiState.playbackState,
                     onEvent = { viewModel.onEvent(it) },
                     innerPadding = innerPadding
                 )

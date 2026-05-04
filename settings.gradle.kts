@@ -41,6 +41,7 @@ include(":core:playback")
 include(":core:datastore")
 include(":core:database")
 include(":core:mediastore")
+include(":core:palette")
 
 include(":feature:home:api")
 include(":feature:home:impl")
@@ -51,6 +52,11 @@ include(":feature:settings:api")
 
 include(":feature:songs:api")
 include(":feature:songs:impl")
+
+
+include(":feature:albums:api")
+
+include(":feature:playlists:api")
 
 include(":feature:nowplaying")
 
