@@ -71,7 +71,9 @@ internal class SongRepositoryImpl @Inject constructor(
 
     override fun getSongs(ids: List<Long>): Flow<List<Song>> {
         return flow {
-            emit(mediaStoreDataSource.getSongs(ids).map { it.toSong() })
+            val songs = mediaStoreDataSource.getSongs(ids).map { it.toSong() }
+            val songsMap = songs.associateBy { it.id }
+            emit(ids.mapNotNull { songsMap[it] })
         }
     }
 
@@ -82,9 +84,10 @@ internal class SongRepositoryImpl @Inject constructor(
     }
 
     override fun getBasicSongs(ids: List<Long>): Flow<List<Song>> {
-        Timber.d("getBasicSongs run....")
         return flow {
-            emit(mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() })
+            val songs = mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() }
+            val songsMap = songs.associateBy { it.id }
+            emit(ids.mapNotNull { songsMap[it] })
         }
     }
 }
