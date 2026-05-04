@@ -20,22 +20,15 @@ import javax.inject.Inject
  */
 class ObserveNowPlayingUseCase @Inject constructor(
     private val observePlaybackState: ObservePlaybackStateUseCase,
-    private val getBasicSongs: GetBasicSongsUseCase,
+    private val observeQueueUseCase: ObserveQueueUseCase,
     private val paletteRepository: PaletteRepository,
     private val getPrefs: GetUserPreferencesUseCase
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<NowPlayingData> {
         val playbackStateFlow = observePlaybackState()
+        val songsFlow = observeQueueUseCase()
         val prefsFlow = getPrefs()
-
-        // Chỉ tải metadata khi danh sách ID trong hàng đợi thay đổi
-        val songsFlow = playbackStateFlow
-            .map { it.queueIds }
-            .distinctUntilChanged()
-            .flatMapLatest { ids ->
-                if (ids.isNotEmpty()) getBasicSongs(ids) else flowOf(emptyList())
-            }
 
         return combine(
             playbackStateFlow,
