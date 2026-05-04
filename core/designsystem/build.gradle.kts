@@ -20,6 +20,8 @@ roborazzi {
 }
 
 dependencies {
+    implementation(projects.core.model)
+
     implementation(libs.coil.compose)
     implementation(libs.androidx.palette)
 
