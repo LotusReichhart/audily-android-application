@@ -75,6 +75,7 @@ class AudilyAudioService : MediaLibraryService() {
         Timber.d("AudilyAudioService Destroyed")
         mediaSession?.release()
         mediaSession = null
+        playbackManager.release() // Đảm bảo ExoPlayer được giải phóng hoàn toàn
         super.onDestroy()
     }
 

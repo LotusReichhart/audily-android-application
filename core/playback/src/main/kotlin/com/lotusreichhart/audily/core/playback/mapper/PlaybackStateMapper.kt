@@ -8,7 +8,7 @@ import com.lotusreichhart.audily.core.model.playback.RepeatMode
 /**
  * Chuyển đổi trạng thái thực tế của Media3 Player sang mô hình PlaybackState của ứng dụng.
  */
-object PlaybackStateMapper {
+internal object PlaybackStateMapper {
     fun map(player: Player): PlaybackState {
         val currentMediaItem = player.currentMediaItem
         val songId = currentMediaItem?.mediaId?.toLongOrNull()

@@ -8,7 +8,7 @@ import androidx.core.net.toUri
 /**
  * Chuyển đổi giữa Model bài hát của Audily và MediaItem của Media3.
  */
-object MediaItemMapper {
+internal object MediaItemMapper {
     fun toMediaItem(song: Song): MediaItem {
         val metadata = MediaMetadata.Builder()
             .setTitle(song.basic.title)

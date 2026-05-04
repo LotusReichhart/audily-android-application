@@ -2,20 +2,25 @@ package com.lotusreichhart.audily.core.playback.repository
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers.Main
+import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.playback.PlaybackManager
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PlaybackRepositoryImpl @Inject constructor(
-    private val playbackManager: PlaybackManager
+internal class PlaybackRepositoryImpl @Inject constructor(
+    private val playbackManager: PlaybackManager,
+    @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher,
 ) : PlaybackRepository {
 
     override val playbackState: StateFlow<PlaybackState> = playbackManager.playbackState
@@ -27,8 +32,11 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override fun observePlaybackPosition(): Flow<Long> = flow {
         while (true) {
-            emit(playbackManager.player.currentPosition)
-            delay(500)
+            val position = withContext(mainDispatcher) {
+                playbackManager.player.currentPosition
+            }
+            emit(position)
+            delay(250) // Đảm bảo độ mượt cho Progress Bar
         }
     }
 }
