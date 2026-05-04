@@ -22,8 +22,6 @@ internal object PlaybackStateMapper {
                 else -> NowPlayingState.IDLE
             },
             currentSongId = songId,
-            playbackPosition = player.currentPosition,
-            bufferedPosition = player.bufferedPosition,
             duration = player.duration,
             isShuffleOn = player.shuffleModeEnabled,
             repeatMode = when (player.repeatMode) {

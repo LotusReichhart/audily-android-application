@@ -9,8 +9,6 @@ data class PlaybackState(
     val queueIds: List<Long> = emptyList(),
     val isShuffleOn: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF,
-    val playbackPosition: Long = 0,
-    val bufferedPosition: Long = 0,
     val duration: Long = 0,
     val speed: Float = 1.0f,
     val pitch: Float = 1.0f
@@ -22,8 +20,6 @@ data class PlaybackState(
             queueIds = emptyList(),
             isShuffleOn = false,
             repeatMode = RepeatMode.OFF,
-            playbackPosition = 0,
-            bufferedPosition = 0,
             duration = 0,
             speed = 1.0f,
             pitch = 1.0f

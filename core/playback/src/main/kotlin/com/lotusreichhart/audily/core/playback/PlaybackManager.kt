@@ -202,35 +202,10 @@ class PlaybackManager @Inject constructor(
 
     internal fun addSongsToQueue(songs: List<Song>, index: Int = -1) {
         val player = getOrCreatePlayer()
-
-        songs.forEach { song ->
-            val songIdStr = song.id.toString()
-            var existingIndex = -1
-            for (i in 0 until player.mediaItemCount) {
-                if (player.getMediaItemAt(i).mediaId == songIdStr) {
-                    existingIndex = i
-                    break
-                }
-            }
-
-            if (existingIndex != -1) {
-                // Nếu đã có, di chuyển về cuối (hoặc vị trí index chỉ định)
-                val targetIndex = if (index >= 0) index else player.mediaItemCount - 1
-                if (existingIndex != targetIndex) {
-                    player.moveMediaItem(
-                        existingIndex,
-                        targetIndex
-                    )
-                }
-            } else {
-                // Nếu chưa có, thêm mới vào cuối (hoặc vị trí index chỉ định)
-                val targetIndex = if (index >= 0) index else player.mediaItemCount
-                player.addMediaItem(
-                    targetIndex,
-                    MediaItemMapper.toMediaItem(song)
-                )
-            }
-        }
+        val mediaItems = MediaItemMapper.toMediaItems(songs)
+        
+        val targetIndex = if (index >= 0) index else player.mediaItemCount
+        player.addMediaItems(targetIndex, mediaItems)
     }
 
     internal fun removeFromQueue(songId: Long) {
@@ -353,7 +328,7 @@ class PlaybackManager @Inject constructor(
                 if (isDiscontinuity) {
                     listener.onPositionDiscontinuity(
                         newState.currentSongId,
-                        newState.playbackPosition,
+                        player.currentPosition,
                         duration,
                         newState.queueIds,
                         currentSourceId,
@@ -363,7 +338,7 @@ class PlaybackManager @Inject constructor(
                     listener.onPlaybackStateChanged(
                         player.isPlaying,
                         newState.currentSongId,
-                        newState.playbackPosition,
+                        player.currentPosition,
                         duration,
                         newState.queueIds,
                         currentSourceId,

@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 class ObserveQueueUseCase @Inject constructor(
@@ -21,8 +23,16 @@ class ObserveQueueUseCase @Inject constructor(
         val songsFlow = playbackStateFlow
             .map { it.queueIds }
             .distinctUntilChanged()
+            .onEach { ids ->
+                Timber.d("Check lỗi sai thứ tự Queue - ObserveQueueUseCase - Queue IDs updated | Size: ${ids.size} | Data: $ids")
+            }
             .flatMapLatest { ids ->
                 if (ids.isNotEmpty()) getBasicSongs(ids) else flowOf(emptyList())
+            }.onEach { songs ->
+                val formattedData = songs.joinToString(separator = " | ") { song ->
+                    "${song.id} - ${song.basic.title} - ${song.basic.artist}"
+                }
+                Timber.d("Check lỗi sai thứ tự Queue - ObserveQueueUseCase - Basic Song List size: ${songs.size}, Data: [$formattedData]")
             }
 
         return songsFlow

@@ -65,8 +65,6 @@ class MappersTest {
 
         assertEquals(NowPlayingState.PLAYING, state.nowPlayingState)
         assertEquals(456L, state.currentSongId)
-        assertEquals(1000L, state.playbackPosition)
-        assertEquals(2000L, state.bufferedPosition)
         assertEquals(3000L, state.duration)
         assertEquals(true, state.isShuffleOn)
         assertEquals(RepeatMode.ONE, state.repeatMode)
