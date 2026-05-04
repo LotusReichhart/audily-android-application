@@ -75,7 +75,7 @@ internal class SongRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getBasicSongs(id: Long): Flow<Song?> {
+    override fun getBasicSong(id: Long): Flow<Song?> {
         return flow {
             emit(mediaStoreDataSource.getBasicSong(id)?.toSong())
         }

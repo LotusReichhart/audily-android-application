@@ -43,6 +43,6 @@ interface SongRepository {
      */
     fun getSongs(ids: List<Long>): Flow<List<Song>>
 
-    fun getBasicSongs(id: Long): Flow<Song?>
+    fun getBasicSong(id: Long): Flow<Song?>
     fun getBasicSongs(ids: List<Long>): Flow<List<Song>>
 }
