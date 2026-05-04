@@ -16,7 +16,7 @@ class FastRewindUseCase @Inject constructor(
     suspend operator fun invoke() {
         val skipDuration = userPreferencesRepository.getUserPreferences()
             .first().playbackSettings.skipDuration.toLong()
-        
+
         playbackRepository.handleEvent(PlaybackEvent.SeekBy(-skipDuration))
     }
 }

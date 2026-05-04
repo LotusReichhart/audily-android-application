@@ -7,5 +7,6 @@ import javax.inject.Inject
 class SeekToUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
-    suspend operator fun invoke(position: Long) = playbackRepository.handleEvent(PlaybackEvent.SeekTo(position))
+    suspend operator fun invoke(position: Long) =
+        playbackRepository.handleEvent(PlaybackEvent.SeekTo(position))
 }
