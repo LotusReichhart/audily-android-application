@@ -75,6 +75,12 @@ internal class SongRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getBasicSongs(id: Long): Flow<Song?> {
+        return flow {
+            emit(mediaStoreDataSource.getBasicSong(id)?.toSong())
+        }
+    }
+
     override fun getBasicSongs(ids: List<Long>): Flow<List<Song>> {
         Timber.d("getBasicSongs run....")
         return flow {

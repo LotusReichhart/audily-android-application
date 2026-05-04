@@ -89,6 +89,10 @@ class MediaStoreDataSource @Inject constructor(
         return contentResolver.querySongsByIds(musicUri, ids)
     }
 
+    fun getBasicSong(id: Long): MediaStoreSong? {
+        return contentResolver.queryBasicSongById(musicUri, id)
+    }
+
     fun getBasicSongs(ids: List<Long>): List<MediaStoreSong> {
         return contentResolver.queryBasicSongsByIds(musicUri, ids)
     }
