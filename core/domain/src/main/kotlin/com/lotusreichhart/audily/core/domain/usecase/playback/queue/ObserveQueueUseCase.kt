@@ -1,5 +1,6 @@
-package com.lotusreichhart.audily.core.domain.usecase.playback.state
+package com.lotusreichhart.audily.core.domain.usecase.playback.queue
 
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetBasicSongsUseCase
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow

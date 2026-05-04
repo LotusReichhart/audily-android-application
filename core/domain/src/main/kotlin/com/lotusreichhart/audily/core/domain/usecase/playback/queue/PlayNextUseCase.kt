@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.domain.usecase.playback.control
+package com.lotusreichhart.audily.core.domain.usecase.playback.queue
 
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent

@@ -1,6 +1,7 @@
 package com.lotusreichhart.audily.core.domain.usecase.playback.state
 
 import com.lotusreichhart.audily.core.domain.repository.playback.PaletteRepository
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.ObserveQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetBasicSongsUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingData

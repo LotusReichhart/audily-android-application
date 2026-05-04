@@ -1,5 +1,6 @@
 package com.lotusreichhart.audily.core.domain.usecase.playback.control
 
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.SkipToIndexUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetPlaybackPitchUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetPlaybackSpeedUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetRepeatModeUseCase

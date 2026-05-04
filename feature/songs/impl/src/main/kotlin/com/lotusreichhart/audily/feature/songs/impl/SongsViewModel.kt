@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.lotusreichhart.audily.core.domain.usecase.favorite.ToggleFavoriteUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlayNextUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayNextUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.PauseSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
