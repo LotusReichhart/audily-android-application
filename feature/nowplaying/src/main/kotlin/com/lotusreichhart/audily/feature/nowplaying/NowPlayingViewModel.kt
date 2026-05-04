@@ -7,8 +7,7 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPl
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackPositionUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
-import androidx.compose.ui.graphics.Color
-import com.lotusreichhart.audily.feature.nowplaying.model.NowPlayingPaletteColors
+import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,13 +45,7 @@ class NowPlayingViewModel @Inject constructor(
             queue = data.queue,
             currentIndex = data.currentIndex,
             skipDuration = data.skipDuration,
-            paletteColors = data.colors?.let {
-                NowPlayingPaletteColors(
-                    vibrant = Color(it.vibrant),
-                    vibrantDark = Color(it.vibrantDark),
-                    dominant = Color(it.dominant)
-                )
-            },
+            paletteColors = data.colors?.toUiPalette(),
             hasNext = data.hasNext,
             hasPrevious = data.hasPrevious,
             isLyricsVisible = isLyricsVisible

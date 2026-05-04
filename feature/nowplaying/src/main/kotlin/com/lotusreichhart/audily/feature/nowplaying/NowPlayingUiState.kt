@@ -1,8 +1,8 @@
 package com.lotusreichhart.audily.feature.nowplaying
 
+import com.lotusreichhart.audily.core.designsystem.model.UiPalette
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.song.Song
-import com.lotusreichhart.audily.feature.nowplaying.model.NowPlayingPaletteColors
 
 data class NowPlayingUiState(
     val playbackState: PlaybackState = PlaybackState.INITIAL,
@@ -11,7 +11,7 @@ data class NowPlayingUiState(
     val queue: List<Song> = emptyList(),
     val currentIndex: Int = -1,
     val skipDuration: Int = 10,
-    val paletteColors: NowPlayingPaletteColors? = null,
+    val paletteColors: UiPalette? = null,
     val hasNext: Boolean = true,
     val hasPrevious: Boolean = true,
     val isLyricsVisible: Boolean = false
