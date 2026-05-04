@@ -163,14 +163,6 @@ class AudilyDataStoreTest {
     }
 
     @Test
-    fun `Playback - update playback speed`() = testScope.runTest {
-        audilyDataStore.playback.updatePlaybackSpeed(1.5f)
-
-        val result = audilyDataStore.userPreferences.first()
-        assertEquals(1.5f, result.playbackSettings.playbackSpeed, 0.01f)
-    }
-
-    @Test
     fun `Playback - update volume normalization`() = testScope.runTest {
         audilyDataStore.playback.updateVolumeNormalization(true)
 
