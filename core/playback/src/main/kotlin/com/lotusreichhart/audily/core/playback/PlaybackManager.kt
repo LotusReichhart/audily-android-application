@@ -46,9 +46,14 @@ class PlaybackManager @Inject constructor(
     private val _playbackState = MutableStateFlow(PlaybackState.INITIAL)
     internal val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
+    private var isInitialized = false
+
     // Lưu trữ ngữ cảnh phát nhạc (Playlist/Album)
     internal var currentSourceId: Long? = null
     internal var currentSourceType: String? = null
+
+    // Cờ báo hiệu cần khôi phục dữ liệu (dành cho trường hợp Player bị kill nhưng Manager vẫn sống)
+    private var needsRestoration = false
 
     internal val player: Player
         get() = getOrCreatePlayer()
@@ -83,8 +88,6 @@ class PlaybackManager @Inject constructor(
             is PlaybackEvent.MoveQueueItem -> moveQueueItem(event.from, event.to)
             is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs, event.index)
             is PlaybackEvent.PlayNext -> addNext(event.song)
-            else -> { /* Handled at Repository level */
-            }
         }
     }
 
@@ -94,6 +97,8 @@ class PlaybackManager @Inject constructor(
             it.release()
         }
         exoPlayer = null
+        isInitialized = false
+        _playbackState.value = PlaybackState.INITIAL
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -155,6 +160,7 @@ class PlaybackManager @Inject constructor(
             startPosition
         )
         player.prepare()
+        markAsInitialized()
     }
 
     internal fun addNext(song: Song) {
@@ -174,6 +180,7 @@ class PlaybackManager @Inject constructor(
         if (player.mediaItemCount == 0) {
             player.setMediaItem(MediaItemMapper.toMediaItem(song))
             player.prepare()
+            markAsInitialized()
             player.play()
             return
         }
@@ -206,6 +213,7 @@ class PlaybackManager @Inject constructor(
         
         val targetIndex = if (index >= 0) index else player.mediaItemCount
         player.addMediaItems(targetIndex, mediaItems)
+        markAsInitialized()
     }
 
     internal fun removeFromQueue(songId: Long) {
@@ -242,6 +250,17 @@ class PlaybackManager @Inject constructor(
         exoPlayer?.playbackParameters = PlaybackParameters(speed, pitch)
     }
 
+    internal fun needsRestoration(): Boolean = needsRestoration
+
+    internal fun markAsInitialized() {
+        if (!isInitialized || needsRestoration) {
+            isInitialized = true
+            needsRestoration = false
+            Timber.d("Audily Service Kill - PlaybackManager marked as initialized")
+            notifyListeners()
+        }
+    }
+
     internal fun onSessionEnded() {
         val player = exoPlayer ?: return
         val queueIds = PlaybackStateMapper.getQueueIds(player)
@@ -276,7 +295,10 @@ class PlaybackManager @Inject constructor(
     }
 
     private fun getOrCreatePlayer(): ExoPlayer {
-        return exoPlayer ?: ExoPlayer.Builder(context)
+        val player = exoPlayer
+        if (player != null) return player
+
+        return ExoPlayer.Builder(context)
             .setAudioAttributes(
                 androidx.media3.common.AudioAttributes.Builder()
                     .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -291,6 +313,10 @@ class PlaybackManager @Inject constructor(
             .also {
                 it.addListener(playerListener)
                 exoPlayer = it
+                // Đánh dấu là Player mới toanh, cần nạp lại Session
+                needsRestoration = true
+                isInitialized = false 
+                Timber.d("Audily Service Kill - New Player created, needs restoration")
             }
     }
 
@@ -316,8 +342,12 @@ class PlaybackManager @Inject constructor(
     }
 
     private fun notifyListeners(isDiscontinuity: Boolean = false) {
+        if (!isInitialized) {
+            Timber.d("Audily Service Kill - notifyListeners blocked: not initialized")
+            return
+        }
         val player = exoPlayer ?: return
-        val newState = PlaybackStateMapper.map(player)
+        val newState = PlaybackStateMapper.map(player, true)
         _playbackState.value = newState
 
         val duration =

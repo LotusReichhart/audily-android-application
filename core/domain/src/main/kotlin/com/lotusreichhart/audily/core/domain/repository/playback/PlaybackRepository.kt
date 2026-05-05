@@ -17,4 +17,14 @@ interface PlaybackRepository {
      * Theo dõi vị trí phát nhạc hiện tại (ms).
      */
     fun observePlaybackPosition(): Flow<Long>
+
+    /**
+     * Kiểm tra trình phát có vừa được tái tạo và cần khôi phục dữ liệu không.
+     */
+    fun needsRestoration(): Boolean
+
+    /**
+     * Đánh dấu trình phát đã sẵn sàng (đã khôi phục session xong).
+     */
+    fun markAsInitialized()
 }

@@ -4,7 +4,6 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.queue.SkipToIndexU
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetRepeatModeUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetShuffleUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.settings.SetSpeedAndPitchUseCase
-import com.lotusreichhart.audily.core.domain.usecase.playback.state.RestorePlaybackSessionUseCase
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import javax.inject.Inject
 
@@ -19,7 +18,6 @@ class PlaybackControlUseCases @Inject constructor(
     private val seekToUseCase: SeekToUseCase,
     private val setShuffleUseCase: SetShuffleUseCase,
     private val setRepeatModeUseCase: SetRepeatModeUseCase,
-    private val restoreSessionUseCase: RestorePlaybackSessionUseCase,
     private val stopSongUseCase: StopSongUseCase,
     private val setSpeedAndPitchUseCase: SetSpeedAndPitchUseCase,
     private val fastForwardUseCase: FastForwardUseCase,
@@ -34,7 +32,6 @@ class PlaybackControlUseCases @Inject constructor(
     suspend fun seekTo(position: Long) = seekToUseCase(position)
     suspend fun setShuffle(enabled: Boolean) = setShuffleUseCase(enabled)
     suspend fun setRepeatMode(mode: RepeatMode) = setRepeatModeUseCase(mode)
-    suspend fun restoreSession() = restoreSessionUseCase()
     suspend fun stop() = stopSongUseCase()
     suspend fun setSpeedAndPitch(speed: Float, pitch: Float) = setSpeedAndPitchUseCase(speed, pitch)
     suspend fun fastForward() = fastForwardUseCase()
