@@ -26,13 +26,6 @@ class NowPlayingViewModel @Inject constructor(
 
     private val _isLyricsVisible = MutableStateFlow(false)
 
-    init {
-        // Khôi phục phiên phát nhạc đã lưu khi ViewModel khởi tạo
-        viewModelScope.launch {
-            controls.restoreSession()
-        }
-    }
-
     val uiState: StateFlow<NowPlayingUiState> = combine(
         observeNowPlaying(),
         observePlaybackPosition(),
