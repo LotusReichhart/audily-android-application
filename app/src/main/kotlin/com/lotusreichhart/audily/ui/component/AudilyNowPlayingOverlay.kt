@@ -24,15 +24,22 @@ fun AudilyNowPlayingOverlay(
     appState: AudilyAppState,
     nowPlayingViewModel: NowPlayingViewModel,
     flingBehavior: FlingBehavior,
+    navBarVisibilityProgress: Float,
     modifier: Modifier = Modifier
 ) {
     // Root Box không dùng fillMaxSize() để tránh chặn touch toàn màn hình
     Box(
         modifier = modifier
             .offset {
+                // Chỉ áp dụng độ dời nếu có Bottom Bar (thường là ở chế độ Portrait)
+                // Và độ dời này phải biến mất khi trình phát đang mở rộng (expandProgress tiến tới 1)
+                val barOffset = if (appState.bottomBarHeightPx > 0) {
+                    (1f - navBarVisibilityProgress) * appState.bottomBarHeightPx * (1f - appState.expandProgress)
+                } else 0f
+
                 IntOffset(
                     x = 0,
-                    y = appState.currentPanelOffsetY.roundToInt()
+                    y = (appState.currentPanelOffsetY + barOffset).roundToInt()
                 )
             }
             .anchoredDraggable(

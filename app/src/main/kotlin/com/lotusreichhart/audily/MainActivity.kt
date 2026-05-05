@@ -5,42 +5,32 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import android.content.Intent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.AudilyTheme
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.ui.permission.PermissionHandler
 import com.lotusreichhart.audily.core.ui.permission.PermissionScreen
 import com.lotusreichhart.audily.ui.AudilyApp
 import com.lotusreichhart.audily.ui.rememberAudilyAppState
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.RestorePlaybackSessionUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var restorePlaybackSessionUseCase: RestorePlaybackSessionUseCase
 
     private var shouldExpandPlayer by mutableStateOf(false)
 
@@ -55,18 +45,19 @@ class MainActivity : ComponentActivity() {
             )
 
             // Tự động mở NowPlaying nếu Intent yêu cầu
-            LaunchedEffect(shouldExpandPlayer) {
-                if (shouldExpandPlayer) {
-                    appState.expandPanel()
-                    shouldExpandPlayer = false
-                }
-            }
+//            LaunchedEffect(shouldExpandPlayer) {
+//                if (shouldExpandPlayer) {
+//                    appState.expandPanel()
+//                    shouldExpandPlayer = false
+//                }
+//            }
 
             AudilyTheme {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(
-                            appState = appState
+                            appState = appState,
+//                            shouldExpandPlayer = shouldExpandPlayer
                         )
                     },
                     deniedContent = { shouldShowRationale, onRequestPermission ->
@@ -77,6 +68,15 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Khôi phục session mỗi khi quay lại app (nếu trình phát đã bị kill)
+        lifecycleScope.launch {
+            Timber.d("Audily Service Kill - Bắt đầy khôi phục Playback State...")
+            restorePlaybackSessionUseCase()
         }
     }
 

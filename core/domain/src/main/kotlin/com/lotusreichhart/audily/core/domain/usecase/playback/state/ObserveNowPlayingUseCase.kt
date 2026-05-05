@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ class ObserveNowPlayingUseCase @Inject constructor(
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<NowPlayingData> {
-        val playbackStateFlow = observePlaybackState()
+        val playbackStateFlow = observePlaybackState().filter { it.isInitialized }
         val songsFlow = observeQueueUseCase()
         val prefsFlow = getPrefs()
         val paletteFlow = observeCurrentPalette()
@@ -39,7 +40,7 @@ class ObserveNowPlayingUseCase @Inject constructor(
             val repeatMode = prefs.playbackSettings.repeatMode
 
             val currentSong = songs.find { it.id == currentId }
-            Timber.d("Check lỗi sai thứ tự Queue - ObserveNowPlayingUseCase - currentSong: ${currentSong?.id} - ${currentSong?.basic?.title} - ${currentSong?.basic?.artist}")
+            Timber.d("Audily Service Kill - ObserveNowPlayingUseCase - currentSong: ${currentSong?.id} - ${currentSong?.basic?.title} - ${currentSong?.basic?.artist}")
             Timber.d("Chạy khi có sự thay đổi state - ObserveNowPlayingUseCase - currentSong: ${currentSong?.id} - ${currentSong?.basic?.title} - ${currentSong?.basic?.artist}")
 
             val currentIndex =
@@ -68,6 +69,10 @@ class ObserveNowPlayingUseCase @Inject constructor(
                 hasPrevious = hasPrevious,
                 skipDuration = prefs.playbackSettings.skipDuration
             )
+        }.filter { data ->
+            // Nếu có ID bài hát nhưng chưa load xong Metadata (song == null),
+            // thì chặn lại không cho UI cập nhật để tránh hiện tượng giật khung hình.
+            data.playbackState.currentSongId == null || data.song != null
         }.distinctUntilChanged()
     }
 }

@@ -1,75 +1,65 @@
 package com.lotusreichhart.audily.feature.home.impl
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
-import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
-import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.feature.home.impl.component.HomeTopBar
+import timber.log.Timber
 
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
+    onInitialLoadingFinished: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = uiState) {
-        HomeUiState.Loading -> {
-            // Hiển thị trạng thái loading nếu cần
-        }
-
-        is HomeUiState.Success -> {
-            HomeScreen(
-                currentTab = state.selectedTab,
-                onNavigateToPlaylists = onNavigateToPlaylists,
-                onNavigateToAlbums = onNavigateToAlbums,
-                songsContent = { modifier ->
-                    viewModel.songsEntry.Render(modifier)
-                },
-                modifier = modifier
+    LaunchedEffect(uiState.isLoading) {
+        Timber.d(
+            "Giải quyết vấn đề Drop khung hình giữa Songs và Nowplaying -" +
+                    " HomeScreen theo dõi trạng thái isLoading: ${uiState.isLoading}"
+        )
+        if (!uiState.isLoading) {
+            Timber.d(
+                "Giải quyết vấn đề Drop khung hình giữa Songs và Nowplaying -" +
+                        " HomeScreen callback running..."
             )
+            onInitialLoadingFinished()
         }
     }
+
+
+    HomeScreen(
+        modifier = modifier,
+        onNavigateToSongs = onNavigateToSongs,
+        onNavigateToPlaylists = onNavigateToPlaylists,
+        onNavigateToAlbums = onNavigateToAlbums
+    )
 }
 
 @Composable
 internal fun HomeScreen(
-    currentTab: HomeTab,
+    modifier: Modifier = Modifier,
+    onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
-    onNavigateToAlbums: () -> Unit,
-    songsContent: @Composable (Modifier) -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateToAlbums: () -> Unit
 ) {
     AudilyScaffold(
         topBar = {
             HomeTopBar(
-                selectedTab = currentTab,
+                onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
                 onSearchClick = { /* TODO: Navigate to Search Feature later */ }
@@ -79,115 +69,7 @@ internal fun HomeScreen(
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            when (currentTab) {
-                HomeTab.Songs -> songsContent(Modifier.fillMaxSize())
-                else -> {
-                    // Các tab khác đã được điều hướng đi
-                }
-            }
+            Text("Home Screen")
         }
-    }
-}
-
-@Composable
-private fun HomeTopBar(
-    selectedTab: HomeTab,
-    onNavigateToPlaylists: () -> Unit,
-    onNavigateToAlbums: () -> Unit,
-    onSearchClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = LocalDimensions.current.paddingMedium)
-            .padding(bottom = LocalDimensions.current.paddingSmall),
-        verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = "Audily",
-                style = MaterialTheme.typography.displaySmall.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            Surface(
-                modifier = Modifier
-                    .padding(1.dp)
-                    .size(LocalDimensions.current.iconButtonHeight),
-                onClick = onSearchClick,
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp,
-                shadowElevation = 2.dp
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        painter = painterResource(id = AudilyIcons.Search),
-                        contentDescription = "Search",
-                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-        }
-
-        // Hàng 2: Tabs (Có thể cuộn ngang)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
-        ) {
-            HomeChip(
-                titleId = HomeTab.Songs.title,
-                selected = selectedTab == HomeTab.Songs,
-                onClick = {}
-            )
-            HomeChip(
-                titleId = HomeTab.Playlists.title,
-                selected = false,
-                onClick = onNavigateToPlaylists
-            )
-            HomeChip(
-                titleId = HomeTab.Albums.title,
-                selected = false,
-                onClick = onNavigateToAlbums
-            )
-        }
-    }
-}
-
-@Composable
-private fun HomeChip(
-    titleId: Int,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .padding(1.dp),
-        onClick = onClick,
-        shape = CircleShape,
-        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        contentColor = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-        tonalElevation = if (selected) 2.dp else 0.dp,
-        shadowElevation = if (selected) 2.dp else 1.dp
-    ) {
-        Text(
-            text = stringResource(titleId),
-            modifier = Modifier.padding(
-                horizontal = LocalDimensions.current.paddingLarge,
-                vertical = LocalDimensions.current.paddingSmall
-            ),
-            style = MaterialTheme.typography.titleSmall.copy(
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-            )
-        )
     }
 }

@@ -11,7 +11,8 @@ data class PlaybackState(
     val repeatMode: RepeatMode = RepeatMode.OFF,
     val duration: Long = 0,
     val speed: Float = 1.0f,
-    val pitch: Float = 1.0f
+    val pitch: Float = 1.0f,
+    val isInitialized: Boolean = false
 ) {
     companion object {
         val INITIAL = PlaybackState(
@@ -22,7 +23,8 @@ data class PlaybackState(
             repeatMode = RepeatMode.OFF,
             duration = 0,
             speed = 1.0f,
-            pitch = 1.0f
+            pitch = 1.0f,
+            isInitialized = false
         )
     }
 }

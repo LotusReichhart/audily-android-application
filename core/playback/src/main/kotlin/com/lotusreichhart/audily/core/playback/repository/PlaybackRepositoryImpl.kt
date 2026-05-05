@@ -39,4 +39,10 @@ internal class PlaybackRepositoryImpl @Inject constructor(
             delay(250) // Đảm bảo độ mượt cho Progress Bar
         }
     }
+
+    override fun markAsInitialized() {
+        playbackManager.markAsInitialized()
+    }
+
+    override fun needsRestoration(): Boolean = playbackManager.needsRestoration()
 }

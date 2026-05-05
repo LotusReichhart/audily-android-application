@@ -14,8 +14,8 @@ class PlayFromQueueUseCase @Inject constructor(
     suspend operator fun invoke(songId: Long, queueIds: List<Long>) {
         val currentQueue = playbackRepository.playbackState.value.queueIds
 
-        Timber.d("Check lỗi sai thứ tự Queue - PlayFromQueueUseCase - currentQueue: $currentQueue")
-        Timber.d("Check lỗi sai thứ tự Queue - PlayFromQueueUseCase - queueIds: $queueIds")
+        Timber.d("Audily Service Kill - PlayFromQueueUseCase - currentQueue: $currentQueue")
+        Timber.d("Audily Service Kill - PlayFromQueueUseCase - queueIds: $queueIds")
 
         if (currentQueue == queueIds && currentQueue.isNotEmpty()) {
             val targetIndex = currentQueue.indexOf(songId).coerceAtLeast(0)

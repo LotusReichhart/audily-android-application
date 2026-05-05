@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 
 @Composable
 fun <T : Any> AudilyNavHost(
@@ -22,10 +23,12 @@ fun <T : Any> AudilyNavHost(
     modifier: Modifier = Modifier,
     topPadding: Dp = LocalDimensions.current.paddingExtraSmall
 ) {
+    val bottomPadding = LocalDynamicBottomPadding.current
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = topPadding)
+            .padding(top = topPadding, bottom = bottomPadding)
             .windowInsetsPadding(
                 WindowInsets.safeDrawing.only(
                     WindowInsetsSides.Horizontal + WindowInsetsSides.Top

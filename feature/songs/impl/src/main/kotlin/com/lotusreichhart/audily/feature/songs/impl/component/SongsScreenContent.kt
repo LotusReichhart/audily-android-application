@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,15 +24,12 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.lotusreichhart.audily.core.common.util.TimeUtils
 import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
-import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
-import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
-import com.lotusreichhart.audily.feature.songs.impl.SongsScreenConstants
 import com.lotusreichhart.audily.feature.songs.impl.SongsUiEvent
 import com.lotusreichhart.audily.feature.songs.impl.rememberSongsScreenState
 import com.lotusreichhart.audily.feature.songs.impl.util.labelResId
@@ -53,7 +49,6 @@ internal fun SongsScreenContent(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    val bottomPadding = LocalDynamicBottomPadding.current
     val screenState = rememberSongsScreenState()
 
     Box(
@@ -88,7 +83,6 @@ internal fun SongsScreenContent(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 top = headerHeightDp,
-                bottom = bottomPadding + LocalDimensions.current.paddingSmall,
             )
         ) {
             items(

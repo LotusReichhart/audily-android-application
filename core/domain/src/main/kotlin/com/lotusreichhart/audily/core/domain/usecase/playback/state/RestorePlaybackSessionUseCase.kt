@@ -19,20 +19,23 @@ class RestorePlaybackSessionUseCase @Inject constructor(
     private val songRepository: SongRepository
 ) {
     suspend operator fun invoke() {
-        // QUAN TRỌNG: Nếu Player đang có bài hát (nghĩa là Service đang phát nhạc ngầm), 
-        // không được khôi phục đè lên vì sẽ làm ngắt quãng nhạc.
-        if (playbackRepository.playbackState.value.currentSongId != null) {
-            Timber.d("Active session detected, skipping restoration")
+        // QUAN TRỌNG: Nếu Player đang có bài hát và KHÔNG ở trạng thái cần khôi phục (Zombie),
+        // thì mới bỏ qua việc khôi phục để tránh ngắt quãng nhạc.
+        if (playbackRepository.playbackState.value.currentSongId != null && !playbackRepository.needsRestoration()) {
+            Timber.d("Audily Service Kill - Active session detected, skipping restoration")
+            playbackRepository.markAsInitialized()
             return
         }
 
-        val session = userPreferencesRepository.getPlaybackSession().first() ?: return
-        val userPrefs = userPreferencesRepository.getUserPreferences().first()
-        val settings = userPrefs.playbackSettings
+        try {
+            val session = userPreferencesRepository.getPlaybackSession().first()
+            if (session == null || session.queueIds.isEmpty()) return
 
-        if (session.queueIds.isNotEmpty()) {
+            val userPrefs = userPreferencesRepository.getUserPreferences().first()
+            val settings = userPrefs.playbackSettings
+
             val songs = songRepository.getSongs(session.queueIds).first()
-            
+
             if (songs.isNotEmpty()) {
                 val startIndex = session.currentSongId?.let { id ->
                     songs.indexOfFirst { it.id == id }
@@ -45,14 +48,16 @@ class RestorePlaybackSessionUseCase @Inject constructor(
                         startPosition = session.position
                     )
                 )
-                
+
                 // Khôi phục các thiết lập khác
                 playbackRepository.handleEvent(PlaybackEvent.SetShuffle(settings.isShuffleEnabled))
                 playbackRepository.handleEvent(PlaybackEvent.SetRepeatMode(settings.repeatMode))
-                
+
                 // Đảm bảo dừng nhạc khi vừa mở app
                 playbackRepository.handleEvent(PlaybackEvent.Pause)
             }
+        } finally {
+            playbackRepository.markAsInitialized()
         }
     }
 }
