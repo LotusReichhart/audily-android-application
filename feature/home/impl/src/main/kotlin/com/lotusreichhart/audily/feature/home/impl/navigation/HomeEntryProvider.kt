@@ -7,15 +7,19 @@ import androidx.navigation3.runtime.NavKey
 import com.lotusreichhart.audily.core.navigation.Navigator
 import com.lotusreichhart.audily.feature.home.api.navigation.HomeNavKey
 import com.lotusreichhart.audily.feature.home.impl.HomeScreen
+import com.lotusreichhart.audily.feature.songs.api.navigation.SongsNavKey
 
 fun EntryProviderScope<NavKey>.homeEntry(
-    navigator: Navigator
+    navigator: Navigator,
+    onInitialLoadingFinished: () -> Unit
 ) {
     entry<HomeNavKey> {
         HomeScreen(
             modifier = Modifier.fillMaxSize(),
+            onNavigateToSongs = { navigator.navigate(SongsNavKey) },
             onNavigateToPlaylists = { /* Sẽ xử lý điều hướng sau */ },
-            onNavigateToAlbums = { /* Sẽ xử lý điều hướng sau */ }
+            onNavigateToAlbums = { /* Sẽ xử lý điều hướng sau */ },
+            onInitialLoadingFinished = onInitialLoadingFinished
         )
     }
 }

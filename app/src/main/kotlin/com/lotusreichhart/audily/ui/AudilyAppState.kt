@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -46,7 +47,7 @@ fun rememberAudilyAppState(
 
     val navigationState = rememberNavigationState(
         startKey = HomeNavKey,
-        topLevelKeys = TOP_LEVEL_NAV_ITEMS.keys
+        topLevelKeys = TOP_LEVEL_NAV_ITEMS
     )
     val navigator = remember(navigationState) { Navigator(navigationState) }
 
@@ -117,6 +118,8 @@ class AudilyAppState(
 
     var isPanelVisible by mutableStateOf(false)
 
+    var isInitialLoadingFinished by mutableStateOf(false)
+
     /**
      * Tính toán padding dưới cùng cho nội dung (NavDisplay).
      * Bao gồm: Chiều cao BottomBar (nếu hiện) + Chiều cao MiniPlayer (nếu hiện).
@@ -160,5 +163,25 @@ class AudilyAppState(
         coroutineScope.launch {
             draggableState.animateTo(AudilyPanelState.EXPANDED)
         }
+    }
+
+    /**
+     * Cập nhật các điểm neo (anchors) cho trình phát nhạc dựa trên kích thước màn hình.
+     */
+    fun updatePlayerAnchors(fullHeight: Float, isWide: Boolean) {
+        if (fullHeight <= 0) return
+
+        val expandedY = 0f
+        val collapsedY = if (isWide) {
+            (fullHeight - panelHeightPx).coerceAtLeast(0f)
+        } else {
+            (fullHeight - bottomBarHeightPx - panelHeightPx).coerceAtLeast(0f)
+        }
+
+        val anchors = DraggableAnchors {
+            AudilyPanelState.COLLAPSED at collapsedY
+            AudilyPanelState.EXPANDED at expandedY
+        }
+        draggableState.updateAnchors(anchors)
     }
 }

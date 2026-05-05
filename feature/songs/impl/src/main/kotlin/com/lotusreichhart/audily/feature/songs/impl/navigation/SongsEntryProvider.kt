@@ -6,7 +6,9 @@ import com.lotusreichhart.audily.core.navigation.Navigator
 import com.lotusreichhart.audily.feature.songs.api.navigation.SongsNavKey
 import com.lotusreichhart.audily.feature.songs.impl.SongsScreen
 
-fun EntryProviderScope<NavKey>.songsEntry(navigator: Navigator){
+fun EntryProviderScope<NavKey>.songsEntry(
+    navigator: Navigator
+) {
     entry<SongsNavKey> {
         SongsScreen()
     }

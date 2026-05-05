@@ -61,31 +61,46 @@ internal class SongsViewModel @Inject constructor(
     private val _sortOrder = _userPrefs.map { it?.songSortOrder ?: SongsUiState().sortOrder }
     private val _sortType = _userPrefs.map { it?.songSortType ?: SongsUiState().sortType }
 
-    private val _songs: Flow<PagingData<Song>> = combine(_sortOrder, _sortType) { order, type ->
-        order to type
-    }.flatMapLatest { (order, type) ->
-        getSongsPagedUseCase(sortOrder = order, sortType = type)
-    }.cachedIn(viewModelScope)
-
-    // Danh sách ID toàn bộ bài hát theo sort hiện tại (dùng cho Queue)
-    private val _allSongIds: StateFlow<List<Long>> = combine(_sortOrder, _sortType) { order, type ->
-        order to type
-    }.flatMapLatest { (order, type) ->
-        getSongIdsUseCase(sortOrder = order, sortType = type)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = emptyList()
-    )
-
     private val _isInitialLoading = MutableStateFlow(true)
+    private val _isDataLoadingStarted = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
-            delay(3500)
+            // Chờ animation trượt của BottomBar hoàn tất
+            delay(1000)
+            _isDataLoadingStarted.value = true
+            // Tổng thời gian hiện Shimmer
+            delay(2000)
             _isInitialLoading.value = false
         }
     }
+
+    private val _songs: Flow<PagingData<Song>> =
+        combine(_sortOrder, _sortType, _isDataLoadingStarted) { order, type, isStarted ->
+            Triple(order, type, isStarted)
+        }.flatMapLatest { (order, type, isStarted) ->
+            if (!isStarted) {
+                kotlinx.coroutines.flow.flowOf(PagingData.empty())
+            } else {
+                getSongsPagedUseCase(sortOrder = order, sortType = type)
+            }
+        }.cachedIn(viewModelScope)
+
+    // Danh sách ID toàn bộ bài hát theo sort hiện tại (dùng cho Queue)
+    private val _allSongIds: StateFlow<List<Long>> =
+        combine(_sortOrder, _sortType, _isDataLoadingStarted) { order, type, isStarted ->
+            Triple(order, type, isStarted)
+        }.flatMapLatest { (order, type, isStarted) ->
+            if (!isStarted) {
+                kotlinx.coroutines.flow.flowOf(emptyList())
+            } else {
+                getSongIdsUseCase(sortOrder = order, sortType = type)
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     val uiState: StateFlow<SongsUiState> = combine(
         _sortOrder,
