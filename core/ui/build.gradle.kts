@@ -14,7 +14,7 @@ dependencies {
     implementation(projects.core.designsystem)
     
     implementation(libs.accompanist.permissions)
-    implementation(libs.androidx.compose.material3.window.size)
+    implementation(libs.androidx.navigation3.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
