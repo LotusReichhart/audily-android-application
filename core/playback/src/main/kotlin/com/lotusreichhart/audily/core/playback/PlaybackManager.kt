@@ -16,6 +16,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers.Main
 import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
+import com.lotusreichhart.audily.core.domain.usecase.history.UpdateHistoryUseCase
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
@@ -25,7 +26,9 @@ import com.lotusreichhart.audily.core.playback.mapper.PlaybackStateMapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,11 +37,13 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val HISTORY_THRESHOLD_MS = 60_000L // 1 phút
 @Singleton
 class PlaybackManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
     @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher,
-    private val listeners: Set<@JvmSuppressWildcards PlaybackStateListener>
+    private val listeners: Set<@JvmSuppressWildcards PlaybackStateListener>,
+    private val updateHistoryUseCase: UpdateHistoryUseCase
 ) {
     private val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
     private var exoPlayer: ExoPlayer? = null
@@ -47,6 +52,11 @@ class PlaybackManager @Inject constructor(
     internal val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
     private var isInitialized = false
+
+    // region History Tracking
+    private var historyTrackingJob: Job? = null
+    private var lastHistorySongId: Long? = null
+    // endregion
 
     // Lưu trữ ngữ cảnh phát nhạc (Playlist/Album)
     internal var currentSourceId: Long? = null
@@ -92,6 +102,7 @@ class PlaybackManager @Inject constructor(
     }
 
     internal fun release() {
+        stopHistoryTracking()
         exoPlayer?.let {
             it.removeListener(playerListener)
             it.release()
@@ -113,9 +124,11 @@ class PlaybackManager @Inject constructor(
 
     internal fun pause() {
         exoPlayer?.pause()
+        stopHistoryTracking()
     }
 
     internal fun stop() {
+        stopHistoryTracking()
         exoPlayer?.let {
             it.stop()
             it.clearMediaItems()
@@ -189,7 +202,7 @@ class PlaybackManager @Inject constructor(
 
         if (existingIndex != -1) {
             // Trường hợp đã tồn tại trong hàng đợi
-            if (existingIndex == currentIndex) return // Đang phát bài này rồi thì thôi
+            if (existingIndex == currentIndex) return // Đ đang phát bài này rồi thì thôi
 
             val targetIndex = if (existingIndex < currentIndex) currentIndex else currentIndex + 1
             if (existingIndex != targetIndex) {
@@ -262,6 +275,7 @@ class PlaybackManager @Inject constructor(
     }
 
     internal fun onSessionEnded() {
+        stopHistoryTracking()
         val player = exoPlayer ?: return
         val queueIds = PlaybackStateMapper.getQueueIds(player)
         val currentMediaItem = player.currentMediaItem
@@ -321,9 +335,23 @@ class PlaybackManager @Inject constructor(
     }
 
     private val playerListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(playbackState: Int) = notifyListeners()
-        override fun onIsPlayingChanged(isPlaying: Boolean) = notifyListeners()
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = notifyListeners()
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            notifyListeners()
+            updateHistoryTracking()
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            notifyListeners()
+            updateHistoryTracking()
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            notifyListeners()
+            // Reset tracking cho bài hát mới
+            lastHistorySongId = null 
+            updateHistoryTracking()
+        }
+
         override fun onPositionDiscontinuity(
             oldPosition: Player.PositionInfo,
             newPosition: Player.PositionInfo,
@@ -378,4 +406,47 @@ class PlaybackManager @Inject constructor(
             }
         }
     }
+
+    // region History Tracking Implementation
+    private fun updateHistoryTracking() {
+        val player = exoPlayer ?: return
+        val currentSongId = player.currentMediaItem?.mediaId?.toLongOrNull() ?: return
+        
+        if (player.isPlaying && player.playbackState == Player.STATE_READY) {
+            startHistoryTracking(currentSongId)
+        } else {
+            stopHistoryTracking()
+        }
+    }
+
+    private fun startHistoryTracking(songId: Long) {
+        // Nếu bài này đã được ghi lịch sử trong phiên này rồi thì không đếm lại
+        if (lastHistorySongId == songId) return
+        
+        // Hủy job cũ nếu có
+        historyTrackingJob?.cancel()
+        
+        historyTrackingJob = scope.launch {
+            Timber.d("Starting history tracking for song $songId")
+            var accumulatedTime = 0L
+            val pollInterval = 1000L
+            
+            while (accumulatedTime < HISTORY_THRESHOLD_MS) {
+                delay(pollInterval)
+                if (exoPlayer?.isPlaying == true) {
+                    accumulatedTime += pollInterval
+                }
+            }
+            
+            Timber.d("History threshold reached for song $songId. Updating history...")
+            updateHistoryUseCase(songId)
+            lastHistorySongId = songId
+        }
+    }
+
+    private fun stopHistoryTracking() {
+        historyTrackingJob?.cancel()
+        historyTrackingJob = null
+    }
+    // endregion
 }
