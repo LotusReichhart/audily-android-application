@@ -168,12 +168,10 @@ class AudilyAppState(
     /**
      * Cập nhật các điểm neo (anchors) cho trình phát nhạc dựa trên kích thước màn hình.
      */
-    fun updatePlayerAnchors(fullHeight: Float, windowSize: com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize) {
+    fun updatePlayerAnchors(fullHeight: Float, isWide: Boolean) {
         if (fullHeight <= 0) return
 
         val expandedY = 0f
-        val isWide = windowSize != com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize.Compact
-        
         val collapsedY = if (isWide) {
             (fullHeight - panelHeightPx).coerceAtLeast(0f)
         } else {

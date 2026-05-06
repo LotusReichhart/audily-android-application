@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.ui
+package com.lotusreichhart.audily.ui.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.lotusreichhart.audily.core.ui.GlobalSheetKey
+import com.lotusreichhart.audily.core.ui.GlobalSheetRegistry
 
 /**
  * Khởi tạo các thành phần UI toàn cục như Registry cho BottomSheets.

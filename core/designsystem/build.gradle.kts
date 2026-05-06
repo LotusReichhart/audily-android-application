@@ -24,7 +24,6 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.androidx.palette)
-    implementation(libs.androidx.compose.material3.window.size)
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.compose.ui.test.junit4)
