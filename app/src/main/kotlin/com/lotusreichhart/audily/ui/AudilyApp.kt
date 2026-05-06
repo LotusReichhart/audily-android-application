@@ -12,14 +12,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -33,24 +28,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import com.lotusreichhart.audily.core.designsystem.component.AudilyBottomSheet
-import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationBar
-import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationBarItem
-import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRail
-import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRailItem
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
@@ -70,18 +58,20 @@ import com.lotusreichhart.audily.core.navigation.toEntries
 import com.lotusreichhart.audily.ui.component.AudilyNavHost
 import com.lotusreichhart.audily.ui.component.AudilyNowPlayingOverlay
 import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import com.lotusreichhart.audily.core.ui.AudilyWindowSize
-import com.lotusreichhart.audily.core.ui.LocalAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.adaptive.toAudilyWindowSize
+import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
+import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
+import com.lotusreichhart.audily.core.ui.GlobalUiInitializer
 import android.app.Activity
 import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import com.lotusreichhart.audily.ui.component.GlobalUiInitializer
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -92,11 +82,10 @@ fun AudilyApp(
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Tính toán WindowSizeClass dựa trên Activity hiện tại
     val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(context as Activity)
     val audilyWindowSize = remember(windowSizeClass) {
-        AudilyWindowSize(widthSizeClass = windowSizeClass.widthSizeClass)
+        windowSizeClass.toAudilyWindowSize()
     }
 
     LaunchedEffect(isOffline) {
@@ -196,23 +185,24 @@ internal fun AudilyApp(
         label = "navBarVisibilityProgress"
     )
 
-    // Sử dụng derivedStateOf để đảm bảo Re-composition chính xác khi các điều kiện thay đổi
+    // Giải quyết vấn đề mất MiniPlayer khi xoay màn hình ngoài NAV_BAR_ITEMS
+    var isInitialLoadingFinished by rememberSaveable { mutableStateOf(false) }
+    
+    // Đồng bộ ngược lại appState nếu cần (cho các logic cũ)
+    LaunchedEffect(isInitialLoadingFinished) {
+        appState.isInitialLoadingFinished = isInitialLoadingFinished
+    }
+
     val isOverlayVisible by remember(
         hasSong,
         shouldExpandPlayer,
-        appState.isInitialLoadingFinished
+        isInitialLoadingFinished
     ) {
         derivedStateOf {
-            val isReady = appState.isInitialLoadingFinished || shouldExpandPlayer
+            val isReady = isInitialLoadingFinished || shouldExpandPlayer
             val visible = hasSong && isReady
-            Timber.d("Giải quyết vấn đề Drop khung hình giữa Songs và Nowplaying - AudilyApp theo dõi trạng thái của isOverlayVisible: $visible (hasSong: $hasSong, isReady: $isReady)")
             visible
         }
-    }
-
-    LaunchedEffect(isOverlayVisible) {
-        Timber.d("Giải quyết vấn đề Drop khung hình giữa Songs và Nowplaying - AudilyApp theo dõi trạng thái của isOverlayVisible: $isOverlayVisible")
-
     }
 
     LaunchedEffect(hasSong) {
@@ -234,10 +224,10 @@ internal fun AudilyApp(
         fullHeight,
         appState.bottomBarHeightPx,
         appState.panelHeightPx,
-        windowSize.isWide,
+        windowSize,
         hasSong
     ) {
-        appState.updatePlayerAnchors(fullHeight.toFloat(), windowSize.isWide)
+        appState.updatePlayerAnchors(fullHeight.toFloat(), windowSize)
     }
 
     val progress = appState.expandProgress
@@ -251,8 +241,7 @@ internal fun AudilyApp(
                 homeEntry(
                     navigator = appState.navigator,
                     onInitialLoadingFinished = {
-                        Timber.d("Giải quyết vấn đề Drop khung hình giữa Songs và Nowplaying - AudilyApp Callback result: Bắt đầu set isInitialLoadingFinished = true")
-                        appState.isInitialLoadingFinished = true
+                        isInitialLoadingFinished = true
                     }
                 )
                 songsEntry(navigator = appState.navigator)
@@ -298,108 +287,41 @@ internal fun AudilyApp(
                     }
                 }
 
-                if (windowSize.isWide) {
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        // Rail nằm ở cánh trái, không bị đè bởi gì cả
-                        AudilyNavigationRail {
-                            NAV_BAR_ITEMS.forEach { (navKey, navItem) ->
-                                val selected = appState.navigationState.currentTopLevelKey == navKey
-                                AudilyNavigationRailItem(
-                                    selected = selected,
-                                    onClick = { appState.navigator.navigate(navKey) },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(id = navItem.unselectedIcon),
-                                            contentDescription = stringResource(id = navItem.iconTextId),
-                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                        )
-                                    },
-                                    selectedIcon = {
-                                        Icon(
-                                            painter = painterResource(id = navItem.selectedIcon),
-                                            contentDescription = stringResource(id = navItem.iconTextId),
-                                            modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                        )
-                                    },
-                                    label = {
-                                        Text(
-                                            text = stringResource(id = navItem.iconTextId),
-                                            style = MaterialTheme.typography.labelSmall
-                                        )
-                                    }
-                                )
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                        ) {
-                            // Nội dung màn hình
-                            navHostContent(LocalDimensions.current.paddingSmall)
-                        }
+                val navItems = remember {
+                    NAV_BAR_ITEMS.map { (key, item) ->
+                        AudilyNavItem(
+                            selectedIcon = item.selectedIcon,
+                            unselectedIcon = item.unselectedIcon,
+                            iconTextId = item.iconTextId,
+                            key = key
+                        )
                     }
-                    // Overlay cho NowPlaying
-                    nowPlayingOverlayContent(Modifier)
-                } else {
-                    // Portrait Mode
-                    Box(modifier = Modifier.fillMaxSize()) {
+                }
+
+                AudilyNavigationSuiteScaffold(
+                    currentKey = appState.navigationState.currentTopLevelKey,
+                    navItems = navItems,
+                    onNavItemClick = { appState.navigator.navigate(it) },
+                    navBarVisibilityProgress = navBarVisibilityProgress,
+                    expandProgress = progress,
+                    bottomBarHeightPx = appState.bottomBarHeightPx,
+                    onBottomBarSizeChanged = { appState.bottomBarHeightPx = it },
+                    overlayContent = {
+                        nowPlayingOverlayContent(Modifier)
+                    }
+                ) { modifier ->
+                    Box(modifier = modifier) {
                         // 1. Lớp nền: Nội dung màn hình
-                        navHostContent(LocalDimensions.current.paddingExtraSmall)
+                        val topPadding = if (windowSize == AudilyWindowSize.Compact)
+                            LocalDimensions.current.paddingExtraSmall
+                        else
+                            LocalDimensions.current.paddingSmall
 
-                        // 2. Lớp giữa: NowPlaying (Nằm trên nội dung nhưng dưới NavigationBar khi collapsed)
-                        nowPlayingOverlayContent(Modifier.align(Alignment.BottomCenter))
+                        navHostContent(topPadding)
 
-                        // 3. Lớp trên cùng: NavigationBar (Đảm bảo click luôn ăn)
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .offset {
-                                    val combinedVisibility =
-                                        navBarVisibilityProgress * (1f - progress)
-                                    val yOffset =
-                                        ((1f - combinedVisibility) * appState.bottomBarHeightPx).roundToInt()
-                                    IntOffset(x = 0, y = yOffset)
-                                }
-                                .alpha(navBarVisibilityProgress * (1f - progress))
-                                .onSizeChanged {
-                                    appState.bottomBarHeightPx = it.height.toFloat()
-                                    appState.isBottomBarVisible = it.height > 0
-                                }
-                        ) {
-                            AudilyNavigationBar(
-                                containerColor = MaterialTheme.colorScheme.background
-                            ) {
-                                NAV_BAR_ITEMS.forEach { (navKey, navItem) ->
-                                    val selected =
-                                        appState.navigationState.currentTopLevelKey == navKey
-                                    AudilyNavigationBarItem(
-                                        selected = selected,
-                                        onClick = { appState.navigator.navigate(navKey) },
-                                        icon = {
-                                            Icon(
-                                                painter = painterResource(id = navItem.unselectedIcon),
-                                                contentDescription = stringResource(id = navItem.iconTextId),
-                                                modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                            )
-                                        },
-                                        selectedIcon = {
-                                            Icon(
-                                                painter = painterResource(id = navItem.selectedIcon),
-                                                contentDescription = stringResource(id = navItem.iconTextId),
-                                                modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
-                                            )
-                                        },
-                                        label = {
-                                            Text(
-                                                text = stringResource(id = navItem.iconTextId),
-                                                style = MaterialTheme.typography.labelSmall
-                                            )
-                                        }
-                                    )
-                                }
-                            }
+                        // Logic 4: BackHandler được khai báo sau NavHost nên sẽ có ưu tiên cao hơn
+                        BackHandler(enabled = appState.isExpanded) {
+                            appState.collapsePanel()
                         }
                     }
                 }
@@ -408,9 +330,9 @@ internal fun AudilyApp(
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier = Modifier
-                        .align(if (windowSize.isWide) Alignment.BottomEnd else Alignment.BottomCenter)
-                        .padding(if (windowSize.isWide) 16.dp else 0.dp)
-                        .padding(bottom = if (windowSize.isWide) 0.dp else dynamicPadding + 16.dp)
+                        .align(if (windowSize != AudilyWindowSize.Compact) Alignment.BottomEnd else Alignment.BottomCenter)
+                        .padding(if (windowSize != AudilyWindowSize.Compact) 16.dp else 0.dp)
+                        .padding(bottom = if (windowSize != AudilyWindowSize.Compact) 0.dp else dynamicPadding + 16.dp)
                 )
             }
 
@@ -425,10 +347,6 @@ internal fun AudilyApp(
                 }
             }
         }
-    }
-
-    BackHandler(enabled = appState.isExpanded) {
-        appState.collapsePanel()
     }
 }
 

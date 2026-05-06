@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(projects.feature.songs.api)
     implementation(projects.core.model)
+    implementation(projects.core.ui)
     
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)

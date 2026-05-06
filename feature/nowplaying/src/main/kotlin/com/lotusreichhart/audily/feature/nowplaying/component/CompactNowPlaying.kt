@@ -22,35 +22,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
-import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceVariantDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiState
-import com.lotusreichhart.audily.feature.nowplaying.R
 import com.lotusreichhart.audily.feature.nowplaying.constants.SharedContentStateConstants
-import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
-internal fun NowPlayingScreenPortrait(
+internal fun CompactNowPlaying(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
     onLyricsToggle: () -> Unit,

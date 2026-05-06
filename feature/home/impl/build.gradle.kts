@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.model)
+    implementation(projects.core.ui)
 
     implementation(projects.feature.home.api)
 

@@ -32,15 +32,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingMenu
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.ui.GlobalSheetKey
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
-import com.lotusreichhart.audily.core.ui.LocalAudilyWindowSize
+import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingScreenLandscape
-import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingScreenPortrait
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingMenu
+import com.lotusreichhart.audily.feature.nowplaying.component.ExpandedNowPlaying
+import com.lotusreichhart.audily.feature.nowplaying.component.CompactNowPlaying
+import com.lotusreichhart.audily.feature.nowplaying.component.LandscapeNowPlaying
 
 @Composable
 fun NowPlayingScreen(
@@ -112,8 +113,6 @@ internal fun NowPlayingScreen(
     onRingtoneClick: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
 ) {
-    val windowSize = LocalAudilyWindowSize.current
-    val isWide = windowSize.isWide
     var isMenuVisible by remember { mutableStateOf(false) }
 
     val defaultColor = SurfaceDark
@@ -207,29 +206,45 @@ internal fun NowPlayingScreen(
             }
     ) {
         SharedTransitionLayout {
-            if (isWide) {
-                NowPlayingScreenLandscape(
-                    uiState = uiState,
-                    onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                    isMenuVisible = isMenuVisible,
-                    onMenuToggle = { isMenuVisible = !isMenuVisible },
-                    onCloseClick = onCloseClick,
-                    onOpenQueue = onOpenQueue,
-                    onEvent = onEvent,
-                    sharedTransitionScope = this
-                )
-            } else {
-                NowPlayingScreenPortrait(
-                    uiState = uiState,
-                    onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                    isMenuVisible = isMenuVisible,
-                    onMenuToggle = { isMenuVisible = !isMenuVisible },
-                    onCloseClick = onCloseClick,
-                    onOpenQueue = onOpenQueue,
-                    onEvent = onEvent,
-                    sharedTransitionScope = this
-                )
-            }
+            AudilyAdaptiveLayout(
+                compact = {
+                    CompactNowPlaying(
+                        uiState = uiState,
+                        onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                        isMenuVisible = isMenuVisible,
+                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onCloseClick = onCloseClick,
+                        onOpenQueue = onOpenQueue,
+                        onEvent = onEvent,
+                        sharedTransitionScope = this@SharedTransitionLayout
+                    )
+                },
+                landscape = {
+                    LandscapeNowPlaying(
+                        uiState = uiState,
+                        onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                        isMenuVisible = isMenuVisible,
+                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onCloseClick = onCloseClick,
+                        onOpenQueue = onOpenQueue,
+                        onEvent = onEvent,
+                        sharedTransitionScope = this@SharedTransitionLayout
+                    )
+                },
+                expanded = {
+                    // Logic: Tablet/Fold sẽ dùng Landscape cho đến khi có Two-Pane đặc thù
+                    ExpandedNowPlaying(
+                        uiState = uiState,
+                        onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                        isMenuVisible = isMenuVisible,
+                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onCloseClick = onCloseClick,
+                        onOpenQueue = onOpenQueue,
+                        onEvent = onEvent,
+                        sharedTransitionScope = this@SharedTransitionLayout
+                    )
+                }
+            )
         }
 
         // Lớp nền mờ khi menu mở
