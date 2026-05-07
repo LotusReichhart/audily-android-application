@@ -1,7 +1,5 @@
 package com.lotusreichhart.audily.feature.home.impl
 
-
-import com.lotusreichhart.audily.feature.home.api.R
 import com.lotusreichhart.audily.feature.songs.api.R as songsApiR
 import com.lotusreichhart.audily.feature.playlists.api.R as playlistsApiR
 import com.lotusreichhart.audily.feature.albums.api.R as albumsApiR
@@ -10,7 +8,7 @@ internal sealed interface HomeTab {
     val title: Int
 
     data object Home : HomeTab {
-        override val title: Int = R.string.feature_home_api_tab_your_vibe
+        override val title: Int = R.string.feature_home_impl_tab_your_vibe
     }
 
     data object Songs : HomeTab {

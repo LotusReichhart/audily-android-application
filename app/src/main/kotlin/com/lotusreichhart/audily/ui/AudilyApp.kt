@@ -39,7 +39,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import com.lotusreichhart.audily.core.designsystem.component.AudilyBottomSheet
-import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.ui.AudilySheetController
@@ -70,8 +69,6 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -263,11 +260,10 @@ internal fun AudilyApp(
                     .fillMaxSize()
                     .onSizeChanged { fullHeight = it.height }
             ) {
-                val navHostContent = @Composable { topPadding: Dp ->
+                val navHostContent = @Composable {
                     AudilyNavHost(
                         entries = appState.navigationState.toEntries(entryProvider),
                         onBack = { appState.navigator.goBack() },
-                        topPadding = topPadding
                     )
                 }
 
@@ -311,13 +307,7 @@ internal fun AudilyApp(
                     }
                 ) { modifier ->
                     Box(modifier = modifier) {
-                        // 1. Lớp nền: Nội dung màn hình
-                        val topPadding = if (windowSize == AudilyWindowSize.Compact)
-                            LocalDimensions.current.paddingExtraSmall
-                        else
-                            LocalDimensions.current.paddingSmall
-
-                        navHostContent(topPadding)
+                        navHostContent()
 
                         // Logic 4: BackHandler được khai báo sau NavHost nên sẽ có ưu tiên cao hơn
                         BackHandler(enabled = appState.isExpanded) {

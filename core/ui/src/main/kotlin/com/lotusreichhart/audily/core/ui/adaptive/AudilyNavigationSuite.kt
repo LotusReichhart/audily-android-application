@@ -60,8 +60,8 @@ fun AudilyNavigationSuiteScaffold(
     val windowSize = LocalAudilyWindowSize.current
 
     val movableMainContent = remember(content) {
-        movableContentOf { 
-            content(Modifier.fillMaxSize()) 
+        movableContentOf {
+            content(Modifier.fillMaxSize())
         }
     }
 
@@ -82,7 +82,8 @@ fun AudilyNavigationSuiteScaffold(
                         Box(
                             modifier = Modifier
                                 .offset {
-                                    val yOffset = ((1f - combinedVisibility) * bottomBarHeightPx).roundToInt()
+                                    val yOffset =
+                                        ((1f - combinedVisibility) * bottomBarHeightPx).roundToInt()
                                     IntOffset(x = 0, y = yOffset)
                                 }
                                 .alpha(combinedVisibility)
@@ -100,14 +101,14 @@ fun AudilyNavigationSuiteScaffold(
                                             Icon(
                                                 painter = painterResource(id = item.unselectedIcon),
                                                 contentDescription = stringResource(id = item.iconTextId),
-                                                modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                                modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
                                             )
                                         },
                                         selectedIcon = {
                                             Icon(
                                                 painter = painterResource(id = item.selectedIcon),
                                                 contentDescription = stringResource(id = item.iconTextId),
-                                                modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                                modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
                                             )
                                         },
                                         label = {
@@ -139,14 +140,14 @@ fun AudilyNavigationSuiteScaffold(
                                     Icon(
                                         painter = painterResource(id = item.unselectedIcon),
                                         contentDescription = stringResource(id = item.iconTextId),
-                                        modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
                                     )
                                 },
                                 selectedIcon = {
                                     Icon(
                                         painter = painterResource(id = item.selectedIcon),
                                         contentDescription = stringResource(id = item.iconTextId),
-                                        modifier = Modifier.size(LocalDimensions.current.iconSizeLarge)
+                                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
                                     )
                                 },
                                 label = {
@@ -158,7 +159,9 @@ fun AudilyNavigationSuiteScaffold(
                             )
                         }
                     }
-                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    Box(modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()) {
                         movableMainContent()
                     }
                 }
