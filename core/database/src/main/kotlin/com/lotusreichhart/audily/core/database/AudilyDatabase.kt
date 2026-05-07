@@ -10,6 +10,8 @@ import com.lotusreichhart.audily.core.database.entity.PlaybackSessionEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistEntity
 import com.lotusreichhart.audily.core.database.entity.PlaylistSongCrossRef
 import com.lotusreichhart.audily.core.database.entity.PlayingQueueEntity
+import com.lotusreichhart.audily.core.database.entity.HistoryEntity
+import com.lotusreichhart.audily.core.database.dao.HistoryDao
 
 @Database(
     entities = [
@@ -18,12 +20,14 @@ import com.lotusreichhart.audily.core.database.entity.PlayingQueueEntity
         PlaylistSongCrossRef::class,
         PlaybackSessionEntity::class,
         PlayingQueueEntity::class,
+        HistoryEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class AudilyDatabase : RoomDatabase() {
     abstract fun favoritesDao(): FavoritesDao
     abstract fun playlistDao(): PlaylistDao
     abstract fun playbackDao(): PlaybackDao
+    abstract fun historyDao(): HistoryDao
 }

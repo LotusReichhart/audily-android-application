@@ -12,6 +12,8 @@ import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.data.repository.playback.PlaybackStateListenerImpl
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
+import com.lotusreichhart.audily.core.data.repository.history.HistoryRepositoryImpl
+import com.lotusreichhart.audily.core.domain.repository.history.HistoryRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -51,4 +53,9 @@ internal abstract class DataModule {
     internal abstract fun bindsPlaybackStateListener(
         playbackStateListener: PlaybackStateListenerImpl,
     ): PlaybackStateListener
+
+    @Binds
+    internal abstract fun bindsHistoryRepository(
+        historyRepository: HistoryRepositoryImpl,
+    ): HistoryRepository
 }
