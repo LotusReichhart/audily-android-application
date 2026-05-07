@@ -14,7 +14,9 @@ object AudilyIcons {
     val FavoriteFill = R.drawable.core_designsystem_ic_fill_favorite
     val DragHandle = R.drawable.core_designsystem_ic_drag_handle
     val QueueMusic = R.drawable.core_designsystem_ic_queue_music
+    val Resume = R.drawable.core_designsystem_ic_resume
     val Search = R.drawable.core_designsystem_ic_search
+    val Shuffle = R.drawable.core_designsystem_ic_shuffle
     val Sort = R.drawable.core_designsystem_ic_sort
     val Timer = R.drawable.core_designsystem_ic_timer
     val VerticalDot = R.drawable.core_designsystem_ic_vertical_dot

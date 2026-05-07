@@ -47,7 +47,6 @@ internal fun CompactNowPlaying(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
     onLyricsToggle: () -> Unit,
-    isMenuVisible: Boolean,
     onMenuToggle: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
@@ -79,7 +78,6 @@ internal fun CompactNowPlaying(
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
                 isLyricsVisible = uiState.isLyricsVisible,
-                isMenuVisible = isMenuVisible,
                 onQueueClick = onOpenQueue,
                 onLyricsClick = onLyricsToggle,
                 onExtendClick = onMenuToggle

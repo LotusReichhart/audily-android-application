@@ -130,7 +130,7 @@ internal fun MiniPlayerContent(
                             id = if (isPlaying) NowPlayingIcons.Pause else NowPlayingIcons.Resume
                         ),
                         contentDescription = "Play/Pause",
-                        iconSize = 24.dp,
+                        iconSize = 20.dp,
                         containerSize = 40.dp,
                         tint = OnSurfaceDark
                     )

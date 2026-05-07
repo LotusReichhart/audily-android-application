@@ -42,7 +42,6 @@ internal fun ExpandedNowPlaying(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
     onLyricsToggle: () -> Unit,
-    isMenuVisible: Boolean,
     onMenuToggle: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
@@ -172,7 +171,6 @@ internal fun ExpandedNowPlaying(
 
                 NowPlayingExtension(
                     isLyricsVisible = uiState.isLyricsVisible,
-                    isMenuVisible = isMenuVisible,
                     onQueueClick = onOpenQueue,
                     onLyricsClick = onLyricsToggle,
                     onExtendClick = onMenuToggle

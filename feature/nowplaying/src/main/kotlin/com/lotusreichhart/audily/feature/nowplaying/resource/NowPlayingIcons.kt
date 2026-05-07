@@ -11,11 +11,9 @@ internal object NowPlayingIcons {
     val Previous = R.drawable.feature_nowplaying_ic_previous
     val Shuffle = R.drawable.feature_nowplaying_ic_shuffle
     val Stop = R.drawable.feature_nowplaying_ic_stop
-    val RepeatOff = R.drawable.feature_nowplaying_ic_repeat_off
     val RepeatOne = R.drawable.feature_nowplaying_ic_repeat_one
     val RepeatAll = R.drawable.feature_nowplaying_ic_repeat_all
-    val ExtendOff = R.drawable.feature_nowplaying_ic_extend_off
-    val ExtendOn = R.drawable.feature_nowplaying_ic_extend_on
+    val Extend = R.drawable.feature_nowplaying_ic_extend
     val Speed = R.drawable.feature_nowplaying_ic_speed
     val SkipDuration = R.drawable.feature_nowplaying_ic_skip_duration
     val SetRingtone = R.drawable.feature_nowplaying_ic_set_ringtone
