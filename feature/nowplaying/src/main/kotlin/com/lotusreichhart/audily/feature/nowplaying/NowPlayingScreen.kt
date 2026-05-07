@@ -211,7 +211,6 @@ internal fun NowPlayingScreen(
                     CompactNowPlaying(
                         uiState = uiState,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        isMenuVisible = isMenuVisible,
                         onMenuToggle = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
@@ -223,7 +222,6 @@ internal fun NowPlayingScreen(
                     LandscapeNowPlaying(
                         uiState = uiState,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        isMenuVisible = isMenuVisible,
                         onMenuToggle = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
@@ -236,7 +234,6 @@ internal fun NowPlayingScreen(
                     ExpandedNowPlaying(
                         uiState = uiState,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        isMenuVisible = isMenuVisible,
                         onMenuToggle = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,

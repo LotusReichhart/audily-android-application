@@ -17,6 +17,15 @@ import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+
 @Composable
 internal fun NowPlayingControls(
     modifier: Modifier = Modifier,
@@ -33,6 +42,13 @@ internal fun NowPlayingControls(
     hasNext: Boolean = true,
     hasPrevious: Boolean = true
 ) {
+    var repeatRotation by remember { mutableFloatStateOf(0f) }
+    val animatedRepeatRotation by animateFloatAsState(
+        targetValue = repeatRotation,
+        animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing),
+        label = "repeatRotation"
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -45,21 +61,21 @@ internal fun NowPlayingControls(
             contentDescription = "Shuffle",
             containerSize = 28.dp,
             iconSize = 24.dp,
-            modifier = Modifier.alpha(if (isShuffleOn) 1f else 0.5f),
+            modifier = Modifier.alpha(if (isShuffleOn) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Previous
         AudilyIconButton(
             onClick = { if (hasPrevious) onSkipPreviousClick() },
             painter = painterResource(id = NowPlayingIcons.Previous),
             contentDescription = "Previous",
-            containerSize = 34.dp,
-            iconSize = 28.dp,
-            modifier = Modifier.alpha(if (hasPrevious) 1f else 0.5f),
+            containerSize = 28.dp,
+            iconSize = 24.dp,
+            modifier = Modifier.alpha(if (hasPrevious) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Fast Rewind
         AudilyIconButton(
             onClick = onFastRewindClick,
@@ -69,7 +85,7 @@ internal fun NowPlayingControls(
             iconSize = 28.dp,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Play/Pause
         AudilyIconButton(
             onClick = onResumePauseClick,
@@ -77,12 +93,12 @@ internal fun NowPlayingControls(
                 id = if (isPlaying) NowPlayingIcons.Pause else NowPlayingIcons.Resume
             ),
             contentDescription = "Play/Pause",
-            iconSize = 30.dp,
+            iconSize = 28.dp,
             containerSize = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.primary,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Fast Forward
         AudilyIconButton(
             onClick = onFastForwardClick,
@@ -92,24 +108,27 @@ internal fun NowPlayingControls(
             iconSize = 28.dp,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Next
         AudilyIconButton(
             onClick = { if (hasNext) onSkipNextClick() },
             painter = painterResource(id = NowPlayingIcons.Next),
             contentDescription = "Next",
-            containerSize = 34.dp,
-            iconSize = 28.dp,
-            modifier = Modifier.alpha(if (hasNext) 1f else 0.5f),
+            containerSize = 28.dp,
+            iconSize = 24.dp,
+            modifier = Modifier.alpha(if (hasNext) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         // Repeat
         AudilyIconButton(
-            onClick = onRepeatClick,
+            onClick = {
+                repeatRotation += 360f
+                onRepeatClick()
+            },
             painter = painterResource(
                 id = when (repeatMode) {
-                    RepeatMode.OFF -> NowPlayingIcons.RepeatOff
+                    RepeatMode.OFF -> NowPlayingIcons.RepeatAll
                     RepeatMode.ONE -> NowPlayingIcons.RepeatOne
                     RepeatMode.ALL -> NowPlayingIcons.RepeatAll
                 }
@@ -117,6 +136,15 @@ internal fun NowPlayingControls(
             contentDescription = "Repeat",
             containerSize = 28.dp,
             iconSize = 24.dp,
+            modifier = Modifier
+                .alpha(
+                    when (repeatMode) {
+                        RepeatMode.OFF -> 0.7f
+                        RepeatMode.ONE -> 1f
+                        RepeatMode.ALL -> 1f
+                    }
+                )
+                .graphicsLayer { rotationZ = animatedRepeatRotation },
             tint = OnSurfaceDark
         )
     }

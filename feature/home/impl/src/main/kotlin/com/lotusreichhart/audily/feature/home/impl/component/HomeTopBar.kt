@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ internal fun HomeTopBar(
 ) {
     Column(
         modifier = Modifier
+            .statusBarsPadding()
             .fillMaxWidth()
             .padding(bottom = LocalDimensions.current.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
@@ -57,7 +59,7 @@ internal fun HomeTopBar(
             Surface(
                 modifier = Modifier
                     .padding(1.dp)
-                    .size(LocalDimensions.current.iconButtonHeight),
+                    .size(44.dp),
                 onClick = onSearchClick,
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface,
@@ -68,7 +70,7 @@ internal fun HomeTopBar(
                     Icon(
                         painter = painterResource(id = AudilyIcons.Search),
                         contentDescription = "Search",
-                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium),
+                        modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -88,21 +90,20 @@ internal fun HomeTopBar(
                 onClick = {}
             )
             HomeChip(
-                modifier = Modifier.padding(start = 20.dp),
+                modifier = Modifier.padding(start = LocalDimensions.current.paddingMedium),
                 titleId = HomeTab.Songs.title,
                 selected = false,
                 onClick = onNavigateToSongs
             )
             HomeChip(
-                modifier = Modifier.padding(start = 20.dp),
+                modifier = Modifier.padding(start = LocalDimensions.current.paddingMedium),
                 titleId = HomeTab.Playlists.title,
                 selected = false,
                 onClick = onNavigateToPlaylists
             )
             HomeChip(
                 modifier = Modifier.padding(
-                    start = 20.dp,
-                    end = LocalDimensions.current.paddingMedium
+                    horizontal = LocalDimensions.current.paddingMedium
                 ),
                 titleId = HomeTab.Albums.title,
                 selected = false,

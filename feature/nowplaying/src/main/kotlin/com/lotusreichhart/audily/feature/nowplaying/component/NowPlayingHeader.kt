@@ -32,8 +32,8 @@ internal fun NowPlayingHeader(
             onClick = onCloseClick,
             painter = painterResource(id = AudilyIcons.ArrowDown),
             contentDescription = "Close",
-            modifier = Modifier.offset(x = (-8).dp),
-            containerSize = 32.dp,
+            modifier = Modifier.offset(x = (-5).dp),
+            containerSize = 24.dp,
             iconSize = 24.dp,
             tint = OnSurfaceDark
         )
@@ -50,7 +50,7 @@ internal fun NowPlayingHeader(
             painter = painterResource(id = AudilyIcons.VerticalDot),
             contentDescription = "Menu",
             modifier = Modifier.offset(x = 12.dp),
-            containerSize = 32.dp,
+            containerSize = 24.dp,
             iconSize = 24.dp,
             tint = OnSurfaceDark
         )

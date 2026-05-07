@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_impl_tab_your_vibe">Gu của bạn</string>
+
+    <string name="feature_home_impl_greeting_morning">Ngày mới tốt lành</string>
+    <string name="feature_home_impl_greeting_afternoon">Chào buổi chiều</string>
+    <string name="feature_home_impl_greeting_evening">Buổi tối vui vẻ</string>
+    <string name="feature_home_impl_greeting_night">Chúc ngủ ngon</string>
+
+    <string name="feature_home_impl_section_recently_played">Nghe gần đây</string>
+    <string name="feature_home_impl_section_top_played">Nghe nhiều nhất</string>
+    <string name="feature_home_impl_section_recently_added">Thêm gần đây</string>
+    <string name="feature_home_impl_section_discovery">Gợi ý</string>
+    <string name="feature_home_impl_action_shuffle_all">Phát ngẫu nhiên</string>
+    <string name="feature_home_impl_action_resume">Tiếp tục</string>
+</resources>

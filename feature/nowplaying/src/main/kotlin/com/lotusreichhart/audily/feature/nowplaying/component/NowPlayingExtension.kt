@@ -20,7 +20,6 @@ import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 internal fun NowPlayingExtension(
     modifier: Modifier = Modifier,
     isLyricsVisible: Boolean,
-    isMenuVisible: Boolean,
     onQueueClick: () -> Unit,
     onLyricsClick: () -> Unit,
     onExtendClick: () -> Unit
@@ -39,7 +38,7 @@ internal fun NowPlayingExtension(
                 iconSize = 28.dp,
                 tint = OnSurfaceDark
             )
-            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
+            Spacer(modifier = Modifier.width(12.dp))
             AudilyIconButton(
                 onClick = onLyricsClick,
                 painter = painterResource(
@@ -55,7 +54,7 @@ internal fun NowPlayingExtension(
         AudilyIconButton(
             onClick = onExtendClick,
             painter = painterResource(
-                id = if (isMenuVisible) NowPlayingIcons.ExtendOn else NowPlayingIcons.ExtendOff
+                id = NowPlayingIcons.Extend
             ),
             contentDescription = "Extend Menu",
             containerSize = 24.dp,

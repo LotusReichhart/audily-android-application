@@ -203,26 +203,3 @@ object AudilyNavigationDefaults {
     @Composable
     fun navigationSelectedItemColor() = MaterialTheme.colorScheme.primary
 }
-
-@Composable
-@Preview
-fun AudilyNavigationBarItemPreview() {
-    MaterialTheme {
-        Surface {
-            AudilyNavigationBar {
-                AudilyNavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-                    label = { Text(text = "Home", style = MaterialTheme.typography.labelSmall) }
-                )
-                AudilyNavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
-                    label = { Text(text = "Search", style = MaterialTheme.typography.labelSmall) }
-                )
-            }
-        }
-    }
-}
