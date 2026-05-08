@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.SurfaceVariantDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiState
+import com.lotusreichhart.audily.feature.nowplaying.queue.QueueScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -66,81 +68,99 @@ internal fun ExpandedNowPlaying(
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .padding(horizontal = LocalDimensions.current.paddingLarge),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Trái: Ảnh bìa
-            val rotationY by animateFloatAsState(
-                targetValue = if (uiState.isLyricsVisible) 180f else 0f,
-                animationSpec = tween(
-                    durationMillis = 600,
-                    easing = FastOutSlowInEasing
-                ),
-                label = "CardFlip"
-            )
-            val density = LocalDensity.current
-
-            Box(
+            // Bên trái (2/5): Queue
+            QueueScreen(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(2f)
                     .fillMaxHeight()
-                    .graphicsLayer {
-                        this.rotationY = rotationY
-                        cameraDistance = 12f * density.density
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (rotationY <= 90f) {
-                    // Mặt trước: Artwork
-                    NowPlayingArtworkPager(
-                        modifier = Modifier.fillMaxSize(),
-                        artworkModifier = Modifier
-                            .fillMaxHeight(1f)
-                            .fillMaxWidth(1f)
-                            .padding(horizontal = LocalDimensions.current.paddingMedium),
-                        uiState = uiState,
-                        onEvent = onEvent,
-                        sharedTransitionScope = sharedTransitionScope
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                this.rotationY = 180f
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        NowPlayingNoLyrics()
-                    }
-                }
-            }
+            )
 
-            // Phải: Điều khiển
+            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraLarge))
+
+            // Bên phải (3/5): Giao diện Player
             Column(
                 modifier = Modifier
-                    .weight(1.2f)
+                    .weight(3f)
                     .fillMaxHeight()
-                    .padding(LocalDimensions.current.paddingMedium),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(vertical = LocalDimensions.current.paddingMedium),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                NowPlayingInfo(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(SurfaceVariantDark.copy(alpha = 0.7f))
-                        .padding(LocalDimensions.current.paddingMedium),
-                    title = uiState.currentSong?.basic?.title
-                        ?: stringResource(coreR.string.core_designsystem_unknown_title),
-                    artist = uiState.currentSong?.basic?.artist
-                        ?: stringResource(coreR.string.core_designsystem_unknown_artist),
-                    isFavorite = uiState.currentSong?.isFavorite ?: false,
-                    onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) }
+                // Artwork & Lyrics Flip
+                val rotationY by animateFloatAsState(
+                    targetValue = if (uiState.isLyricsVisible) 180f else 0f,
+                    animationSpec = tween(
+                        durationMillis = 600,
+                        easing = FastOutSlowInEasing
+                    ),
+                    label = "CardFlip"
                 )
+                val density = LocalDensity.current
 
-                Column {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            this.rotationY = rotationY
+                            cameraDistance = 12f * density.density
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (rotationY <= 90f) {
+                        // Mặt trước: Artwork
+                        NowPlayingArtworkPager(
+                            modifier = Modifier.fillMaxSize(),
+                            artworkModifier = Modifier
+                                .fillMaxHeight(0.9f)
+                                .fillMaxWidth(0.9f),
+                            uiState = uiState,
+                            onEvent = onEvent,
+                            sharedTransitionScope = sharedTransitionScope
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer {
+                                    this.rotationY = 180f
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            NowPlayingNoLyrics()
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingLarge))
+
+                // Info, Progress, Controls
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    NowPlayingInfo(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(SurfaceVariantDark.copy(alpha = 0.7f))
+                            .padding(LocalDimensions.current.paddingMedium),
+                        title = uiState.currentSong?.basic?.title
+                            ?: stringResource(coreR.string.core_designsystem_unknown_title),
+                        artist = uiState.currentSong?.basic?.artist
+                            ?: stringResource(coreR.string.core_designsystem_unknown_artist),
+                        isFavorite = uiState.currentSong?.isFavorite ?: false,
+                        onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) }
+                    )
+
+                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
+
                     NowPlayingProgress(
+                        modifier = Modifier.fillMaxWidth(0.9f),
                         progressMs = uiState.playbackPositionMs,
                         durationMs = uiState.playbackState.duration,
                         songId = uiState.currentSong?.id,
@@ -152,8 +172,9 @@ internal fun ExpandedNowPlaying(
                             }
                         }
                     )
-                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
+                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingLarge))
                     NowPlayingControls(
+                        modifier = Modifier.fillMaxWidth(0.9f),
                         isPlaying = uiState.playbackState.nowPlayingState == NowPlayingState.PLAYING,
                         isShuffleOn = uiState.playbackState.isShuffleOn,
                         repeatMode = uiState.playbackState.repeatMode,
@@ -167,14 +188,17 @@ internal fun ExpandedNowPlaying(
                         hasNext = uiState.hasNext,
                         hasPrevious = uiState.hasPrevious
                     )
-                }
 
-                NowPlayingExtension(
-                    isLyricsVisible = uiState.isLyricsVisible,
-                    onQueueClick = onOpenQueue,
-                    onLyricsClick = onLyricsToggle,
-                    onExtendClick = onMenuToggle
-                )
+                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
+
+                    NowPlayingExtension(
+                        modifier = Modifier.fillMaxWidth(0.9f),
+                        isLyricsVisible = uiState.isLyricsVisible,
+                        onQueueClick = onOpenQueue,
+                        onLyricsClick = onLyricsToggle,
+                        onExtendClick = onMenuToggle
+                    )
+                }
             }
         }
     }

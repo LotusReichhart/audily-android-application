@@ -11,10 +11,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
-import com.lotusreichhart.audily.core.ui.GlobalSheetKey
-import com.lotusreichhart.audily.core.ui.GlobalUiEvent
-import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
+import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
 import com.lotusreichhart.audily.feature.nowplaying.component.MiniPlayerContent
+import com.lotusreichhart.audily.feature.nowplaying.queue.QueueScreen
 
 @Composable
 fun MiniNowPlaying(
@@ -23,14 +22,23 @@ fun MiniNowPlaying(
     viewModel: NowPlayingViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val globalUiEventBus = LocalGlobalUiEventBus.current
+    val sheetController = LocalAudilySheetController.current
 
     MiniNowPlaying(
         modifier = modifier,
         uiState = uiState,
         onClick = onClick,
         onOpenQueue = {
-            globalUiEventBus.emit(GlobalUiEvent.OpenSheet(GlobalSheetKey.QUEUE, true))
+            sheetController.showSheet(
+                content = {
+                    QueueScreen(
+                        onClose = { sheetController.hideSheet() }
+                    )
+                },
+                isFullScreen = true,
+                showDragHandle = false,
+                enableSwipeToDismiss = false
+            )
         },
         onEvent = viewModel::onEvent
     )

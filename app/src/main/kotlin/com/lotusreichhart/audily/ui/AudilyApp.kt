@@ -64,10 +64,12 @@ import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
 import com.lotusreichhart.audily.core.ui.GlobalUiInitializer
 import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -118,16 +120,26 @@ internal fun AudilyApp(
     // Quản lý trạng thái của Bottom Sheet toàn cục
     var sheetContent by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
     var isSheetFullScreen by remember { mutableStateOf(false) }
+    var isShowDragHandle by remember { mutableStateOf(false) }
+    var isSheetSwipeEnabled by remember { mutableStateOf(true) }
 
     val sheetController = remember {
         object : AudilySheetController {
-            override fun showSheet(content: @Composable () -> Unit, isFullScreen: Boolean) {
+            override fun showSheet(
+                content: @Composable () -> Unit,
+                isFullScreen: Boolean,
+                showDragHandle: Boolean,
+                enableSwipeToDismiss: Boolean
+            ) {
                 sheetContent = content
                 isSheetFullScreen = isFullScreen
+                isShowDragHandle = showDragHandle
+                isSheetSwipeEnabled = enableSwipeToDismiss
             }
 
             override fun hideSheet() {
                 sheetContent = null
+                isSheetSwipeEnabled = true
             }
         }
     }
@@ -184,7 +196,7 @@ internal fun AudilyApp(
 
     // Giải quyết vấn đề mất MiniPlayer khi xoay màn hình ngoài NAV_BAR_ITEMS
     var isInitialLoadingFinished by rememberSaveable { mutableStateOf(false) }
-    
+
     // Đồng bộ ngược lại appState nếu cần (cho các logic cũ)
     LaunchedEffect(isInitialLoadingFinished) {
         appState.isInitialLoadingFinished = isInitialLoadingFinished
@@ -331,6 +343,8 @@ internal fun AudilyApp(
                 AudilyBottomSheet(
                     onDismissRequest = { sheetController.hideSheet() },
                     isFullScreen = isSheetFullScreen,
+                    showDragHandle = isShowDragHandle,
+                    enableSwipeToDismiss = isSheetSwipeEnabled,
                     containerColor = SurfaceDark
                 ) {
                     sheetContent?.invoke()

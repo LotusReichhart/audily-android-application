@@ -7,4 +7,10 @@
     <string name="feature_nowplaying_menu_speed_pitch">Speed &amp; Pitch</string>
     <string name="feature_nowplaying_menu_skip_duration">Skip duration</string>
     <string name="feature_nowplaying_menu_ringtone">Ringtone</string>
+
+    <string name="feature_nowplaying_queue_title">Up Next</string>
+    <string name="feature_nowplaying_queue_save_as_playlist">Save as playlist</string>
+    <string name="feature_nowplaying_queue_stop">Stop</string>
+    <string name="feature_nowplaying_queue_play_now">Play now</string>
+    <string name="feature_nowplaying_queue_remove_from_queue">Remove from queue</string>
 </resources>

@@ -1,0 +1,281 @@
+package com.lotusreichhart.audily.feature.nowplaying.queue
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
+import com.lotusreichhart.audily.core.model.song.Song
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.lotusreichhart.audily.core.designsystem.component.ActionItem
+import com.lotusreichhart.audily.core.designsystem.component.AudilyActionSheet
+import com.lotusreichhart.audily.core.designsystem.component.AudilyBottomSheet
+import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
+import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
+import com.lotusreichhart.audily.core.model.playback.NowPlayingState
+import com.lotusreichhart.audily.feature.nowplaying.R
+import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
+import com.lotusreichhart.audily.feature.nowplaying.util.nowPlayingBackground
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun QueueScreen(
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit = {},
+    viewModel: QueueViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState
+    var showQueueMenu by remember { mutableStateOf(false) }
+    var selectedIndexForMenu by remember { mutableStateOf<Int?>(null) }
+    var selectedSongForMenu by remember { mutableStateOf<Song?>(null) }
+    var showSongMenu by remember { mutableStateOf(false) }
+
+    QueueScreen(
+        modifier = modifier,
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        onClose = onClose,
+        onQueueMenuClick = { showQueueMenu = true },
+        onItemMenuClick = { index, songId ->
+            selectedSongForMenu = uiState.queue.find { it.id == songId }
+            selectedIndexForMenu = index
+            showSongMenu = true
+        }
+    )
+
+    if (showQueueMenu) {
+        AudilyBottomSheet(
+            onDismissRequest = { showQueueMenu = false },
+            isFullScreen = false,
+            showDragHandle = false,
+            enableSwipeToDismiss = true,
+            containerColor = Color.Transparent
+        ) {
+            AudilyActionSheet(
+                options = listOf(
+                    ActionItem(
+                        label = stringResource(R.string.feature_nowplaying_queue_save_as_playlist),
+                        icon = AudilyIcons.Playlist,
+                        onClick = { /* Xử lý */ }
+                    ),
+                    ActionItem(
+                        label = stringResource(R.string.feature_nowplaying_queue_stop),
+                        icon = NowPlayingIcons.Stop,
+                        isDestructive = true,
+                        onClick = {
+                            viewModel.onEvent(QueueUiEvent.OnStopQueue)
+                            onClose()
+                        }
+                    )
+                ),
+                onDismiss = { showQueueMenu = false }
+            )
+        }
+    }
+
+    val selectedSong = selectedSongForMenu
+    val selectedIndex = selectedIndexForMenu
+
+    if (showSongMenu && selectedSong != null && selectedIndex != null) {
+        AudilyBottomSheet(
+            onDismissRequest = { showSongMenu = false },
+            isFullScreen = false,
+            showDragHandle = false,
+            enableSwipeToDismiss = true,
+            containerColor = Color.Transparent
+        ) {
+            AudilyActionSheet(
+                header = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AudilyArtwork(
+                            artworkUri = selectedSong.basic.artworkUri,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = selectedSong.basic.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = selectedSong.basic.artist,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                },
+                options = listOf(
+                    ActionItem(
+                        label = stringResource(R.string.feature_nowplaying_queue_play_now),
+                        icon = AudilyIcons.Resume,
+                        onClick = {
+                            viewModel.onEvent(QueueUiEvent.OnSkipToIndex(selectedIndex))
+                            showSongMenu = false
+                        }
+                    ),
+                    ActionItem(
+                        label = stringResource(R.string.feature_nowplaying_queue_remove_from_queue),
+                        icon = AudilyIcons.QueueMusic,
+                        isDestructive = true,
+                        onClick = {
+                            viewModel.onEvent(QueueUiEvent.OnRemoveFromQueue(selectedSong.id))
+                            showSongMenu = false
+                        }
+                    )
+                ),
+                onDismiss = { showSongMenu = false }
+            )
+        }
+    }
+}
+
+@Composable
+internal fun QueueScreen(
+    modifier: Modifier = Modifier,
+    uiState: QueueUiState,
+    onEvent: (QueueUiEvent) -> Unit,
+    onClose: () -> Unit,
+    onQueueMenuClick: () -> Unit,
+    onItemMenuClick: (index: Int, songId: Long) -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+
+    // Local state để render list lập tức khi drag (tránh độ trễ từ ViewModel)
+    var localQueue by remember { mutableStateOf(uiState.queue) }
+
+    LaunchedEffect(uiState.queue) {
+        // Cập nhật từ state gốc nếu dữ liệu thực tế thay đổi (ví dụ: chuyển bài, xóa bài)
+        localQueue = uiState.queue
+    }
+
+    // Lưu lại vị trí bắt đầu khi bắt đầu kéo
+    var initialIndex by remember { mutableStateOf<Int?>(null) }
+
+    val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        localQueue = localQueue.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxWidth(),
+        topBar = {
+            QueueHeader(
+                queueSummary = uiState.queueSummary,
+                onCloseClick = onClose,
+                onMenuClick = onQueueMenuClick
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .nowPlayingBackground(uiState.paletteColors)
+        ) {
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                itemsIndexed(
+                    items = localQueue,
+                    key = { _, song -> song.id }
+                ) { index, song ->
+                    ReorderableItem(reorderableState, key = song.id) { isDragging ->
+                        // Hiệu ứng nhấc lên khi đang drag
+                        val elevation by animateFloatAsState(
+                            if (isDragging) 8f else 0f,
+                            label = "elevation"
+                        )
+
+                        val playbackStatus = when {
+                            uiState.currentIndex == index -> {
+                                if (uiState.playbackState.nowPlayingState == NowPlayingState.PLAYING)
+                                    SongPlaybackStatus.PLAYING
+                                else
+                                    SongPlaybackStatus.PAUSED
+                            }
+
+                            else -> SongPlaybackStatus.NONE
+                        }
+
+                        val onDragStarted = {
+                            initialIndex = index
+                        }
+                        val onDragStopped = {
+                            val from = initialIndex
+                            val to = localQueue.indexOfFirst { it.id == song.id }
+                            if (from != null && to != -1 && from != to) {
+                                onEvent(QueueUiEvent.OnMoveQueueItem(from, to))
+                            }
+                            initialIndex = null
+                        }
+
+                        QueueSongItem(
+                            modifier = Modifier
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .graphicsLayer {
+                                    this.shadowElevation = elevation
+                                }
+                                .longPressDraggableHandle(
+                                    onDragStarted = { onDragStarted() },
+                                    onDragStopped = { onDragStopped() }
+                                ),
+                            index = index,
+                            song = song,
+                            playbackStatus = playbackStatus,
+                            isDragging = isDragging,
+                            dragHandleModifier = Modifier.draggableHandle(
+                                onDragStarted = { onDragStarted() },
+                                onDragStopped = { onDragStopped() }
+                            ),
+                            onEvent = onEvent,
+                            onItemMenuClick = onItemMenuClick
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
