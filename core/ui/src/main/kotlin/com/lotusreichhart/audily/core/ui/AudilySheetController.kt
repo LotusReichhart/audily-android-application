@@ -15,7 +15,9 @@ interface AudilySheetController {
      */
     fun showSheet(
         content: @Composable () -> Unit,
-        isFullScreen: Boolean = false
+        isFullScreen: Boolean = false,
+        showDragHandle: Boolean = true,
+        enableSwipeToDismiss: Boolean = true
     )
     
     /**
