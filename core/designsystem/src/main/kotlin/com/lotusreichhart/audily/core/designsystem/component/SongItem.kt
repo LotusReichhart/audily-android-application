@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.R
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 
 /**
  * Trạng thái phát nhạc của bài hát để hiển thị hiệu ứng tương ứng.
@@ -55,16 +56,18 @@ enum class SongPlaybackStatus {
 
 @Composable
 fun SongItem(
+    modifier: Modifier = Modifier,
     title: String,
     artist: String,
     albumArt: @Composable () -> Unit,
     onClick: () -> Unit,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier,
     isMissing: Boolean = false,
     isFavorite: Boolean = false,
     showDragHandle: Boolean = false,
+    dragHandleModifier: Modifier = Modifier,
     playbackStatus: SongPlaybackStatus = SongPlaybackStatus.NONE,
+    inNowPlaying: Boolean = false
 ) {
     val isSelected = playbackStatus != SongPlaybackStatus.NONE
     val contentAlpha = if (isMissing) 0.5f else if (isSelected) 0.7f else 1f
@@ -72,7 +75,6 @@ fun SongItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
             .clickable(
                 onClick = onClick,
                 indication = null,
@@ -83,7 +85,8 @@ fun SongItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (showDragHandle) {
-            DragHandleIcon()
+            DragHandleIcon(modifier = dragHandleModifier, inNowPlaying = inNowPlaying)
+            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
         }
 
         Row(
@@ -100,29 +103,33 @@ fun SongItem(
             Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
 
             SongInformation(
+                modifier = Modifier.weight(1f),
                 title = title,
                 artist = artist,
                 isSelected = isSelected,
                 isMissing = isMissing,
                 isFavorite = isFavorite,
-                modifier = Modifier.weight(1f)
+                inNowPlaying = inNowPlaying
             )
         }
 
         // Section các nút chức năng (Drag Handle hiện tại và Menu Button) giữ độ sáng 1.0f
-        SongMenuButton(onClick = onMenuClick)
+        SongMenuButton(onClick = onMenuClick, inNowPlaying = inNowPlaying)
     }
 }
 
 @Composable
-private fun DragHandleIcon() {
+private fun DragHandleIcon(
+    modifier: Modifier = Modifier,
+    inNowPlaying: Boolean
+) {
     Icon(
         painter = painterResource(id = AudilyIcons.DragHandle),
         contentDescription = null,
-        modifier = Modifier
+        modifier = modifier
             .size(24.dp)
             .padding(end = LocalDimensions.current.paddingExtraSmall),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant
+        tint = if (inNowPlaying) OnSurfaceDark else MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -154,12 +161,13 @@ private fun SongArtwork(
 
 @Composable
 private fun SongInformation(
+    modifier: Modifier = Modifier,
     title: String,
     artist: String,
     isSelected: Boolean,
     isMissing: Boolean,
     isFavorite: Boolean,
-    modifier: Modifier = Modifier
+    inNowPlaying: Boolean
 ) {
     val displayTitle =
         if (isMissing) stringResource(id = R.string.core_designsystem_song_is_missing) else title
@@ -169,7 +177,7 @@ private fun SongInformation(
     val titleColor = when {
         isMissing -> MaterialTheme.colorScheme.error
         isSelected -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onSurface
+        else -> if (inNowPlaying) OnSurfaceDark else MaterialTheme.colorScheme.onSurface
     }
 
     Column(
@@ -208,7 +216,7 @@ private fun SongInformation(
             Text(
                 text = displayArtist,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (inNowPlaying) OnSurfaceDark.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -217,7 +225,10 @@ private fun SongInformation(
 }
 
 @Composable
-private fun SongMenuButton(onClick: () -> Unit) {
+private fun SongMenuButton(
+    onClick: () -> Unit,
+    inNowPlaying: Boolean
+) {
     Box(
         modifier = Modifier
             .size(32.dp)
@@ -232,9 +243,11 @@ private fun SongMenuButton(onClick: () -> Unit) {
             painter = painterResource(id = AudilyIcons.VerticalDot),
             contentDescription = null,
             modifier = Modifier
-                .size(24.dp)
-                .offset(x = 10.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
+                .size(20.dp)
+                .offset(x = 7.dp),
+            tint = if (inNowPlaying) OnSurfaceDark.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                alpha = 0.9f
+            )
         )
     }
 }

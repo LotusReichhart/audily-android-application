@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.feature.songs.impl.component
+package com.lotusreichhart.audily.feature.nowplaying.queue
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,18 +25,21 @@ import androidx.compose.ui.res.painterResource
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.SongItem
 import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
-import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.model.song.Song
-import com.lotusreichhart.audily.feature.songs.impl.SongsUiEvent
+import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun SongSwipeItem(
+internal fun QueueSongItem(
+    modifier: Modifier = Modifier,
+    dragHandleModifier: Modifier = Modifier,
+    index: Int,
     song: Song,
     playbackStatus: SongPlaybackStatus,
-    onEvent: (SongsUiEvent) -> Unit,
-    modifier: Modifier = Modifier,
+    isDragging: Boolean = false,
+    onEvent: (QueueUiEvent) -> Unit,
+    onItemMenuClick: (index: Int, songId: Long) -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.Settled,
@@ -44,13 +47,9 @@ internal fun SongSwipeItem(
 
     LaunchedEffect(dismissState.currentValue) {
         when (dismissState.currentValue) {
-            SwipeToDismissBoxValue.StartToEnd -> {
-                onEvent(SongsUiEvent.PlayNextClicked(song))
-                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-            }
-
+            SwipeToDismissBoxValue.StartToEnd,
             SwipeToDismissBoxValue.EndToStart -> {
-                onEvent(SongsUiEvent.ToggleFavoriteClicked(song.id))
+                onEvent(QueueUiEvent.OnRemoveFromQueue(song.id))
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
 
@@ -60,10 +59,12 @@ internal fun SongSwipeItem(
 
     SwipeToDismissBox(
         state = dismissState,
-        backgroundContent = { SongSwipeBackground(dismissState) },
+        enableDismissFromStartToEnd = !isDragging,
+        enableDismissFromEndToStart = !isDragging,
+        backgroundContent = { QueueSwipeBackground(dismissState) },
         content = {
             SongItem(
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                modifier = modifier.background(Color.Transparent),
                 title = song.basic.title,
                 artist = song.basic.artist,
                 albumArt = {
@@ -74,9 +75,12 @@ internal fun SongSwipeItem(
                 },
                 isMissing = song.isMissing,
                 isFavorite = song.isFavorite,
+                showDragHandle = true, // Quan trọng: Bật Drag Handle cho Queue
+                dragHandleModifier = dragHandleModifier,
                 playbackStatus = playbackStatus,
-                onClick = { onEvent(SongsUiEvent.SongClicked(song.id)) },
-                onMenuClick = { },
+                onClick = { onEvent(QueueUiEvent.OnSongClicked(index, song.id)) },
+                onMenuClick = { onItemMenuClick(index, song.id) },
+                inNowPlaying = true
             )
         }
     )
@@ -84,7 +88,7 @@ internal fun SongSwipeItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SongSwipeBackground(
+private fun QueueSwipeBackground(
     dismissState: SwipeToDismissBoxState
 ) {
     val dimensions = LocalDimensions.current
@@ -92,17 +96,17 @@ private fun SongSwipeBackground(
 
     val actionConfig = when (direction) {
         SwipeToDismissBoxValue.StartToEnd -> SwipeActionConfig(
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
             alignment = Alignment.CenterStart,
-            icon = AudilyIcons.QueueMusic,
-            iconTint = MaterialTheme.colorScheme.primary
+            icon = NowPlayingIcons.RemoveFromQueue,
+            iconTint = MaterialTheme.colorScheme.onSurface
         )
 
         SwipeToDismissBoxValue.EndToStart -> SwipeActionConfig(
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
             alignment = Alignment.CenterEnd,
-            icon = AudilyIcons.FavoriteFill,
-            iconTint = Color.Red
+            icon = NowPlayingIcons.RemoveFromQueue,
+            iconTint = MaterialTheme.colorScheme.onSurface
         )
 
         else -> SwipeActionConfig(
@@ -129,7 +133,7 @@ private fun SongSwipeBackground(
         if (actionConfig.icon != null) {
             Icon(
                 painter = painterResource(actionConfig.icon),
-                contentDescription = null,
+                contentDescription = "Delete",
                 modifier = Modifier
                     .scale(scale)
                     .size(dimensions.iconSizeLarge),

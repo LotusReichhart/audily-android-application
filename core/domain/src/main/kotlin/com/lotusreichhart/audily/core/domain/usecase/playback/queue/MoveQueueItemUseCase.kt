@@ -7,5 +7,6 @@ import javax.inject.Inject
 class MoveQueueItemUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
-    suspend operator fun invoke(from: Int, to: Int) = playbackRepository.handleEvent(PlaybackEvent.MoveQueueItem(from, to))
+    suspend operator fun invoke(from: Int, to: Int) =
+        playbackRepository.handleEvent(PlaybackEvent.MoveQueueItem(from, to))
 }

@@ -21,4 +21,6 @@ internal object NowPlayingIcons {
     val TimerPauseFill = R.drawable.feature_nowplaying_ic_fill_timer_pause
     val LyricsOutline = R.drawable.feature_nowplaying_ic_outline_lyrics
     val LyricsFill = R.drawable.feature_nowplaying_ic_fill_lyrics
+
+    val RemoveFromQueue = R.drawable.feature_nowplaying_ic_remove_from_queue
 }

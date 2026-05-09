@@ -7,4 +7,10 @@
     <string name="feature_nowplaying_menu_speed_pitch">Tốc độ &amp; Cao độ</string>
     <string name="feature_nowplaying_menu_skip_duration">Thời gian tua</string>
     <string name="feature_nowplaying_menu_ringtone">Nhạc chuông</string>
+
+    <string name="feature_nowplaying_queue_title">Chờ phát</string>
+    <string name="feature_nowplaying_queue_save_as_playlist">Lưu thành danh sách phát mới</string>
+    <string name="feature_nowplaying_queue_stop">Ngừng phát</string>
+    <string name="feature_nowplaying_queue_play_now">Phát ngay</string>
+    <string name="feature_nowplaying_queue_remove_from_queue">Xóa khỏi hàng chờ</string>
 </resources>

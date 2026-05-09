@@ -18,7 +18,6 @@ class PlaybackControlUseCases @Inject constructor(
     private val seekToUseCase: SeekToUseCase,
     private val setShuffleUseCase: SetShuffleUseCase,
     private val setRepeatModeUseCase: SetRepeatModeUseCase,
-    private val stopSongUseCase: StopSongUseCase,
     private val setSpeedAndPitchUseCase: SetSpeedAndPitchUseCase,
     private val fastForwardUseCase: FastForwardUseCase,
     private val fastRewindUseCase: FastRewindUseCase,
@@ -32,7 +31,6 @@ class PlaybackControlUseCases @Inject constructor(
     suspend fun seekTo(position: Long) = seekToUseCase(position)
     suspend fun setShuffle(enabled: Boolean) = setShuffleUseCase(enabled)
     suspend fun setRepeatMode(mode: RepeatMode) = setRepeatModeUseCase(mode)
-    suspend fun stop() = stopSongUseCase()
     suspend fun setSpeedAndPitch(speed: Float, pitch: Float) = setSpeedAndPitchUseCase(speed, pitch)
     suspend fun fastForward() = fastForwardUseCase()
     suspend fun fastRewind() = fastRewindUseCase()

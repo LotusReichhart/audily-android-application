@@ -21,7 +21,7 @@ import javax.inject.Inject
 class NowPlayingViewModel @Inject constructor(
     observeNowPlaying: ObserveNowPlayingUseCase,
     observePlaybackPosition: ObservePlaybackPositionUseCase,
-    private val controls: PlaybackControlUseCases
+    private val controls: PlaybackControlUseCases,
 ) : ViewModel() {
 
     private val _isLyricsVisible = MutableStateFlow(false)

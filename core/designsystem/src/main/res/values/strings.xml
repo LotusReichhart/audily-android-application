@@ -6,6 +6,7 @@
     <string name="core_designsystem_unknown_artist">Unknown Artist</string>
     <string name="core_designsystem_unknown_album">Unknown Album</string>
     <string name="core_designsystem_unknown_title">Unknown TItle</string>
+    <string name="core_designsystem_unknown_cancel">Cancel</string>
 
     <!-- Sort Order Labels -->
     <string name="core_designsystem_sort_order_title">Title</string>
