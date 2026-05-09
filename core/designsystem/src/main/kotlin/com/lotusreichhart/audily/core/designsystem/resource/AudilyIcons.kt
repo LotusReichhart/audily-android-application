@@ -4,6 +4,8 @@ import com.lotusreichhart.audily.core.designsystem.R
 
 object AudilyIcons {
     val ArrowDown = R.drawable.core_designsystem_ic_arrow_down
+    val Delete = R.drawable.core_designsystem_ic_delete
+    val Edit = R.drawable.core_designsystem_ic_edit
     val HomeOutline = R.drawable.core_designsystem_ic_outline_home
     val HomeFill = R.drawable.core_designsystem_ic_fill_home
     val TimerOutline = R.drawable.core_designsystem_ic_outline_timelapse
@@ -15,8 +17,11 @@ object AudilyIcons {
     val DragHandle = R.drawable.core_designsystem_ic_drag_handle
     val Playlist = R.drawable.core_designsystem_ic_playlist
     val QueueMusic = R.drawable.core_designsystem_ic_queue_music
+    val Pause = R.drawable.core_designsystem_ic_pause
     val Resume = R.drawable.core_designsystem_ic_resume
+    val PlayNext = R.drawable.core_designsystem_ic_play_next
     val Search = R.drawable.core_designsystem_ic_search
+    val Share = R.drawable.core_designsystem_ic_share
     val Shuffle = R.drawable.core_designsystem_ic_shuffle
     val Sort = R.drawable.core_designsystem_ic_sort
     val Timer = R.drawable.core_designsystem_ic_timer

@@ -7,13 +7,16 @@ import androidx.compose.runtime.Composable
  * Giúp giải quyết vấn đề phụ thuộc vòng và giữ cho AudilyApp sạch sẽ.
  */
 object GlobalSheetRegistry {
-    private val registry = mutableMapOf<String, @Composable () -> Unit>()
+    private val registry = mutableMapOf<String, @Composable (Any?) -> Unit>()
 
-    fun register(key: String, content: @Composable () -> Unit) {
+    fun register(key: String, content: @Composable (Any?) -> Unit) {
         registry[key] = content
     }
 
-    fun getContent(key: String): (@Composable () -> Unit)? {
-        return registry[key]
+    @Composable
+    fun Render(key: String, params: Any?) {
+        registry[key]?.invoke(params)
     }
+
+    fun isRegistered(key: String): Boolean = registry.containsKey(key)
 }
