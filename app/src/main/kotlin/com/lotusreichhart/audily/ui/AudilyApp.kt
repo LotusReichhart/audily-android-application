@@ -62,9 +62,7 @@ import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSiz
 import com.lotusreichhart.audily.core.designsystem.adaptive.toAudilyWindowSize
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
-import com.lotusreichhart.audily.core.ui.GlobalUiInitializer
 import android.app.Activity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -146,17 +144,17 @@ internal fun AudilyApp(
 
     val globalUiEventBus: GlobalUiEventBus = remember { GlobalUiEventBus() }
 
-    // Khởi tạo các thành phần UI toàn cục
-    GlobalUiInitializer()
-
     // Lắng nghe sự kiện từ GlobalUiEventBus
     LaunchedEffect(globalUiEventBus) {
         globalUiEventBus.events.collect { event ->
             when (event) {
                 is GlobalUiEvent.OpenSheet -> {
-                    val content = GlobalSheetRegistry.getContent(event.key)
-                    if (content != null) {
-                        sheetController.showSheet(content, event.isFullScreen)
+                    if (GlobalSheetRegistry.isRegistered(event.key)) {
+                        sheetController.showSheet(
+                            content = { GlobalSheetRegistry.Render(event.key, event.params) },
+                            isFullScreen = event.isFullScreen,
+                            showDragHandle = event.isShowDragHandle
+                        )
                     }
                 }
 
@@ -345,7 +343,7 @@ internal fun AudilyApp(
                     isFullScreen = isSheetFullScreen,
                     showDragHandle = isShowDragHandle,
                     enableSwipeToDismiss = isSheetSwipeEnabled,
-                    containerColor = SurfaceDark
+                    containerColor = Color.Transparent
                 ) {
                     sheetContent?.invoke()
                 }

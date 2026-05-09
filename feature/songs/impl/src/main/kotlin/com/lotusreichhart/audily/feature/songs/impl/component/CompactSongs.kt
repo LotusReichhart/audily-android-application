@@ -46,7 +46,8 @@ internal fun CompactSongs(
     sortType: SortOrderType,
     playbackState: PlaybackState,
     screenState: SongsScreenState,
-    onEvent: (SongsUiEvent) -> Unit
+    onEvent: (SongsUiEvent) -> Unit,
+    onMenuClick: (song: Song) -> Unit
 ) {
     AudilyScaffold(
         containerColor = Color.Transparent,
@@ -106,7 +107,8 @@ internal fun CompactSongs(
                                 SongSwipeItem(
                                     song = song,
                                     playbackStatus = playbackStatus,
-                                    onEvent = onEvent
+                                    onEvent = onEvent,
+                                    onMenuClick = onMenuClick
                                 )
                             }
                         }

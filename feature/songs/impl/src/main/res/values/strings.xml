@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_songs_impl_menu_play">Play</string>
+    <string name="feature_songs_impl_menu_play_once">Play Once</string>
+    <string name="feature_songs_impl_menu_resume">Pause</string>
+    <string name="feature_songs_impl_menu_pause">Pause</string>
+    <string name="feature_songs_impl_menu_play_next">Play Next</string>
+    <string name="feature_songs_impl_menu_add_to_queue">Add to Queue</string>
+    <string name="feature_songs_impl_menu_add_to_playlist">Add to Playlist</string>
+    <string name="feature_songs_impl_menu_add_to_favorite">Add to Favorite</string>
+    <string name="feature_songs_impl_menu_remove_from_favorite">Remove from Favorite</string>
+    <string name="feature_songs_impl_menu_edit_tag">Edit Tag</string>
+    <string name="feature_songs_impl_menu_share">Share</string>
+    <string name="feature_songs_impl_menu_delete">Delete</string>
+</resources>

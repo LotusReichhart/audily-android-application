@@ -12,6 +12,11 @@ import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
+import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
+import com.lotusreichhart.audily.core.ui.GlobalParams
+import com.lotusreichhart.audily.core.ui.GlobalSheetKey
+import com.lotusreichhart.audily.core.ui.GlobalUiEvent
+import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import com.lotusreichhart.audily.feature.songs.impl.component.CompactSongs
 import com.lotusreichhart.audily.feature.songs.impl.component.ExpandedSongs
@@ -38,6 +43,8 @@ internal fun SongsScreen(
 
     val screenState = rememberSongsScreenState()
 
+    val globalUiEventBus = LocalGlobalUiEventBus.current
+
     SongsScreen(
         modifier = modifier,
         isLoading = isLoading,
@@ -47,7 +54,20 @@ internal fun SongsScreen(
         sortType = sortType,
         playbackState = playbackState,
         screenState = screenState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onMenuClick = { song ->
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    key = GlobalSheetKey.SONG_MENU,
+                    params = mapOf(
+                        GlobalParams.PARAM_SONG to song,
+                        GlobalParams.PARAM_CALLER to GlobalMenuCaller.LIST_SCREEN,
+                        GlobalParams.PARAM_QUEUE_IDS to uiState.allSongIds
+                    ),
+                    isShowDragHandle = false
+                )
+            )
+        }
     )
 }
 
@@ -61,7 +81,8 @@ internal fun SongsScreen(
     sortType: SortOrderType,
     playbackState: PlaybackState,
     screenState: SongsScreenState,
-    onEvent: (SongsUiEvent) -> Unit
+    onEvent: (SongsUiEvent) -> Unit,
+    onMenuClick: (song: Song) -> Unit
 ) {
     AudilyAdaptiveLayout(
         compact = {
@@ -75,6 +96,7 @@ internal fun SongsScreen(
                 playbackState = playbackState,
                 screenState = screenState,
                 onEvent = onEvent,
+                onMenuClick = onMenuClick
             )
         },
         landscape = {
@@ -88,6 +110,7 @@ internal fun SongsScreen(
                 playbackState = playbackState,
                 screenState = screenState,
                 onEvent = onEvent,
+                onMenuClick = onMenuClick
             )
         },
         expanded = {
@@ -102,6 +125,7 @@ internal fun SongsScreen(
                 playbackState = playbackState,
                 screenState = screenState,
                 onEvent = onEvent,
+                onMenuClick = onMenuClick
             )
         }
     )

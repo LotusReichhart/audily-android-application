@@ -22,6 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
+import com.lotusreichhart.audily.core.ui.GlobalParams
 import com.lotusreichhart.audily.core.ui.GlobalSheetKey
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
@@ -63,6 +65,18 @@ fun NowPlayingScreen(
             )
         },
         onCloseClick = onCloseClick,
+        onMenuClick = {
+            globalUiEventBus.emit(
+                GlobalUiEvent.OpenSheet(
+                    key = GlobalSheetKey.SONG_MENU,
+                    params = mapOf(
+                        GlobalParams.PARAM_SONG to uiState.currentSong,
+                        GlobalParams.PARAM_CALLER to GlobalMenuCaller.NOW_PLAYING
+                    ),
+                    isShowDragHandle = false
+                )
+            )
+        },
         onEvent = viewModel::onEvent,
         onTimerClick = {
             globalUiEventBus.emit(
@@ -105,6 +119,7 @@ internal fun NowPlayingScreen(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
     onCloseClick: () -> Unit,
+    onMenuClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onTimerClick: () -> Unit,
     onSpeedPitchClick: () -> Unit,
@@ -124,8 +139,9 @@ internal fun NowPlayingScreen(
                 compact = {
                     CompactNowPlaying(
                         uiState = uiState,
+                        onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onExtendClick = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,
@@ -135,8 +151,9 @@ internal fun NowPlayingScreen(
                 landscape = {
                     LandscapeNowPlaying(
                         uiState = uiState,
+                        onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onExtendClick = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,
@@ -147,8 +164,9 @@ internal fun NowPlayingScreen(
                     // Logic: Tablet/Fold sẽ dùng Landscape cho đến khi có Two-Pane đặc thù
                     ExpandedNowPlaying(
                         uiState = uiState,
+                        onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
-                        onMenuToggle = { isMenuVisible = !isMenuVisible },
+                        onExtendClick = { isMenuVisible = !isMenuVisible },
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,

@@ -43,8 +43,9 @@ import com.lotusreichhart.audily.feature.nowplaying.queue.QueueScreen
 internal fun ExpandedNowPlaying(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
+    onMenuClick: () -> Unit,
     onLyricsToggle: () -> Unit,
-    onMenuToggle: () -> Unit,
+    onExtendClick: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
@@ -61,7 +62,7 @@ internal fun ExpandedNowPlaying(
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
                 onCloseClick = onCloseClick,
-                onMenuClick = onMenuToggle
+                onMenuClick = onMenuClick
             )
         },
     ) { paddingValues ->
@@ -196,7 +197,7 @@ internal fun ExpandedNowPlaying(
                         isLyricsVisible = uiState.isLyricsVisible,
                         onQueueClick = onOpenQueue,
                         onLyricsClick = onLyricsToggle,
-                        onExtendClick = onMenuToggle
+                        onExtendClick = onExtendClick
                     )
                 }
             }
