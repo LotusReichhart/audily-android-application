@@ -52,6 +52,7 @@ class PlaybackManager @Inject constructor(
     internal val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
     private var isInitialized = false
+    private var isRestoring = false
 
     // region History Tracking
     private var historyTrackingJob: Job? = null
@@ -98,6 +99,7 @@ class PlaybackManager @Inject constructor(
             is PlaybackEvent.MoveQueueItem -> moveQueueItem(event.from, event.to)
             is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs, event.index)
             is PlaybackEvent.PlayNext -> addNext(event.song)
+            is PlaybackEvent.AddSongToLast -> addLast(event.song)
         }
     }
 
@@ -229,6 +231,32 @@ class PlaybackManager @Inject constructor(
         markAsInitialized()
     }
 
+    internal fun addLast(song: Song) {
+        val player = getOrCreatePlayer()
+        val songIdStr = song.id.toString()
+
+        // 1. Kiểm tra xem bài hát đã có trong hàng đợi chưa
+        var existingIndex = -1
+        for (i in 0 until player.mediaItemCount) {
+            if (player.getMediaItemAt(i).mediaId == songIdStr) {
+                existingIndex = i
+                break
+            }
+        }
+
+        if (existingIndex != -1) {
+            // Nếu đã tồn tại, di chuyển xuống cuối
+            val lastIndex = player.mediaItemCount - 1
+            if (existingIndex != lastIndex) {
+                player.moveMediaItem(existingIndex, lastIndex)
+            }
+        } else {
+            // Nếu chưa có, thêm mới vào cuối
+            player.addMediaItem(MediaItemMapper.toMediaItem(song))
+        }
+        markAsInitialized()
+    }
+
     internal fun removeFromQueue(songId: Long) {
         val player = exoPlayer ?: return
         for (i in 0 until player.mediaItemCount) {
@@ -270,6 +298,17 @@ class PlaybackManager @Inject constructor(
             isInitialized = true
             needsRestoration = false
             Timber.d("Audily Service Kill - PlaybackManager marked as initialized")
+            if (!isRestoring) {
+                notifyListeners()
+            }
+        }
+    }
+ 
+    internal fun setRestoring(restoring: Boolean) {
+        this.isRestoring = restoring
+        Timber.d("Audily Service Kill - setRestoring: $restoring")
+        if (!restoring) {
+            markAsInitialized() // Đảm bảo trạng thái initialized khi kết thúc restore
             notifyListeners()
         }
     }
@@ -370,8 +409,8 @@ class PlaybackManager @Inject constructor(
     }
 
     private fun notifyListeners(isDiscontinuity: Boolean = false) {
-        if (!isInitialized) {
-            Timber.d("Audily Service Kill - notifyListeners blocked: not initialized")
+        if (!isInitialized || isRestoring) {
+            Timber.d("Audily Service Kill - notifyListeners blocked: isInitialized=$isInitialized, isRestoring=$isRestoring")
             return
         }
         val player = exoPlayer ?: return

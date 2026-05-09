@@ -44,5 +44,9 @@ internal class PlaybackRepositoryImpl @Inject constructor(
         playbackManager.markAsInitialized()
     }
 
+    override fun setRestoring(restoring: Boolean) {
+        playbackManager.setRestoring(restoring)
+    }
+
     override fun needsRestoration(): Boolean = playbackManager.needsRestoration()
 }

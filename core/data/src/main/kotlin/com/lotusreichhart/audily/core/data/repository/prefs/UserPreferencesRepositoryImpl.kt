@@ -15,6 +15,7 @@ import com.lotusreichhart.audily.core.model.prefs.UserPreferences
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class UserPreferencesRepositoryImpl @Inject constructor(
@@ -126,6 +127,12 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         sourceId: Long?,
         sourceType: String?
     ) {
+        if (queueIds.isEmpty()) {
+            Timber.d("Audily Service Kill - UserPreferencesRepository: Blocked saving empty session")
+            return
+        }
+
+        Timber.d("Audily Service Kill - UserPreferencesRepository: Saving session | Queue size: ${queueIds.size} | SongId: $songId")
         val session = com.lotusreichhart.audily.core.database.entity.PlaybackSessionEntity(
             currentSongId = songId,
             position = position,

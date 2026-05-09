@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.data.repository.playback
 
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
 import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -19,7 +20,18 @@ class PlaybackStateListenerImpl @Inject constructor(
         sourceId: Long?,
         sourceType: String?
     ) {
-        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
+        if (queueIds.isNotEmpty()) {
+            userPreferencesRepository.savePlaybackSession(
+                songId,
+                position,
+                duration,
+                queueIds,
+                sourceId,
+                sourceType
+            )
+        } else {
+            Timber.d("Audily Service Kill - PlaybackStateListener(Position): Blocked saving empty queueIds")
+        }
     }
 
     override suspend fun onPlaybackStateChanged(
@@ -31,7 +43,18 @@ class PlaybackStateListenerImpl @Inject constructor(
         sourceId: Long?,
         sourceType: String?
     ) {
-        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
+        if (queueIds.isNotEmpty()) {
+            userPreferencesRepository.savePlaybackSession(
+                songId,
+                position,
+                duration,
+                queueIds,
+                sourceId,
+                sourceType
+            )
+        } else {
+            Timber.d("Audily Service Kill - PlaybackStateListener(StateChanged): Blocked saving empty queueIds")
+        }
     }
 
     override suspend fun onSessionEnded(
@@ -42,6 +65,17 @@ class PlaybackStateListenerImpl @Inject constructor(
         sourceId: Long?,
         sourceType: String?
     ) {
-        userPreferencesRepository.savePlaybackSession(songId, position, duration, queueIds, sourceId, sourceType)
+        if (queueIds.isNotEmpty()) {
+            userPreferencesRepository.savePlaybackSession(
+                songId,
+                position,
+                duration,
+                queueIds,
+                sourceId,
+                sourceType
+            )
+        } else {
+            Timber.d("Audily Service Kill - PlaybackStateListener(SessionEnded): Blocked saving empty queueIds")
+        }
     }
 }

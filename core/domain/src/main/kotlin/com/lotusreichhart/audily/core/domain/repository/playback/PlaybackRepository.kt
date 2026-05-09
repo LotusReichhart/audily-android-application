@@ -27,4 +27,9 @@ interface PlaybackRepository {
      * Đánh dấu trình phát đã sẵn sàng (đã khôi phục session xong).
      */
     fun markAsInitialized()
+
+    /**
+     * Bật/tắt trạng thái đang khôi phục dữ liệu.
+     */
+    fun setRestoring(restoring: Boolean)
 }
