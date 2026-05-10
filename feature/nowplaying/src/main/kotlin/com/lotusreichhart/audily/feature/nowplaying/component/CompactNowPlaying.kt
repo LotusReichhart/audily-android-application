@@ -49,6 +49,7 @@ internal fun CompactNowPlaying(
     onMenuClick: () -> Unit,
     onLyricsToggle: () -> Unit,
     onExtendClick: () -> Unit,
+    onTimerActiveClick: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
@@ -79,8 +80,10 @@ internal fun CompactNowPlaying(
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
                 isLyricsVisible = uiState.isLyricsVisible,
+                sleepTimerActive = uiState.sleepTimerStatus.isActive,
                 onQueueClick = onOpenQueue,
                 onLyricsClick = onLyricsToggle,
+                onTimerClick = onTimerActiveClick,
                 onExtendClick = onExtendClick
             )
         }

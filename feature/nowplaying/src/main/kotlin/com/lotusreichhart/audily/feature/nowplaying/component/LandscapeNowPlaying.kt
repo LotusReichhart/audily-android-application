@@ -44,6 +44,7 @@ internal fun LandscapeNowPlaying(
     onMenuClick: () -> Unit,
     onLyricsToggle: () -> Unit,
     onExtendClick: () -> Unit,
+    onTimerActiveClick: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
@@ -172,8 +173,10 @@ internal fun LandscapeNowPlaying(
 
                 NowPlayingExtension(
                     isLyricsVisible = uiState.isLyricsVisible,
+                    sleepTimerActive = uiState.sleepTimerStatus.isActive,
                     onQueueClick = onOpenQueue,
                     onLyricsClick = onLyricsToggle,
+                    onTimerClick = onTimerActiveClick,
                     onExtendClick = onExtendClick
                 )
             }

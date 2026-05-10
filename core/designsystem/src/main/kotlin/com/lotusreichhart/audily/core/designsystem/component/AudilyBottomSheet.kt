@@ -43,9 +43,10 @@ fun AudilyBottomSheet(
     showDragHandle: Boolean = true,
     enableSwipeToDismiss: Boolean = true,
     containerColor: Color = SurfaceDark,
+    skipPartiallyExpanded: Boolean = false,
     shape: Shape = if (isFullScreen) RectangleShape else BottomSheetDefaults.ExpandedShape,
     sheetState: SheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = isFullScreen,
+        skipPartiallyExpanded = isFullScreen || skipPartiallyExpanded,
         confirmValueChange = {
             if (enableSwipeToDismiss) true
             else it != SheetValue.Hidden

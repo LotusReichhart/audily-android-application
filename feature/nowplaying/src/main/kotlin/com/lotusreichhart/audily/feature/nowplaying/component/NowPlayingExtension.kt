@@ -16,14 +16,30 @@ import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 
+import androidx.compose.animation.core.*
+import androidx.compose.runtime.getValue
+
 @Composable
 internal fun NowPlayingExtension(
     modifier: Modifier = Modifier,
     isLyricsVisible: Boolean,
+    sleepTimerActive: Boolean,
     onQueueClick: () -> Unit,
     onLyricsClick: () -> Unit,
+    onTimerClick: () -> Unit,
     onExtendClick: () -> Unit
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "timerFlashing")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "timerAlpha"
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -49,6 +65,18 @@ internal fun NowPlayingExtension(
                 iconSize = 24.dp,
                 tint = OnSurfaceDark
             )
+            
+            if (sleepTimerActive) {
+                Spacer(modifier = Modifier.width(12.dp))
+                AudilyIconButton(
+                    onClick = onTimerClick,
+                    painter = painterResource(id = NowPlayingIcons.TimerPauseFill),
+                    contentDescription = "Sleep Timer",
+                    containerSize = 28.dp,
+                    iconSize = 24.dp,
+                    tint = OnSurfaceDark.copy(alpha = alpha)
+                )
+            }
         }
 
         AudilyIconButton(

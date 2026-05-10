@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -26,6 +25,8 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.SongItem
 import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
+import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 
@@ -96,17 +97,17 @@ private fun QueueSwipeBackground(
 
     val actionConfig = when (direction) {
         SwipeToDismissBoxValue.StartToEnd -> SwipeActionConfig(
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+            backgroundColor = SurfaceDark,
             alignment = Alignment.CenterStart,
             icon = NowPlayingIcons.RemoveFromQueue,
-            iconTint = MaterialTheme.colorScheme.onSurface
+            iconTint = OnSurfaceDark
         )
 
         SwipeToDismissBoxValue.EndToStart -> SwipeActionConfig(
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+            backgroundColor = SurfaceDark,
             alignment = Alignment.CenterEnd,
             icon = NowPlayingIcons.RemoveFromQueue,
-            iconTint = MaterialTheme.colorScheme.onSurface
+            iconTint = OnSurfaceDark
         )
 
         else -> SwipeActionConfig(

@@ -40,7 +40,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import com.lotusreichhart.audily.core.designsystem.component.AudilyBottomSheet
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
-import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.ui.AudilySheetController
 import com.lotusreichhart.audily.core.ui.GlobalSheetRegistry
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
@@ -120,6 +119,8 @@ internal fun AudilyApp(
     var isSheetFullScreen by remember { mutableStateOf(false) }
     var isShowDragHandle by remember { mutableStateOf(false) }
     var isSheetSwipeEnabled by remember { mutableStateOf(true) }
+    var sheetContainerColor by remember { mutableStateOf(Color.Transparent) }
+    var isSkipPartiallyExpanded by remember { mutableStateOf(false) }
 
     val sheetController = remember {
         object : AudilySheetController {
@@ -127,12 +128,16 @@ internal fun AudilyApp(
                 content: @Composable () -> Unit,
                 isFullScreen: Boolean,
                 showDragHandle: Boolean,
-                enableSwipeToDismiss: Boolean
+                enableSwipeToDismiss: Boolean,
+                containerColor: Color,
+                skipPartiallyExpanded: Boolean
             ) {
                 sheetContent = content
                 isSheetFullScreen = isFullScreen
                 isShowDragHandle = showDragHandle
                 isSheetSwipeEnabled = enableSwipeToDismiss
+                sheetContainerColor = containerColor
+                isSkipPartiallyExpanded = skipPartiallyExpanded
             }
 
             override fun hideSheet() {
@@ -339,11 +344,14 @@ internal fun AudilyApp(
             // Tầng Overlay cao nhất: BottomSheet
             if (sheetContent != null) {
                 AudilyBottomSheet(
-                    onDismissRequest = { sheetController.hideSheet() },
+                    onDismissRequest = { 
+                        sheetController.hideSheet() 
+                    },
                     isFullScreen = isSheetFullScreen,
                     showDragHandle = isShowDragHandle,
                     enableSwipeToDismiss = isSheetSwipeEnabled,
-                    containerColor = Color.Transparent
+                    containerColor = sheetContainerColor,
+                    skipPartiallyExpanded = isSkipPartiallyExpanded
                 ) {
                     sheetContent?.invoke()
                 }

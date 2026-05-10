@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.MaterialTheme
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
 import com.lotusreichhart.audily.core.ui.GlobalParams
@@ -34,6 +35,10 @@ import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingMenu
 import com.lotusreichhart.audily.feature.nowplaying.component.ExpandedNowPlaying
 import com.lotusreichhart.audily.feature.nowplaying.component.CompactNowPlaying
 import com.lotusreichhart.audily.feature.nowplaying.component.LandscapeNowPlaying
+import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackParametersSheet
+import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackSkipDurationSheet
+import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackTimerSheet
+import com.lotusreichhart.audily.feature.nowplaying.component.SleepTimerCountdownDialog
 import com.lotusreichhart.audily.feature.nowplaying.queue.QueueScreen
 import com.lotusreichhart.audily.feature.nowplaying.util.nowPlayingBackground
 
@@ -46,6 +51,9 @@ fun NowPlayingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val globalUiEventBus = LocalGlobalUiEventBus.current
     val sheetController = LocalAudilySheetController.current
+
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant
+    var showTimerCountdown by remember { mutableStateOf(false) }
 
     StatusBarColorEffect(isLightIcon = true)
 
@@ -73,44 +81,77 @@ fun NowPlayingScreen(
                         GlobalParams.PARAM_SONG to uiState.currentSong,
                         GlobalParams.PARAM_CALLER to GlobalMenuCaller.NOW_PLAYING
                     ),
-                    isShowDragHandle = false
+                    isShowDragHandle = false,
+                    isFullScreen = false
                 )
             )
         },
         onEvent = viewModel::onEvent,
         onTimerClick = {
-            globalUiEventBus.emit(
-                GlobalUiEvent.OpenSheet(
-                    GlobalSheetKey.TIMER,
-                    false
-                )
+            sheetController.showSheet(
+                content = {
+                    PlaybackTimerSheet(
+                        initialMinutes = 0,
+                        onSave = { minutes ->
+                            viewModel.onEvent(NowPlayingUiEvent.OnSetSleepTimer(minutes))
+                            sheetController.hideSheet()
+                        }
+                    )
+                },
+                showDragHandle = true,
+                containerColor = sheetContainerColor,
+                skipPartiallyExpanded = true
             )
         },
+        onTimerActiveClick = { showTimerCountdown = true },
         onSpeedPitchClick = {
-            globalUiEventBus.emit(
-                GlobalUiEvent.OpenSheet(
-                    GlobalSheetKey.SPEED_PITCH,
-                    false
-                )
+            sheetController.showSheet(
+                content = {
+                    PlaybackParametersSheet(
+                        initialSpeed = uiState.playbackState.speed,
+                        initialPitch = uiState.playbackState.pitch,
+                        onSave = { speed, pitch ->
+                            viewModel.onEvent(NowPlayingUiEvent.OnSetSpeedAndPitch(speed, pitch))
+                            viewModel.onEvent(
+                                NowPlayingUiEvent.OnSavePlaybackParameters(
+                                    speed,
+                                    pitch
+                                )
+                            )
+                            sheetController.hideSheet()
+                        }
+                    )
+                },
+                showDragHandle = true,
+                containerColor = sheetContainerColor,
+                skipPartiallyExpanded = true
             )
         },
         onSkipDurationClick = {
-            globalUiEventBus.emit(
-                GlobalUiEvent.OpenSheet(
-                    GlobalSheetKey.SKIP_DURATION,
-                    false
-                )
-            )
-        },
-        onRingtoneClick = {
-            globalUiEventBus.emit(
-                GlobalUiEvent.OpenSheet(
-                    GlobalSheetKey.RINGTONE,
-                    false
-                )
+            sheetController.showSheet(
+                content = {
+                    PlaybackSkipDurationSheet(
+                        initialSeconds = uiState.skipDuration,
+                        onSave = { duration ->
+                            viewModel.onEvent(NowPlayingUiEvent.OnSaveSkipDuration(duration))
+                            sheetController.hideSheet()
+                        }
+                    )
+                },
+                showDragHandle = true,
+                containerColor = sheetContainerColor,
+                skipPartiallyExpanded = true
             )
         }
     )
+
+    if (showTimerCountdown) {
+        SleepTimerCountdownDialog(
+            remainingTimeMs = uiState.sleepTimerStatus.remainingTimeMs,
+            onDismiss = { showTimerCountdown = false },
+            onStopTimer = { viewModel.onEvent(NowPlayingUiEvent.OnSetSleepTimer(null)) }
+        )
+    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -122,9 +163,9 @@ internal fun NowPlayingScreen(
     onMenuClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onTimerClick: () -> Unit,
+    onTimerActiveClick: () -> Unit,
     onSpeedPitchClick: () -> Unit,
     onSkipDurationClick: () -> Unit,
-    onRingtoneClick: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
 ) {
     var isMenuVisible by remember { mutableStateOf(false) }
@@ -142,6 +183,7 @@ internal fun NowPlayingScreen(
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
                         onExtendClick = { isMenuVisible = !isMenuVisible },
+                        onTimerActiveClick = onTimerActiveClick,
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,
@@ -154,6 +196,7 @@ internal fun NowPlayingScreen(
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
                         onExtendClick = { isMenuVisible = !isMenuVisible },
+                        onTimerActiveClick = onTimerActiveClick,
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,
@@ -167,6 +210,7 @@ internal fun NowPlayingScreen(
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
                         onExtendClick = { isMenuVisible = !isMenuVisible },
+                        onTimerActiveClick = onTimerActiveClick,
                         onCloseClick = onCloseClick,
                         onOpenQueue = onOpenQueue,
                         onEvent = onEvent,
@@ -202,10 +246,18 @@ internal fun NowPlayingScreen(
                     bottom = 48.dp
                 ),
             isVisible = isMenuVisible,
-            onTimerClick = onTimerClick,
-            onSpeedPitchClick = onSpeedPitchClick,
-            onSkipDurationClick = onSkipDurationClick,
-            onRingtoneClick = onRingtoneClick,
+            onTimerClick = {
+                onTimerClick()
+                isMenuVisible = false
+            },
+            onSpeedPitchClick = {
+                onSpeedPitchClick()
+                isMenuVisible = false
+            },
+            onSkipDurationClick = {
+                onSkipDurationClick()
+                isMenuVisible = false
+            }
         )
     }
 }

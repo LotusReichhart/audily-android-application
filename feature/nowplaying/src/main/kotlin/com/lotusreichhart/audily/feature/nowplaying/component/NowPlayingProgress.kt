@@ -1,17 +1,19 @@
 package com.lotusreichhart.audily.feature.nowplaying.component
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,13 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
@@ -108,6 +106,7 @@ internal fun NowPlayingProgress(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AudilySlider(
     value: Float,
@@ -115,72 +114,31 @@ private fun AudilySlider(
     onValueChangeFinished: () -> Unit,
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primary,
-    inactiveColor: Color = OnSurfaceDark.copy(alpha = 0.5f),
+    inactiveColor: Color = OnSurfaceDark.copy(alpha = 0.1f),
     thumbColor: Color = Color.White
 ) {
-    val currentOnValueChange by rememberUpdatedState(onValueChange)
-    val currentOnValueChangeFinished by rememberUpdatedState(onValueChangeFinished)
-
-    BoxWithConstraints(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(24.dp)
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    val thumbRadius = 6.dp.toPx()
-                    val trackWidth = size.width - 2 * thumbRadius
-                    val newValue = ((offset.x - thumbRadius) / trackWidth).coerceIn(0f, 1f)
-                    currentOnValueChange(newValue)
-                    currentOnValueChangeFinished()
-                }
-            }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragEnd = { currentOnValueChangeFinished() },
-                    onDragCancel = { currentOnValueChangeFinished() },
-                    onDrag = { change, _ ->
-                        val thumbRadius = 6.dp.toPx()
-                        val trackWidth = size.width - 2 * thumbRadius
-                        val newValue =
-                            ((change.position.x - thumbRadius) / trackWidth).coerceIn(0f, 1f)
-                        currentOnValueChange(newValue)
-                    }
+    Slider(
+        modifier = modifier,
+        value = value,
+        onValueChange = onValueChange,
+        onValueChangeFinished = onValueChangeFinished,
+        thumb = {
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(thumbColor, CircleShape)
+            )
+        },
+        track = { sliderState ->
+            SliderDefaults.Track(
+                sliderState = sliderState,
+                modifier = Modifier.height(6.dp),
+                thumbTrackGapSize = 0.dp,
+                colors = SliderDefaults.colors(
+                    activeTrackColor = activeColor,
+                    inactiveTrackColor = inactiveColor
                 )
-            }
-    ) {
-        val width = constraints.maxWidth.toFloat()
-        val height = constraints.maxHeight.toFloat()
-        val centerY = height / 2
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val trackHeight = 4.dp.toPx()
-            val thumbRadius = 6.dp.toPx()
-
-            // Inactive Track
-            drawLine(
-                color = inactiveColor,
-                start = Offset(thumbRadius, centerY),
-                end = Offset(width - thumbRadius, centerY),
-                strokeWidth = trackHeight,
-                cap = StrokeCap.Round
-            )
-
-            // Active Track
-            val activeEnd = thumbRadius + (width - 2 * thumbRadius) * value
-            drawLine(
-                color = activeColor,
-                start = Offset(thumbRadius, centerY),
-                end = Offset(activeEnd, centerY),
-                strokeWidth = trackHeight,
-                cap = StrokeCap.Round
-            )
-
-            // Thumb
-            drawCircle(
-                color = thumbColor,
-                radius = thumbRadius,
-                center = Offset(activeEnd, centerY)
             )
         }
-    }
+    )
 }

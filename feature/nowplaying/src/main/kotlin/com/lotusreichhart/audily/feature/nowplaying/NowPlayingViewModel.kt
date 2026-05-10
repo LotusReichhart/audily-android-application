@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlaybackControlUseCases
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdatePlaybackParametersUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackPositionUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.timer.ObserveSleepTimerUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.timer.SetSleepTimerUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateSkipDurationUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
@@ -21,7 +25,11 @@ import javax.inject.Inject
 class NowPlayingViewModel @Inject constructor(
     observeNowPlaying: ObserveNowPlayingUseCase,
     observePlaybackPosition: ObservePlaybackPositionUseCase,
+    observeSleepTimer: ObserveSleepTimerUseCase,
     private val controls: PlaybackControlUseCases,
+    private val updatePlaybackParameters: UpdatePlaybackParametersUseCase,
+    private val setSleepTimer: SetSleepTimerUseCase,
+    private val updateSkipDuration: UpdateSkipDurationUseCase,
 ) : ViewModel() {
 
     private val _isLyricsVisible = MutableStateFlow(false)
@@ -29,11 +37,13 @@ class NowPlayingViewModel @Inject constructor(
     val uiState: StateFlow<NowPlayingUiState> = combine(
         observeNowPlaying(),
         observePlaybackPosition(),
+        observeSleepTimer(),
         _isLyricsVisible
-    ) { data, position, isLyricsVisible ->
+    ) { data, position, timer, isLyricsVisible ->
         NowPlayingUiState(
             playbackState = data.playbackState,
             playbackPositionMs = position,
+            sleepTimerStatus = timer,
             currentSong = data.song,
             queue = data.queue,
             currentIndex = data.currentIndex,
@@ -86,6 +96,23 @@ class NowPlayingViewModel @Inject constructor(
 
                 NowPlayingUiEvent.OnToggleLyrics -> {
                     _isLyricsVisible.value = !_isLyricsVisible.value
+                }
+
+                is NowPlayingUiEvent.OnSetSpeedAndPitch -> {
+                    controls.setSpeedAndPitch(event.speed, event.pitch)
+                }
+
+                is NowPlayingUiEvent.OnSavePlaybackParameters -> {
+                    updatePlaybackParameters(event.speed, event.pitch)
+                }
+
+                is NowPlayingUiEvent.OnSetSleepTimer -> {
+                    val durationMs = event.minutes?.let { it * 60 * 1000L } ?: 0L
+                    setSleepTimer(durationMs)
+                }
+
+                is NowPlayingUiEvent.OnSaveSkipDuration -> {
+                    updateSkipDuration(event.durationSeconds)
                 }
             }
         }
