@@ -17,9 +17,12 @@ import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers.Main
 import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
 import com.lotusreichhart.audily.core.domain.usecase.history.UpdateHistoryUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.ClearPlaybackSessionUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
+import com.lotusreichhart.audily.core.model.playback.SleepTimerStatus
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.playback.mapper.MediaItemMapper
 import com.lotusreichhart.audily.core.playback.mapper.PlaybackStateMapper
@@ -38,25 +41,38 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val HISTORY_THRESHOLD_MS = 60_000L // 1 phút
+
 @Singleton
 class PlaybackManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
     @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher,
     private val listeners: Set<@JvmSuppressWildcards PlaybackStateListener>,
-    private val updateHistoryUseCase: UpdateHistoryUseCase
+    private val updateHistoryUseCase: UpdateHistoryUseCase,
+    private val getUserPreferencesUseCase: GetUserPreferencesUseCase,
+    private val clearPlaybackSessionUseCase: ClearPlaybackSessionUseCase
 ) {
     private val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
     private var exoPlayer: ExoPlayer? = null
 
+    private var preferencesJob: Job? = null
+
     private val _playbackState = MutableStateFlow(PlaybackState.INITIAL)
     internal val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
+    private val _sleepTimerStatus = MutableStateFlow(SleepTimerStatus.INITIAL)
+    internal val sleepTimerStatus: StateFlow<SleepTimerStatus> = _sleepTimerStatus.asStateFlow()
+
     private var isInitialized = false
     private var isRestoring = false
+    private var lastFailedIndex: Int = -1
 
     // region History Tracking
     private var historyTrackingJob: Job? = null
     private var lastHistorySongId: Long? = null
+    // endregion
+
+    // region Sleep Timer
+    private var sleepTimerJob: Job? = null
     // endregion
 
     // Lưu trữ ngữ cảnh phát nhạc (Playlist/Album)
@@ -105,6 +121,10 @@ class PlaybackManager @Inject constructor(
 
     internal fun release() {
         stopHistoryTracking()
+        preferencesJob?.cancel()
+        preferencesJob = null
+        sleepTimerJob?.cancel()
+        sleepTimerJob = null
         exoPlayer?.let {
             it.removeListener(playerListener)
             it.release()
@@ -134,6 +154,9 @@ class PlaybackManager @Inject constructor(
         exoPlayer?.let {
             it.stop()
             it.clearMediaItems()
+        }
+        scope.launch {
+            clearPlaybackSessionUseCase()
         }
     }
 
@@ -225,7 +248,7 @@ class PlaybackManager @Inject constructor(
     internal fun addSongsToQueue(songs: List<Song>, index: Int = -1) {
         val player = getOrCreatePlayer()
         val mediaItems = MediaItemMapper.toMediaItems(songs)
-        
+
         val targetIndex = if (index >= 0) index else player.mediaItemCount
         player.addMediaItems(targetIndex, mediaItems)
         markAsInitialized()
@@ -303,13 +326,36 @@ class PlaybackManager @Inject constructor(
             }
         }
     }
- 
+
     internal fun setRestoring(restoring: Boolean) {
         this.isRestoring = restoring
         Timber.d("Audily Service Kill - setRestoring: $restoring")
         if (!restoring) {
             markAsInitialized() // Đảm bảo trạng thái initialized khi kết thúc restore
             notifyListeners()
+        }
+    }
+
+    internal fun setSleepTimer(durationMs: Long) {
+        sleepTimerJob?.cancel()
+        if (durationMs <= 0) {
+            _sleepTimerStatus.value = SleepTimerStatus.INITIAL
+            return
+        }
+
+        sleepTimerJob = scope.launch {
+            var remaining = durationMs
+            _sleepTimerStatus.value = SleepTimerStatus(remaining, true)
+
+            while (remaining > 0) {
+                delay(1000)
+                remaining -= 1000
+                _sleepTimerStatus.value = SleepTimerStatus(remaining.coerceAtLeast(0), true)
+            }
+
+            Timber.d("Sleep Timer - Time is up! Pausing playback.")
+            pause()
+            _sleepTimerStatus.value = SleepTimerStatus.INITIAL
         }
     }
 
@@ -368,9 +414,35 @@ class PlaybackManager @Inject constructor(
                 exoPlayer = it
                 // Đánh dấu là Player mới toanh, cần nạp lại Session
                 needsRestoration = true
-                isInitialized = false 
+                isInitialized = false
                 Timber.d("Audily Service Kill - New Player created, needs restoration")
+
+                // Khởi chạy lắng nghe Preferences
+                observePreferences()
             }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun observePreferences() {
+        preferencesJob?.cancel()
+        preferencesJob = scope.launch {
+            getUserPreferencesUseCase().collect { prefs ->
+                val settings = prefs.playbackSettings
+                exoPlayer?.let { player ->
+                    // 1. Cập nhật Skip Duration
+                    player.setSeekBackIncrementMs(settings.skipDuration.toLong() * 1000)
+                    player.setSeekForwardIncrementMs(settings.skipDuration.toLong() * 1000)
+
+                    // 2. Cập nhật Playback Parameters (Speed & Pitch)
+                    player.playbackParameters = PlaybackParameters(
+                        settings.playbackSpeed,
+                        settings.playbackPitch
+                    )
+
+                    Timber.d("PlaybackManager - Preferences updated: skip=${settings.skipDuration}, speed=${settings.playbackSpeed}")
+                }
+            }
+        }
     }
 
     private val playerListener = object : Player.Listener {
@@ -387,7 +459,7 @@ class PlaybackManager @Inject constructor(
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             notifyListeners()
             // Reset tracking cho bài hát mới
-            lastHistorySongId = null 
+            lastHistorySongId = null
             updateHistoryTracking()
         }
 
@@ -397,14 +469,55 @@ class PlaybackManager @Inject constructor(
             reason: Int
         ) = notifyListeners(isDiscontinuity = true)
 
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+            notifyListeners()
+        }
+
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             notifyListeners()
         }
 
         override fun onPlayerError(error: PlaybackException) {
-            Timber.e(error, "Player Error: ${error.errorCodeName}")
-            exoPlayer?.prepare()
-            notifyListeners()
+            val player = exoPlayer ?: return
+            val currentIndex = player.currentMediaItemIndex
+            val itemCount = player.mediaItemCount
+            val repeatMode = player.repeatMode
+            
+            val hasNext = currentIndex < itemCount - 1 || repeatMode != Player.REPEAT_MODE_OFF
+            val isDecodingError = error.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED
+
+            Timber.e(error, "Audily Playback Error: ${error.errorCodeName}. Item: $currentIndex/$itemCount, hasNext: $hasNext")
+            
+            scope.launch {
+                delay(500)
+                
+                // Nếu lỗi lặp lại lần 2 trên cùng một bài
+                if (currentIndex == lastFailedIndex && isDecodingError) {
+                    if (hasNext) {
+                        Timber.d("Recovery: Second failure on item $currentIndex, skipping to next song.")
+                        player.stop()
+                        player.seekToNext()
+                        player.prepare()
+                        player.play()
+                        lastFailedIndex = -1 
+                    } else {
+                        Timber.d("Recovery: Second failure on last item, stopping playback.")
+                        player.stop()
+                        lastFailedIndex = -1
+                    }
+                    notifyListeners()
+                    return@launch
+                }
+
+                // Lần lỗi đầu tiên: Thử cứu bài hiện tại
+                lastFailedIndex = currentIndex
+                Timber.d("Recovery: Attempting to recover current song (Index $currentIndex)...")
+                player.stop()
+                player.prepare()
+                player.play()
+                
+                notifyListeners()
+            }
         }
     }
 
@@ -450,7 +563,7 @@ class PlaybackManager @Inject constructor(
     private fun updateHistoryTracking() {
         val player = exoPlayer ?: return
         val currentSongId = player.currentMediaItem?.mediaId?.toLongOrNull() ?: return
-        
+
         if (player.isPlaying && player.playbackState == Player.STATE_READY) {
             startHistoryTracking(currentSongId)
         } else {
@@ -461,22 +574,22 @@ class PlaybackManager @Inject constructor(
     private fun startHistoryTracking(songId: Long) {
         // Nếu bài này đã được ghi lịch sử trong phiên này rồi thì không đếm lại
         if (lastHistorySongId == songId) return
-        
+
         // Hủy job cũ nếu có
         historyTrackingJob?.cancel()
-        
+
         historyTrackingJob = scope.launch {
             Timber.d("Starting history tracking for song $songId")
             var accumulatedTime = 0L
             val pollInterval = 1000L
-            
+
             while (accumulatedTime < HISTORY_THRESHOLD_MS) {
                 delay(pollInterval)
                 if (exoPlayer?.isPlaying == true) {
                     accumulatedTime += pollInterval
                 }
             }
-            
+
             Timber.d("History threshold reached for song $songId. Updating history...")
             updateHistoryUseCase(songId)
             lastHistorySongId = songId

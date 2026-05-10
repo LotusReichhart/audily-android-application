@@ -62,7 +62,9 @@ class ObserveNowPlayingUseCase @Inject constructor(
                 currentIndex = currentIndex,
                 playbackState = state.copy(
                     isShuffleOn = prefs.playbackSettings.isShuffleEnabled,
-                    repeatMode = repeatMode
+                    repeatMode = repeatMode,
+                    speed = prefs.playbackSettings.playbackSpeed,
+                    pitch = prefs.playbackSettings.playbackPitch
                 ),
                 colors = colors,
                 hasNext = hasNext,

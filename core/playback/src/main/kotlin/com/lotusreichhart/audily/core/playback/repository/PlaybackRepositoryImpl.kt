@@ -7,6 +7,7 @@ import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
 import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
 import com.lotusreichhart.audily.core.model.playback.PlaybackState
+import com.lotusreichhart.audily.core.model.playback.SleepTimerStatus
 import com.lotusreichhart.audily.core.playback.PlaybackManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -24,6 +25,7 @@ internal class PlaybackRepositoryImpl @Inject constructor(
 ) : PlaybackRepository {
 
     override val playbackState: StateFlow<PlaybackState> = playbackManager.playbackState
+    override val sleepTimerStatus: StateFlow<SleepTimerStatus> = playbackManager.sleepTimerStatus
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun handleEvent(event: PlaybackEvent) {
@@ -46,6 +48,10 @@ internal class PlaybackRepositoryImpl @Inject constructor(
 
     override fun setRestoring(restoring: Boolean) {
         playbackManager.setRestoring(restoring)
+    }
+
+    override fun setSleepTimer(durationMs: Long) {
+        playbackManager.setSleepTimer(durationMs)
     }
 
     override fun needsRestoration(): Boolean = playbackManager.needsRestoration()

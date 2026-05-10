@@ -29,14 +29,14 @@ interface UserPreferencesRepository {
     suspend fun updateMinAudioDuration(duration: Long)
     suspend fun updateFilterSmallFiles(enabled: Boolean)
     suspend fun updateAlbumGridSize(size: Int)
-    
+
     // Sort preferences
     suspend fun updateSongSortOrder(order: SongSortOrder)
     suspend fun updateSongSortType(type: SortOrderType)
-    
+
     suspend fun updateAlbumSortOrder(order: AlbumSortOrder)
     suspend fun updateAlbumSortType(type: SortOrderType)
-    
+
     suspend fun updatePlaylistSortOrder(order: PlaylistSortOrder)
     suspend fun updatePlaylistSortType(type: SortOrderType)
 
@@ -57,6 +57,8 @@ interface UserPreferencesRepository {
         sourceId: Long? = null,
         sourceType: String? = null
     )
+
+    suspend fun clearPlaybackSession()
 
     /**
      * Lấy phiên phát nhạc đã lưu từ Database.

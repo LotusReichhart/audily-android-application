@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.core.domain.repository.song
 import androidx.paging.PagingData
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.song.RingtoneResult
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import kotlinx.coroutines.flow.Flow
@@ -45,4 +46,9 @@ interface SongRepository {
 
     fun getBasicSong(id: Long): Flow<Song?>
     fun getBasicSongs(ids: List<Long>): Flow<List<Song>>
+
+    /**
+     * Cài đặt bài hát làm nhạc chuông hệ thống.
+     */
+    suspend fun setAsRingtone(id: Long): RingtoneResult
 }
