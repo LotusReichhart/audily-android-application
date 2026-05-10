@@ -25,6 +25,7 @@ import com.lotusreichhart.audily.core.designsystem.resource.AudilyImages
 fun AudilyArtwork(
     artworkUri: String?,
     modifier: Modifier = Modifier,
+    isAspectRatio: Boolean = true,
     contentDescription: String? = null
 ) {
     val isDark = isSystemInDarkTheme()
@@ -36,9 +37,9 @@ fun AudilyArtwork(
     }
 
     Box(
-        modifier = modifier
+        modifier = if (isAspectRatio) modifier
             .aspectRatio(1f)
-            .background(backgroundColor),
+            .background(backgroundColor) else modifier.background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         if (artworkUri != null) {

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
 import com.lotusreichhart.audily.feature.home.impl.HomeUiState
-import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.feature.home.impl.HomeUiEvent
 
 @Composable
 internal fun ExpandedHome(
@@ -19,9 +19,7 @@ internal fun ExpandedHome(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
-    onPlaySong: (Long, List<Song>) -> Unit,
-    onShuffleAll: () -> Unit,
-    onResumePlayback: () -> Unit,
+    onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AudilyScaffold(
@@ -45,11 +43,7 @@ internal fun ExpandedHome(
             is HomeUiState.Success -> {
                 HomeContent(
                     homeVibe = uiState.homeVibe,
-                    onSongClick = { songId ->
-                        onPlaySong(songId, uiState.homeVibe.discovery) // Simplified
-                    },
-                    onShuffleAllClick = onShuffleAll,
-                    onResumeClick = onResumePlayback,
+                    onEvent = onEvent,
                     contentPadding = innerPadding
                 )
             }

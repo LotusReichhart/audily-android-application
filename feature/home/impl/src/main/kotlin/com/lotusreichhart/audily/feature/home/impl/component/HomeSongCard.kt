@@ -12,19 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
 @Composable
 internal fun HomeSongCard(
+    modifier: Modifier = Modifier,
     title: String,
     artist: String,
     albumArt: @Composable () -> Unit,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Column(
         modifier = modifier
