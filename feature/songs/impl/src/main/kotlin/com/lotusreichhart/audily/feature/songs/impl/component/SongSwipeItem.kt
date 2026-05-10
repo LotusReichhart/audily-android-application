@@ -33,10 +33,11 @@ import com.lotusreichhart.audily.feature.songs.impl.SongsUiEvent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SongSwipeItem(
+    modifier: Modifier = Modifier,
     song: Song,
     playbackStatus: SongPlaybackStatus,
     onEvent: (SongsUiEvent) -> Unit,
-    modifier: Modifier = Modifier,
+    onMenuClick: (song: Song) -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.Settled,
@@ -76,7 +77,7 @@ internal fun SongSwipeItem(
                 isFavorite = song.isFavorite,
                 playbackStatus = playbackStatus,
                 onClick = { onEvent(SongsUiEvent.SongClicked(song.id)) },
-                onMenuClick = { },
+                onMenuClick = { onMenuClick(song) },
             )
         }
     )

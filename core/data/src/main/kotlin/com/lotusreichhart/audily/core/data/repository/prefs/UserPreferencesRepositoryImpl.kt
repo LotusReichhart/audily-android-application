@@ -3,10 +3,13 @@ package com.lotusreichhart.audily.core.data.repository.prefs
 import com.lotusreichhart.audily.core.data.mapper.prefs.toDomain
 import com.lotusreichhart.audily.core.data.mapper.prefs.toProto
 import com.lotusreichhart.audily.core.database.dao.PlaybackDao
+import com.lotusreichhart.audily.core.database.entity.PlaybackSessionEntity
+import com.lotusreichhart.audily.core.database.entity.PlayingQueueEntity
 import com.lotusreichhart.audily.core.datastore.AudilyDataStore
 import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
 import com.lotusreichhart.audily.core.model.album.AlbumSortOrder
 import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.playback.PlaybackSession
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
@@ -15,6 +18,7 @@ import com.lotusreichhart.audily.core.model.prefs.UserPreferences
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class UserPreferencesRepositoryImpl @Inject constructor(
@@ -126,7 +130,13 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         sourceId: Long?,
         sourceType: String?
     ) {
-        val session = com.lotusreichhart.audily.core.database.entity.PlaybackSessionEntity(
+        if (queueIds.isEmpty()) {
+            Timber.d("Audily Service Kill - UserPreferencesRepository: Blocked saving empty session")
+            return
+        }
+
+        Timber.d("Audily Service Kill - UserPreferencesRepository: Saving session | Queue size: ${queueIds.size} | SongId: $songId")
+        val session = PlaybackSessionEntity(
             currentSongId = songId,
             position = position,
             duration = duration,
@@ -134,7 +144,7 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
             sourceType = sourceType
         )
         val queueItems = queueIds.mapIndexed { index, id ->
-            com.lotusreichhart.audily.core.database.entity.PlayingQueueEntity(
+            PlayingQueueEntity(
                 songId = id,
                 orderIndex = index
             )
@@ -142,13 +152,17 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         playbackDao.saveFullPlaybackState(session, queueItems)
     }
 
-    override fun getPlaybackSession(): Flow<com.lotusreichhart.audily.core.model.playback.PlaybackSession?> {
+    override suspend fun clearPlaybackSession() {
+        playbackDao.clearSession()
+    }
+
+    override fun getPlaybackSession(): Flow<PlaybackSession?> {
         return kotlinx.coroutines.flow.combine(
             playbackDao.getSession(),
             playbackDao.getQueue()
         ) { session, queue ->
             session?.let {
-                com.lotusreichhart.audily.core.model.playback.PlaybackSession(
+                PlaybackSession(
                     currentSongId = it.currentSongId,
                     position = it.position,
                     duration = it.duration,

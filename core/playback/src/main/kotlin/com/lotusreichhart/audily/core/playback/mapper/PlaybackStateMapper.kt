@@ -30,6 +30,8 @@ internal object PlaybackStateMapper {
                 else -> RepeatMode.OFF
             },
             queueIds = getQueueIds(player),
+            speed = player.playbackParameters.speed,
+            pitch = player.playbackParameters.pitch,
             isInitialized = isInitialized
         )
     }

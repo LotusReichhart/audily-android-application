@@ -35,7 +35,6 @@ internal fun NowPlayingMenu(
     onTimerClick: () -> Unit,
     onSpeedPitchClick: () -> Unit,
     onSkipDurationClick: () -> Unit,
-    onRingtoneClick: () -> Unit
 ) {
     Column(
         modifier = modifier.padding(bottom = LocalDimensions.current.paddingMedium),
@@ -59,12 +58,6 @@ internal fun NowPlayingMenu(
             iconId = NowPlayingIcons.SkipDuration,
             label = stringResource(R.string.feature_nowplaying_menu_skip_duration),
             onClick = onSkipDurationClick
-        )
-        MenuFloatingItem(
-            isVisible = isVisible,
-            iconId = NowPlayingIcons.SetRingtone,
-            label = stringResource(R.string.feature_nowplaying_menu_ringtone),
-            onClick = onRingtoneClick
         )
     }
 }

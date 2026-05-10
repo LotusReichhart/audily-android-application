@@ -1,5 +1,11 @@
 package com.lotusreichhart.audily.core.data.repository.song
 
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.media.RingtoneManager
+import android.provider.MediaStore
+import android.provider.Settings
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
@@ -11,10 +17,11 @@ import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.MediaStoreIdPagingSource
 import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.song.RingtoneResult
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -23,6 +30,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 internal class SongRepositoryImpl @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val mediaStoreDataSource: MediaStoreDataSource,
 ) : SongRepository {
 
@@ -88,6 +96,40 @@ internal class SongRepositoryImpl @Inject constructor(
             val songs = mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() }
             val songsMap = songs.associateBy { it.id }
             emit(ids.mapNotNull { songsMap[it] })
+        }
+    }
+
+    override suspend fun setAsRingtone(id: Long): RingtoneResult {
+        // 1. Kiểm tra quyền WRITE_SETTINGS
+        if (!Settings.System.canWrite(context)) {
+            return RingtoneResult.NO_PERMISSION
+        }
+
+        return try {
+            val contentResolver = context.contentResolver
+            val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+
+            // 2. Cập nhật MediaStore (Đánh dấu là nhạc chuông)
+            val values = ContentValues().apply {
+                put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                put(MediaStore.Audio.Media.IS_NOTIFICATION, false)
+                put(MediaStore.Audio.Media.IS_ALARM, false)
+                put(MediaStore.Audio.Media.IS_MUSIC, true)
+            }
+            contentResolver.update(uri, values, null, null)
+
+            // 3. Đặt làm nhạc chuông mặc định
+            RingtoneManager.setActualDefaultRingtoneUri(
+                context,
+                RingtoneManager.TYPE_RINGTONE,
+                uri
+            )
+
+            Timber.d("SongRepositoryImpl - Successfully set ringtone for id: $id")
+            RingtoneResult.SUCCESS
+        } catch (e: Exception) {
+            Timber.e(e, "SongRepositoryImpl - Failed to set ringtone for id: $id")
+            RingtoneResult.FAILED
         }
     }
 }

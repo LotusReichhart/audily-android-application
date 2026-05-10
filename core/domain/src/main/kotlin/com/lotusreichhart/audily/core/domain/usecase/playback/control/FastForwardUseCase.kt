@@ -17,6 +17,6 @@ class FastForwardUseCase @Inject constructor(
         val skipDuration = userPreferencesRepository.getUserPreferences()
             .first().playbackSettings.skipDuration.toLong()
 
-        playbackRepository.handleEvent(PlaybackEvent.SeekBy(skipDuration))
+        playbackRepository.handleEvent(PlaybackEvent.SeekBy(skipDuration * 1000))
     }
 }

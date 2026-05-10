@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_songs_impl_menu_play">Phát</string>
+    <string name="feature_songs_impl_menu_play_once">Phát một lần</string>
+    <string name="feature_songs_impl_menu_resume">Tiếp tục</string>
+    <string name="feature_songs_impl_menu_pause">Tạm dừng</string>
+    <string name="feature_songs_impl_menu_play_next">Phát kế tiếp</string>
+    <string name="feature_songs_impl_menu_add_to_queue">Thêm vào hàng chờ</string>
+    <string name="feature_songs_impl_menu_add_to_playlist">Thêm vào danh sách phát</string>
+    <string name="feature_songs_impl_menu_add_to_favorite">Yêu thích</string>
+    <string name="feature_songs_impl_menu_remove_from_favorite">Bỏ yêu thích</string>
+    <string name="feature_songs_impl_menu_edit_tag">Chỉnh sửa thông tin</string>
+    <string name="feature_songs_impl_menu_share">Chia sẻ</string>
+    <string name="feature_songs_impl_menu_delete">Xóa</string>
+</resources>

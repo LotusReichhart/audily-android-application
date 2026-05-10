@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotusreichhart.audily.core.designsystem.R
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 data class ActionItem(
     val label: String,
@@ -38,10 +39,6 @@ data class ActionItem(
     val isDestructive: Boolean = false
 )
 
-/**
- * Action Sheet được thiết kế theo phong cách iOS dành cho Audily.
- * Các tùy chọn được nhóm vào một thẻ, nút Đóng (Cancel) tách biệt ở dưới.
- */
 @Composable
 fun AudilyActionSheet(
     options: List<ActionItem>,
@@ -50,9 +47,12 @@ fun AudilyActionSheet(
     title: String? = null,
     header: @Composable (() -> Unit)? = null
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .verticalScroll(scrollState)
             .padding(horizontal = LocalDimensions.current.paddingMedium)
             .padding(bottom = LocalDimensions.current.paddingMedium)
             .navigationBarsPadding()
@@ -60,7 +60,7 @@ fun AudilyActionSheet(
         // Khối tùy chọn (Options Card)
         Surface(
             shape = RoundedCornerShape(14.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.98f),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
@@ -132,7 +132,7 @@ fun AudilyActionSheet(
         // Nút Đóng tách biệt (Cancel Card)
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f),
+            color = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onDismiss() }

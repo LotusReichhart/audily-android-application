@@ -46,8 +46,10 @@ import com.lotusreichhart.audily.feature.nowplaying.constants.SharedContentState
 internal fun CompactNowPlaying(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
+    onMenuClick: () -> Unit,
     onLyricsToggle: () -> Unit,
-    onMenuToggle: () -> Unit,
+    onExtendClick: () -> Unit,
+    onTimerActiveClick: () -> Unit,
     onCloseClick: () -> Unit,
     onOpenQueue: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
@@ -69,7 +71,7 @@ internal fun CompactNowPlaying(
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
                 onCloseClick = onCloseClick,
-                onMenuClick = onMenuToggle
+                onMenuClick = onMenuClick
             )
         },
         bottomBar = {
@@ -78,9 +80,11 @@ internal fun CompactNowPlaying(
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
                 isLyricsVisible = uiState.isLyricsVisible,
+                sleepTimerActive = uiState.sleepTimerStatus.isActive,
                 onQueueClick = onOpenQueue,
                 onLyricsClick = onLyricsToggle,
-                onExtendClick = onMenuToggle
+                onTimerClick = onTimerActiveClick,
+                onExtendClick = onExtendClick
             )
         }
     ) { paddingValues ->

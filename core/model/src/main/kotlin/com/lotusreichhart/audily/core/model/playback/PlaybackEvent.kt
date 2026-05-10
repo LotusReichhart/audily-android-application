@@ -20,6 +20,7 @@ sealed class PlaybackEvent {
     data class SetRepeatMode(val mode: RepeatMode) : PlaybackEvent()
     data class SetSpeedAndPitch(val speed: Float, val pitch: Float) : PlaybackEvent()
     data class PlayNext(val song: Song) : PlaybackEvent()
+    data class AddSongToLast(val song: Song) : PlaybackEvent()
     data class RemoveFromQueue(val songId: Long) : PlaybackEvent()
     data class MoveQueueItem(val from: Int, val to: Int) : PlaybackEvent()
     data class AddSongsToQueue(val songs: List<Song>, val index: Int = -1) : PlaybackEvent()

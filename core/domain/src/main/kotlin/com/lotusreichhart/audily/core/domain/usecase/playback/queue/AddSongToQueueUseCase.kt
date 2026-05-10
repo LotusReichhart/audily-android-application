@@ -6,12 +6,12 @@ import com.lotusreichhart.audily.core.model.song.Song
 import javax.inject.Inject
 
 /**
- * UseCase thêm danh sách bài hát vào cuối hàng đợi hiện tại.
+ * UseCase thêm một bài hát vào cuối hàng đợi hiện tại.
  */
-class AddSongsToQueueUseCase @Inject constructor(
+class AddSongToQueueUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
-    suspend operator fun invoke(songs: List<Song>) {
-        playbackRepository.handleEvent(PlaybackEvent.AddSongsToQueue(songs))
+    suspend operator fun invoke(song: Song) {
+        playbackRepository.handleEvent(PlaybackEvent.AddSongToLast(song))
     }
 }

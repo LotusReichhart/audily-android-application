@@ -3,6 +3,7 @@ package com.lotusreichhart.audily
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import com.lotusreichhart.audily.feature.songs.impl.menu.SongMenuInitializer
 
 @HiltAndroidApp
 class AudilyApplication : Application(){
@@ -14,5 +15,8 @@ class AudilyApplication : Application(){
         }
         
         Timber.d("AudilyApplication onCreate....")
+        
+        // Initialize global components
+        SongMenuInitializer.initialize()
     }
 }

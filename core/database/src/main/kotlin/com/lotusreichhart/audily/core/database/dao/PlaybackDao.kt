@@ -20,6 +20,9 @@ interface PlaybackDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveSession(session: PlaybackSessionEntity)
 
+    @Query("DELETE FROM playback_session")
+    suspend fun clearSession()
+
     // === Playing Queue ===
 
     @Query("SELECT * FROM playing_queue ORDER BY orderIndex ASC")

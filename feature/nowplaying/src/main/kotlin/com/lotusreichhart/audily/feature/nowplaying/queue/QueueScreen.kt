@@ -46,6 +46,7 @@ import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 import com.lotusreichhart.audily.feature.nowplaying.util.nowPlayingBackground
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +60,12 @@ internal fun QueueScreen(
     var selectedIndexForMenu by remember { mutableStateOf<Int?>(null) }
     var selectedSongForMenu by remember { mutableStateOf<Song?>(null) }
     var showSongMenu by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.queue, uiState.playbackState.isInitialized) {
+        if (uiState.playbackState.isInitialized && uiState.queue.isEmpty()) {
+            onClose()
+        }
+    }
 
     QueueScreen(
         modifier = modifier,
@@ -182,19 +189,32 @@ internal fun QueueScreen(
 ) {
     val lazyListState = rememberLazyListState()
 
+    // Bọc song với một stableId duy nhất để handle bài hát trùng ID và đảm bảo kéo thả ổn định
+    data class QueueWrapper(
+        val song: Song,
+        val stableId: String = UUID.randomUUID().toString()
+    )
+
     // Local state để render list lập tức khi drag (tránh độ trễ từ ViewModel)
-    var localQueue by remember { mutableStateOf(uiState.queue) }
+    var localQueueWrappers by remember { mutableStateOf(uiState.queue.map { QueueWrapper(it) }) }
 
     LaunchedEffect(uiState.queue) {
-        // Cập nhật từ state gốc nếu dữ liệu thực tế thay đổi (ví dụ: chuyển bài, xóa bài)
-        localQueue = uiState.queue
+        // Chỉ cập nhật từ state gốc nếu dữ liệu thực tế thay đổi (ví dụ: chuyển bài, xóa bài)
+        // So sánh theo ID bài hát để tránh reset stableId khi chỉ là reorder nội bộ
+        val currentSongs = localQueueWrappers.map { it.song }
+        if (currentSongs != uiState.queue) {
+            localQueueWrappers = uiState.queue.map { song ->
+                // Thử tìm lại wrapper cũ để giữ stableId
+                localQueueWrappers.find { it.song == song } ?: QueueWrapper(song)
+            }
+        }
     }
 
     // Lưu lại vị trí bắt đầu khi bắt đầu kéo
     var initialIndex by remember { mutableStateOf<Int?>(null) }
 
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        localQueue = localQueue.toMutableList().apply {
+        localQueueWrappers = localQueueWrappers.toMutableList().apply {
             add(to.index, removeAt(from.index))
         }
     }
@@ -219,10 +239,11 @@ internal fun QueueScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(
-                    items = localQueue,
-                    key = { _, song -> song.id }
-                ) { index, song ->
-                    ReorderableItem(reorderableState, key = song.id) { isDragging ->
+                    items = localQueueWrappers,
+                    key = { _, wrapper -> wrapper.stableId }
+                ) { index, wrapper ->
+                    val song = wrapper.song
+                    ReorderableItem(reorderableState, key = wrapper.stableId) { isDragging ->
                         // Hiệu ứng nhấc lên khi đang drag
                         val elevation by animateFloatAsState(
                             if (isDragging) 8f else 0f,
@@ -245,7 +266,7 @@ internal fun QueueScreen(
                         }
                         val onDragStopped = {
                             val from = initialIndex
-                            val to = localQueue.indexOfFirst { it.id == song.id }
+                            val to = localQueueWrappers.indexOfFirst { it.stableId == wrapper.stableId }
                             if (from != null && to != -1 && from != to) {
                                 onEvent(QueueUiEvent.OnMoveQueueItem(from, to))
                             }

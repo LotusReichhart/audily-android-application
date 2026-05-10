@@ -28,6 +28,7 @@ class RestorePlaybackSessionUseCase @Inject constructor(
         }
 
         try {
+            playbackRepository.setRestoring(true)
             val session = userPreferencesRepository.getPlaybackSession().first()
             if (session == null || session.queueIds.isEmpty()) return
 
@@ -57,7 +58,7 @@ class RestorePlaybackSessionUseCase @Inject constructor(
                 playbackRepository.handleEvent(PlaybackEvent.Pause)
             }
         } finally {
-            playbackRepository.markAsInitialized()
+            playbackRepository.setRestoring(false)
         }
     }
 }

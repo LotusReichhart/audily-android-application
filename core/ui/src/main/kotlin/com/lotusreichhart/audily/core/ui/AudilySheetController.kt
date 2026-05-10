@@ -17,7 +17,9 @@ interface AudilySheetController {
         content: @Composable () -> Unit,
         isFullScreen: Boolean = false,
         showDragHandle: Boolean = true,
-        enableSwipeToDismiss: Boolean = true
+        enableSwipeToDismiss: Boolean = true,
+        containerColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Transparent,
+        skipPartiallyExpanded: Boolean = false
     )
     
     /**
