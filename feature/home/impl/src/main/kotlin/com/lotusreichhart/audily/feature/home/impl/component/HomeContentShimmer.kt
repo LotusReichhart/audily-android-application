@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.util.shimmer
@@ -31,7 +33,8 @@ internal fun HomeContentShimmer(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingLarge)
+        verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingLarge),
+        userScrollEnabled = false
     ) {
         item {
             GreetingShimmer(
@@ -43,10 +46,57 @@ internal fun HomeContentShimmer(
             )
         }
 
-        repeat(3) {
-            item {
-                HorizontalSectionShimmer()
+        item {
+            SectionShimmer(titleWidth = 150.dp) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
+                    horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
+                ) {
+                    items(5) {
+                        HomeSongCardShimmer(size = 135.dp)
+                    }
+                }
             }
+        }
+
+        item {
+            SectionShimmer(titleWidth = 120.dp) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
+                    horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
+                ) {
+                    items(5) {
+                        HomeSongCardShimmer(size = 80.dp)
+                    }
+                }
+            }
+        }
+
+        item {
+            DiscoverySectionShimmer()
+        }
+
+        item {
+            SectionShimmer(titleWidth = 140.dp) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
+                    horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
+                ) {
+                    items(3) {
+                        Box(
+                            modifier = Modifier
+                                .width(220.dp)
+                                .height(150.dp)
+                                .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
+                                .shimmer()
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
         }
     }
 }
@@ -54,22 +104,13 @@ internal fun HomeContentShimmer(
 @Composable
 private fun GreetingShimmer(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(32.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .shimmer()
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .shimmer()
-            )
-        }
+        Box(
+            modifier = Modifier
+                .width(200.dp)
+                .height(38.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .shimmer()
+        )
 
         Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
 
@@ -80,14 +121,14 @@ private fun GreetingShimmer(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(48.dp)
+                    .height(50.dp)
                     .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
                     .shimmer()
             )
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(48.dp)
+                    .height(50.dp)
                     .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
                     .shimmer()
             )
@@ -96,36 +137,72 @@ private fun GreetingShimmer(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun HorizontalSectionShimmer() {
+private fun SectionShimmer(
+    titleWidth: Dp,
+    content: @Composable () -> Unit
+) {
     Column {
         Box(
             modifier = Modifier
                 .padding(horizontal = LocalDimensions.current.paddingMedium)
-                .width(250.dp)
-                .height(24.dp)
+                .width(titleWidth)
+                .height(28.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .shimmer()
         )
 
         Spacer(modifier = Modifier.height(LocalDimensions.current.paddingSmall))
 
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
-            horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
-        ) {
-            items(5) {
-                HomeSongCardShimmer()
+        content()
+    }
+}
+
+@Composable
+private fun DiscoverySectionShimmer() {
+    val dimensions = LocalDimensions.current
+    Column {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = dimensions.paddingMedium)
+                .width(180.dp)
+                .height(28.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .shimmer()
+        )
+
+        Spacer(modifier = Modifier.height(dimensions.paddingSmall))
+
+        repeat(2) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensions.paddingMedium),
+                horizontalArrangement = Arrangement.spacedBy(dimensions.paddingSmall)
+            ) {
+                repeat(2) {
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(76.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shimmer(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Nội dung đã được shimmer() bọc ngoài nên không cần chi tiết bên trong
+                    }
+                }
             }
+            Spacer(modifier = Modifier.height(dimensions.paddingSmall))
         }
     }
 }
 
 @Composable
-private fun HomeSongCardShimmer() {
-    Column(modifier = Modifier.width(80.dp)) {
+private fun HomeSongCardShimmer(size: Dp) {
+    Column(modifier = Modifier.width(size)) {
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(size)
                 .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
                 .shimmer()
         )
@@ -150,4 +227,10 @@ private fun HomeSongCardShimmer() {
                 .shimmer()
         )
     }
+}
+
+@Preview
+@Composable
+private fun PreviewHomeShimmer(){
+    HomeContentShimmer()
 }

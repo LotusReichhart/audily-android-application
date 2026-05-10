@@ -6,7 +6,6 @@ import com.lotusreichhart.audily.core.domain.usecase.home.GetHomeVibeUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongIdsUseCase
-import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,25 +39,25 @@ internal class HomeViewModel @Inject constructor(
             initialValue = HomeUiState.Loading
         )
 
-    fun playSong(songId: Long, contextSongs: List<Song>) {
+    fun onEvent(event: HomeUiEvent) {
         viewModelScope.launch {
-            playFromQueueUseCase(songId, contextSongs.map { it.id })
-        }
-    }
+            when (event) {
+                is HomeUiEvent.OnSongClick -> {
+                    playFromQueueUseCase(event.songId, event.contextSongs.map { it.id })
+                }
 
-    fun shuffleAll() {
-        viewModelScope.launch {
-            val allIds = getSongIdsUseCase(sortOrder = SongSortOrder.TITLE).first()
-            if (allIds.isNotEmpty()) {
-                val shuffled = allIds.shuffled()
-                playFromQueueUseCase(shuffled.first(), shuffled)
+                HomeUiEvent.OnShuffleAll -> {
+                    val allIds = getSongIdsUseCase(sortOrder = SongSortOrder.TITLE).first()
+                    if (allIds.isNotEmpty()) {
+                        val shuffled = allIds.shuffled()
+                        playFromQueueUseCase(shuffled.first(), shuffled)
+                    }
+                }
+
+                HomeUiEvent.OnResume -> {
+                    resumeSongUseCase()
+                }
             }
-        }
-    }
-
-    fun resumePlayback() {
-        viewModelScope.launch {
-            resumeSongUseCase()
         }
     }
 }

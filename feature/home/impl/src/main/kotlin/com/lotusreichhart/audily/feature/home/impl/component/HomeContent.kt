@@ -11,16 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -31,21 +26,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.AudilyButton
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.model.home.GreetingType
 import com.lotusreichhart.audily.core.model.home.HomeVibe
-import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.feature.home.impl.HomeUiEvent
 import com.lotusreichhart.audily.feature.home.impl.R
 
 @Composable
 internal fun HomeContent(
     homeVibe: HomeVibe,
-    onSongClick: (Long) -> Unit,
-    onShuffleAllClick: () -> Unit,
-    onResumeClick: () -> Unit,
+    onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -107,8 +99,9 @@ internal fun HomeContent(
             item {
                 GreetingSection(
                     greeting = stringResource(id = uiInfo.textRes),
-                    onShuffleAllClick = onShuffleAllClick,
-                    onResumeClick = onResumeClick,
+                    greetingColor = uiInfo.color,
+                    onShuffleAllClick = { onEvent(HomeUiEvent.OnShuffleAll) },
+                    onResumeClick = { onEvent(HomeUiEvent.OnResume) },
                     modifier = Modifier.padding(
                         top = LocalDimensions.current.paddingMedium,
                         start = LocalDimensions.current.paddingMedium,
@@ -117,42 +110,61 @@ internal fun HomeContent(
                 )
             }
 
-            if (homeVibe.recentHistory.isNotEmpty()) {
-                item {
-                    HorizontalSongSection(
-                        title = stringResource(R.string.feature_home_impl_section_recently_played),
-                        songs = homeVibe.recentHistory,
-                        onSongClick = onSongClick
-                    )
-                }
-            }
-
             if (homeVibe.topPlayed.isNotEmpty()) {
                 item {
-                    HorizontalSongSection(
-                        title = stringResource(R.string.feature_home_impl_section_top_played),
+                    TopPlayedSection(
                         songs = homeVibe.topPlayed,
-                        onSongClick = onSongClick
+                        onSongClick = { id ->
+                            onEvent(
+                                HomeUiEvent.OnSongClick(
+                                    id,
+                                    homeVibe.topPlayed
+                                )
+                            )
+                        }
                     )
                 }
             }
 
-            if (homeVibe.recentlyAdded.isNotEmpty()) {
+            if (homeVibe.recentHistory.isNotEmpty()) {
                 item {
-                    HorizontalSongSection(
-                        title = stringResource(R.string.feature_home_impl_section_recently_added),
-                        songs = homeVibe.recentlyAdded,
-                        onSongClick = onSongClick
+                    RecentlyPlayedSection(
+                        songs = homeVibe.recentHistory,
+                        onSongClick = { id ->
+                            onEvent(
+                                HomeUiEvent.OnSongClick(
+                                    id,
+                                    homeVibe.recentHistory
+                                )
+                            )
+                        }
                     )
                 }
             }
 
             if (homeVibe.discovery.isNotEmpty()) {
                 item {
-                    HorizontalSongSection(
-                        title = stringResource(R.string.feature_home_impl_section_discovery),
+                    DiscoverySection(
                         songs = homeVibe.discovery,
-                        onSongClick = onSongClick
+                        onSongClick = { id ->
+                            onEvent(HomeUiEvent.OnSongClick(id, homeVibe.discovery))
+                        }
+                    )
+                }
+            }
+
+            if (homeVibe.recentlyAdded.isNotEmpty()) {
+                item {
+                    RecentlyAddedSection(
+                        songs = homeVibe.recentlyAdded,
+                        onSongClick = { id ->
+                            onEvent(
+                                HomeUiEvent.OnSongClick(
+                                    id,
+                                    homeVibe.recentlyAdded
+                                )
+                            )
+                        }
                     )
                 }
             }
@@ -197,17 +209,17 @@ private fun getGreetingUiInfo(type: GreetingType): GreetingUiInfo {
 @Composable
 private fun GreetingSection(
     greeting: String,
+    greetingColor: Color,
     onShuffleAllClick: () -> Unit,
     onResumeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-
         Text(
             text = greeting,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = greetingColor
         )
 
         Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
@@ -231,47 +243,6 @@ private fun GreetingSection(
                 contentColor = MaterialTheme.colorScheme.surfaceVariant,
                 onClick = onResumeClick,
             )
-        }
-    }
-}
-
-@Composable
-private fun HorizontalSongSection(
-    title: String,
-    songs: List<Song>,
-    onSongClick: (Long) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(LocalDimensions.current.paddingSmall))
-
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
-            horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
-        ) {
-            items(songs, key = { it.id }) { song ->
-                HomeSongCard(
-                    title = song.basic.title,
-                    artist = song.basic.artist,
-                    albumArt = {
-                        AudilyArtwork(
-                            artworkUri = song.basic.artworkUri,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
-                        )
-                    },
-                    onClick = { onSongClick(song.id) }
-                )
-            }
         }
     }
 }

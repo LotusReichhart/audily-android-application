@@ -10,7 +10,6 @@ import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import com.lotusreichhart.audily.feature.home.impl.component.CompactHome
 import com.lotusreichhart.audily.feature.home.impl.component.ExpandedHome
 import com.lotusreichhart.audily.feature.home.impl.component.LandscapeHome
-import com.lotusreichhart.audily.core.model.song.Song
 
 @Composable
 internal fun HomeScreen(
@@ -35,9 +34,7 @@ internal fun HomeScreen(
         onNavigateToSongs = onNavigateToSongs,
         onNavigateToPlaylists = onNavigateToPlaylists,
         onNavigateToAlbums = onNavigateToAlbums,
-        onPlaySong = viewModel::playSong,
-        onShuffleAll = viewModel::shuffleAll,
-        onResumePlayback = viewModel::resumePlayback
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -47,9 +44,7 @@ internal fun HomeScreen(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
-    onPlaySong: (Long, List<Song>) -> Unit,
-    onShuffleAll: () -> Unit,
-    onResumePlayback: () -> Unit,
+    onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AudilyAdaptiveLayout(
@@ -60,9 +55,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
-                onPlaySong = onPlaySong,
-                onShuffleAll = onShuffleAll,
-                onResumePlayback = onResumePlayback
+                onEvent = onEvent
             )
         },
         landscape = {
@@ -72,9 +65,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
-                onPlaySong = onPlaySong,
-                onShuffleAll = onShuffleAll,
-                onResumePlayback = onResumePlayback
+                onEvent = onEvent
             )
         },
         expanded = {
@@ -84,9 +75,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
-                onPlaySong = onPlaySong,
-                onShuffleAll = onShuffleAll,
-                onResumePlayback = onResumePlayback
+                onEvent = onEvent
             )
         }
     )
