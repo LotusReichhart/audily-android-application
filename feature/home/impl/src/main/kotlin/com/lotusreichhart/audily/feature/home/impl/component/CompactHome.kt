@@ -18,6 +18,7 @@ internal fun CompactHome(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
+    onSearchClick: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -27,7 +28,7 @@ internal fun CompactHome(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
-                onSearchClick = { /* TODO */ }
+                onSearchClick = onSearchClick
             )
         },
         containerColor = Color.Transparent,

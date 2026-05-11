@@ -74,6 +74,8 @@ dependencies {
     implementation(projects.feature.settings.api)
     implementation(projects.feature.songs.api)
     implementation(projects.feature.songs.impl)
+    implementation(projects.feature.search.api)
+    implementation(projects.feature.search.impl)
     implementation(projects.feature.nowplaying)
 
     implementation(libs.androidx.appcompat)

@@ -18,6 +18,7 @@ internal fun HomeScreen(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
+    onSearchClick: () -> Unit,
     onInitialLoadingFinished: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -34,6 +35,7 @@ internal fun HomeScreen(
         onNavigateToSongs = onNavigateToSongs,
         onNavigateToPlaylists = onNavigateToPlaylists,
         onNavigateToAlbums = onNavigateToAlbums,
+        onSearchClick = onSearchClick,
         onEvent = viewModel::onEvent
     )
 }
@@ -44,6 +46,7 @@ internal fun HomeScreen(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
+    onSearchClick: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,6 +58,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
+                onSearchClick = onSearchClick,
                 onEvent = onEvent
             )
         },
@@ -65,6 +69,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
+                onSearchClick = onSearchClick,
                 onEvent = onEvent
             )
         },
@@ -75,6 +80,7 @@ internal fun HomeScreen(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
+                onSearchClick = onSearchClick,
                 onEvent = onEvent
             )
         }

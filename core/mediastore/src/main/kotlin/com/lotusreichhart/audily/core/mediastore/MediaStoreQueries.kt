@@ -398,11 +398,13 @@ internal fun ContentResolver.queryAlbums(
         val countCol = c.getColumnIndexOrThrow(MediaStore.Audio.Albums.NUMBER_OF_SONGS)
 
         while (c.moveToNext()) {
+            val albumId = c.getLong(idCol)
             albums.add(
                 MediaStoreAlbumSortMetadata(
                     id = c.getLong(idCol),
                     title = c.getString(albumCol) ?: "Unknown Album",
                     artist = c.getString(artistCol) ?: "Unknown Artist",
+                    albumArtUri = getArtworkUri(albumId),
                     songCount = c.getInt(countCol)
                 )
             )

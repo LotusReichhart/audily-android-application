@@ -100,7 +100,7 @@ class MediaStoreDataSource @Inject constructor(
     /**
      * Lấy luồng Metadata nhẹ phục vụ cho việc sorting Album.
      */
-    fun getAlbumsSortMetadata(
+    fun getAlbums(
         searchQuery: String? = null
     ): Flow<List<MediaStoreAlbumSortMetadata>> = callbackFlow {
         val observer = object : ContentObserver(null) {

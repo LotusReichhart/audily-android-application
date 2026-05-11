@@ -19,6 +19,7 @@ internal fun LandscapeHome(
     onNavigateToSongs: () -> Unit,
     onNavigateToPlaylists: () -> Unit,
     onNavigateToAlbums: () -> Unit,
+    onSearchClick: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -28,7 +29,7 @@ internal fun LandscapeHome(
                 onNavigateToSongs = onNavigateToSongs,
                 onNavigateToPlaylists = onNavigateToPlaylists,
                 onNavigateToAlbums = onNavigateToAlbums,
-                onSearchClick = { /* TODO */ }
+                onSearchClick = onSearchClick
             )
         },
         containerColor = Color.Transparent,
