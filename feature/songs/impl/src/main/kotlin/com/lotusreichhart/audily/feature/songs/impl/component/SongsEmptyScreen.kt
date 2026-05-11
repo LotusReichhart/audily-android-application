@@ -45,7 +45,7 @@ internal fun SongsEmptyScreen(
         Icon(
             painter = painterResource(AudilyIcons.SongEmpty),
             contentDescription = "Songs Empty",
-            modifier = Modifier.size(120.dp),
+            modifier = Modifier.size(90.dp),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )
 

@@ -63,7 +63,10 @@ import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.impl.navigation.homeEntry
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingViewModel
+import com.lotusreichhart.audily.feature.search.api.SearchNavKey
+import com.lotusreichhart.audily.feature.search.impl.navigation.searchEntry
 import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
+import com.lotusreichhart.audily.feature.songs.api.navigation.SongsNavKey
 import com.lotusreichhart.audily.feature.songs.impl.navigation.songsEntry
 import com.lotusreichhart.audily.navigation.NAV_BAR_ITEMS
 import com.lotusreichhart.audily.core.navigation.toEntries
@@ -299,6 +302,7 @@ internal fun AudilyApp(
                     }
                 )
                 songsEntry(navigator = appState.navigator)
+                searchEntry(onBack = { appState.navigator.goBack() })
                 entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
                 entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
             }

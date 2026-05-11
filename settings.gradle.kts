@@ -60,3 +60,6 @@ include(":feature:playlists:api")
 
 include(":feature:nowplaying")
 
+include(":feature:search:impl")
+include(":feature:search:api")
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_search_impl_all_placeholder">Search for songs, albums...</string>
+    <string name="feature_search_impl_songs_placeholder">Find a track...</string>
+    <string name="feature_search_impl_playlists_placeholder">Search your playlists...</string>
+    <string name="feature_search_impl_albums_placeholder">Look for an album...</string>
+
+    <!-- Search: Initial state (Invitation to search) -->
+    <string name="feature_search_impl_all_query_empty">What are you looking for?</string>
+    <string name="feature_search_impl_songs_query_empty">Search for a song name…</string>
+    <string name="feature_search_impl_playlists_query_empty">Search for a playlist…</string>
+    <string name="feature_search_impl_albums_query_empty">Search for an album title…</string>
+
+    <!-- Search: No results found -->
+    <string name="feature_search_impl_all_result_empty">No results found</string>
+    <string name="feature_search_impl_songs_result_empty">No songs matched your search</string>
+    <string name="feature_search_impl_playlists_result_empty">No playlists found</string>
+    <string name="feature_search_impl_albums_result_empty">No albums found</string>
+</resources>
