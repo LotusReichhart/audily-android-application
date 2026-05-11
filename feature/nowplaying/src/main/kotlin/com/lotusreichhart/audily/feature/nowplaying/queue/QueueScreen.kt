@@ -222,7 +222,7 @@ internal fun QueueScreen(
     Scaffold(
         modifier = modifier.fillMaxWidth(),
         topBar = {
-            QueueHeader(
+            QueueTopBar(
                 queueSummary = uiState.queueSummary,
                 onCloseClick = onClose,
                 onMenuClick = onQueueMenuClick

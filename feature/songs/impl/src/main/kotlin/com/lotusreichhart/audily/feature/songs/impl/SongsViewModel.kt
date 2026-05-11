@@ -16,8 +16,10 @@ import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateSongSortTypeUse
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongIdsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsPagedUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsSummaryUseCase
+import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -30,24 +32,25 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SongsViewModel @Inject constructor(
-    private val getSongsPagedUseCase: GetSongsPagedUseCase,
+    observePlaybackStateUseCase: ObservePlaybackStateUseCase,
     getSongsSummaryUseCase: GetSongsSummaryUseCase,
-    private val getSongIdsUseCase: GetSongIdsUseCase,
     getUserPreferencesUseCase: GetUserPreferencesUseCase,
+    private val getSongsPagedUseCase: GetSongsPagedUseCase,
+    private val getSongIdsUseCase: GetSongIdsUseCase,
     private val updateSongSortOrderUseCase: UpdateSongSortOrderUseCase,
     private val updateSongSortTypeUseCase: UpdateSongSortTypeUseCase,
     private val playFromQueueUseCase: PlayFromQueueUseCase,
     private val playNextUseCase: PlayNextUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val resumeSongUseCase: ResumeSongUseCase,
-    private val pauseSongUseCase: PauseSongUseCase,
-    observePlaybackStateUseCase: ObservePlaybackStateUseCase
+    private val pauseSongUseCase: PauseSongUseCase
 ) : ViewModel() {
 
     private val _userPrefs = getUserPreferencesUseCase()
@@ -76,11 +79,15 @@ internal class SongsViewModel @Inject constructor(
     }
 
     private val _songs: Flow<PagingData<Song>> =
-        combine(_sortOrder, _sortType, _isDataLoadingStarted) { order, type, isStarted ->
+        combine(
+            _sortOrder,
+            _sortType,
+            _isDataLoadingStarted
+        ) { order, type, isStarted ->
             Triple(order, type, isStarted)
         }.flatMapLatest { (order, type, isStarted) ->
             if (!isStarted) {
-                kotlinx.coroutines.flow.flowOf(PagingData.empty())
+                flowOf(PagingData.empty())
             } else {
                 getSongsPagedUseCase(sortOrder = order, sortType = type)
             }
@@ -88,11 +95,15 @@ internal class SongsViewModel @Inject constructor(
 
     // Danh sách ID toàn bộ bài hát theo sort hiện tại (dùng cho Queue)
     private val _allSongIds: StateFlow<List<Long>> =
-        combine(_sortOrder, _sortType, _isDataLoadingStarted) { order, type, isStarted ->
+        combine(
+            _sortOrder,
+            _sortType,
+            _isDataLoadingStarted
+        ) { order, type, isStarted ->
             Triple(order, type, isStarted)
         }.flatMapLatest { (order, type, isStarted) ->
             if (!isStarted) {
-                kotlinx.coroutines.flow.flowOf(emptyList())
+                flowOf(emptyList())
             } else {
                 getSongIdsUseCase(sortOrder = order, sortType = type)
             }
@@ -107,7 +118,10 @@ internal class SongsViewModel @Inject constructor(
         _sortType,
         getSongsSummaryUseCase(),
         observePlaybackStateUseCase(),
-        combine(_allSongIds, _isInitialLoading) { ids, loading -> ids to loading }
+        combine(
+            _allSongIds,
+            _isInitialLoading
+        ) { ids, loading -> ids to loading }
     ) { sort, type, summary, playback, (allSongIds, isLoading) ->
         SongsUiState(
             songs = _songs,
@@ -132,6 +146,10 @@ internal class SongsViewModel @Inject constructor(
                 is SongsUiEvent.SongClicked -> handleSongClicked(event.songId)
                 is SongsUiEvent.PlayNextClicked -> handlePlayNext(event.song)
                 is SongsUiEvent.ToggleFavoriteClicked -> toggleFavoriteUseCase(event.songId)
+                is SongsUiEvent.Refresh -> {
+                    updateSongSortOrderUseCase(SongSortOrder.TITLE)
+                    updateSongSortTypeUseCase(SortOrderType.ASC)
+                }
             }
         }
     }

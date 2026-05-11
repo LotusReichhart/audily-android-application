@@ -5,6 +5,7 @@ import com.lotusreichhart.audily.core.model.song.Song
 data class SongMenuUiState(
     val song: Song,
     val caller: String = "",
-    val options: List<SongMenuAction> = emptyList()
+    val options: List<SongMenuAction> = emptyList(),
+    val isShowingInfoDialog: Boolean = false
 )
 

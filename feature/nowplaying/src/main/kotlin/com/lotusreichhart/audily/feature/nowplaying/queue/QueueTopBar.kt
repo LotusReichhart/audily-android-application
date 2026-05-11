@@ -27,7 +27,7 @@ import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.feature.nowplaying.R
 
 @Composable
-internal fun QueueHeader(
+internal fun QueueTopBar(
     queueSummary: SongsSummary,
     onCloseClick: () -> Unit,
     onMenuClick: () -> Unit,
