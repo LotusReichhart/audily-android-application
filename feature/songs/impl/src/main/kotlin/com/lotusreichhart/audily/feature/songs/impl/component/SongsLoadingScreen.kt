@@ -23,7 +23,7 @@ internal fun SongsLoadingScreen(
             .padding(innerPadding)
     ) {
         SongsHeaderShimmer()
-        repeat(10) {
+        repeat(20) {
             SongItemShimmer()
         }
     }

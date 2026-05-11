@@ -9,7 +9,35 @@
     <string name="feature_songs_impl_menu_add_to_playlist">Thêm vào danh sách phát</string>
     <string name="feature_songs_impl_menu_add_to_favorite">Yêu thích</string>
     <string name="feature_songs_impl_menu_remove_from_favorite">Bỏ yêu thích</string>
-    <string name="feature_songs_impl_menu_edit_tag">Chỉnh sửa thông tin</string>
+    <string name="feature_songs_impl_menu_info">Thông tin</string>
+    <string name="feature_songs_impl_menu_edit_tag">Chỉnh sửa</string>
+    <string name="feature_songs_impl_menu_ringtone">Cài làm nhạc chuông</string>
     <string name="feature_songs_impl_menu_share">Chia sẻ</string>
     <string name="feature_songs_impl_menu_delete">Xóa</string>
+
+    <string name="feature_songs_impl_info_title">Tiêu đề</string>
+    <string name="feature_songs_impl_info_artist">Ca sĩ</string>
+    <string name="feature_songs_impl_info_album">Album</string>
+    <string name="feature_songs_impl_info_duration">Thời lượng</string>
+    <string name="feature_songs_impl_info_path">Đường dẫn</string>
+    <string name="feature_songs_impl_info_size">Kích cỡ</string>
+    <string name="feature_songs_impl_info_year">Năm</string>
+    <string name="feature_songs_impl_info_close">Đóng</string>
+
+    <string name="feature_songs_impl_empty_title">Chưa có giai điệu nào ở đây</string>
+    <string name="feature_songs_impl_empty_description">Hãy quét bộ nhớ thiết bị hoặc thêm nhạc mới để bắt đầu tận hưởng nhé.</string>
+    <string name="feature_songs_impl_empty_action_scan">Quét tìm nhạc</string>
+
+    <string name="feature_songs_impl_songs_sort">Sắp xếp</string>
+    <string name="feature_songs_impl_songs_sort_default">Mặc định</string>
+    <string name="feature_songs_impl_songs_sort_accept">Xác nhận</string>
+
+    <!-- Sort Order Labels -->
+    <string name="feature_songs_impl_sort_order_title">Tiêu đề</string>
+    <string name="feature_songs_impl_sort_order_artist">Nghệ sĩ</string>
+    <string name="feature_songs_impl_sort_order_album">Album</string>
+    <string name="feature_songs_impl_sort_order_duration">Thời lượng</string>
+    <string name="feature_songs_impl_sort_order_date_added">Ngày thêm</string>
+    <string name="feature_songs_impl_sort_order_number_of_songs">Số bài hát</string>
+    <string name="feature_songs_impl_sort_order_created_date">Ngày tạo</string>
 </resources>

@@ -10,6 +10,11 @@ fun EntryProviderScope<NavKey>.songsEntry(
     navigator: Navigator
 ) {
     entry<SongsNavKey> {
-        SongsScreen()
+        SongsScreen(
+            onBack = {
+                navigator.goBack()
+            },
+            onSearch = {}
+        )
     }
 }

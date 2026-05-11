@@ -11,13 +11,19 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.queue.AddSongToQue
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayNextUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
+import com.lotusreichhart.audily.core.domain.usecase.song.GetSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.song.SetRingtoneUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
+import com.lotusreichhart.audily.core.model.song.RingtoneResult
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
+import com.lotusreichhart.audily.core.ui.GlobalUiEvent
+import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +35,9 @@ class SongMenuViewModel @Inject constructor(
     private val playFromQueueUseCase: PlayFromQueueUseCase,
     private val addSongToQueueUseCase: AddSongToQueueUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val setRingtoneUseCase: SetRingtoneUseCase,
+    private val getSongUseCase: GetSongUseCase,
+    private val globalUiEventBus: GlobalUiEventBus
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf<SongMenuUiState?>(null)
@@ -39,7 +48,23 @@ class SongMenuViewModel @Inject constructor(
         if (_uiState.value?.song?.id == song.id && _uiState.value?.caller == caller) return
 
         this.queueIds = queueIds
-        _uiState.value = SongMenuUiState(song = song, caller = caller)
+        
+        // Khởi tạo trạng thái với các options mặc định để tránh Menu trống trong lần đầu app chạy
+        _uiState.value = SongMenuUiState(
+            song = song,
+            caller = caller,
+            options = buildMenuOptions(isCurrentSong = false, isPlaying = false, caller = caller)
+        )
+
+        // Tải thông tin đầy đủ của bài hát từ Database
+        getSongUseCase(song.id)
+            .onEach { fullSong ->
+                if (fullSong != null) {
+                    val state = _uiState.value ?: return@onEach
+                    _uiState.value = state.copy(song = fullSong)
+                }
+            }
+            .launchIn(viewModelScope)
 
         // Observe playback state to update Play/Pause icon in real-time
         observeNowPlayingUseCase()
@@ -60,6 +85,10 @@ class SongMenuViewModel @Inject constructor(
         viewModelScope.launch {
             when (event) {
                 is SongMenuUiEvent.OnActionClick -> handleAction(event.action)
+                SongMenuUiEvent.OnDismissInfoDialog -> {
+                    val state = _uiState.value ?: return@launch
+                    _uiState.value = state.copy(isShowingInfoDialog = false)
+                }
             }
         }
     }
@@ -85,7 +114,7 @@ class SongMenuViewModel @Inject constructor(
                     } else {
                         // Bài khác: Hiện Play, PlayNext, AddToQueue
                         add(SongMenuAction.Play(songId, queueIds))
-                        add(SongMenuAction.PlayOnce(songId))
+                        add(SongMenuAction.PlayOnce)
                         add(SongMenuAction.PlayNext)
                         add(SongMenuAction.AddToQueue)
                     }
@@ -94,7 +123,9 @@ class SongMenuViewModel @Inject constructor(
 
             add(SongMenuAction.AddToPlaylist)
             add(SongMenuAction.ToggleFavorite(_uiState.value?.song?.isFavorite ?: false))
+            add(SongMenuAction.ShowInfo)
             add(SongMenuAction.EditTags)
+            add(SongMenuAction.SetRingtone)
             add(SongMenuAction.Share)
             add(SongMenuAction.Delete)
         }
@@ -108,17 +139,54 @@ class SongMenuViewModel @Inject constructor(
             }
 
             is SongMenuAction.PlayOnce -> {
-                playFromQueueUseCase(action.songId, emptyList())
+                playFromQueueUseCase(song.id, emptyList())
             }
 
             is SongMenuAction.ResumePause -> {
                 if (action.isPlaying) pauseSongUseCase() else resumeSongUseCase()
             }
 
+            is SongMenuAction.ToggleFavorite -> toggleFavoriteUseCase(song.id)
+
             SongMenuAction.PlayNext -> playNextUseCase(song)
             SongMenuAction.AddToQueue -> addSongToQueueUseCase(song)
-            is SongMenuAction.ToggleFavorite -> toggleFavoriteUseCase(song.id)
-            // Other actions can be implemented later
+            SongMenuAction.ShowInfo -> {
+                Timber.d("Show info running.....")
+                Timber.d("Ui State Before: ${_uiState.value}")
+                val state = _uiState.value ?: return
+                _uiState.value = state.copy(isShowingInfoDialog = true)
+                Timber.d("Ui State After: ${_uiState.value}")
+            }
+
+            SongMenuAction.SetRingtone -> {
+                viewModelScope.launch {
+                    when (val result = setRingtoneUseCase(song.id)) {
+                        is RingtoneResult.SUCCESS -> {
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar("Successfully set as ringtone"))
+                        }
+
+                        is RingtoneResult.NO_PERMISSION -> {
+                            globalUiEventBus.emit(
+                                GlobalUiEvent.ShowSnackbar(
+                                    message = "Need Write Settings permission",
+                                    actionLabel = "GRANT",
+                                    onAction = {
+                                        globalUiEventBus.emit(GlobalUiEvent.OpenWriteSettingsPermission)
+                                    }
+                                )
+                            )
+                        }
+
+                        is RingtoneResult.NEED_SCOPED_STORAGE_PERMISSION -> {
+                            globalUiEventBus.emit(GlobalUiEvent.RequestFilePermission(result.intentSender))
+                        }
+
+                        is RingtoneResult.FAILED -> {
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar("Failed to set ringtone"))
+                        }
+                    }
+                }
+            }
             else -> {}
         }
     }

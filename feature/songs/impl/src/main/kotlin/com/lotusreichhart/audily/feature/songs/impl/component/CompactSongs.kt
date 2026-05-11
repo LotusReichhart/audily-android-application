@@ -47,9 +47,15 @@ internal fun CompactSongs(
     playbackState: PlaybackState,
     screenState: SongsScreenState,
     onEvent: (SongsUiEvent) -> Unit,
+    onBack: () -> Unit,
+    onSearchClick: () -> Unit,
+    onSortClick: () -> Unit,
     onMenuClick: (song: Song) -> Unit
 ) {
     AudilyScaffold(
+        topBar = {
+            SongsTopBar(onBack = onBack, onSearch = onSearchClick)
+        },
         containerColor = Color.Transparent,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
@@ -60,6 +66,11 @@ internal fun CompactSongs(
         ) { isLoading ->
             if (isLoading) {
                 SongsLoadingScreen(innerPadding = innerPadding)
+            } else if (songs.itemCount == 0) {
+                SongsEmptyScreen(
+                    innerPadding = innerPadding,
+                    onScanClick = { onEvent(SongsUiEvent.Refresh) }
+                )
             } else {
                 Box(
                     modifier = modifier
@@ -73,11 +84,11 @@ internal fun CompactSongs(
                     var headerHeightPx by remember { mutableFloatStateOf(0f) }
                     val headerHeightDp = with(LocalDensity.current) { headerHeightPx.toDp() }
 
-                    SongsHeader(
+                    HeaderSticky(
                         songCount = summary.totalCount,
                         totalDuration = TimeUtils.formatDuration(summary.totalDuration),
                         sortText = sortText,
-                        onSortClick = { },
+                        onSortClick = onSortClick,
                         modifier = Modifier
                             .zIndex(1f)
                             .fillMaxWidth()

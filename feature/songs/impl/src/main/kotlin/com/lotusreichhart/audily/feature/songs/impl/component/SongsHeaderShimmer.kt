@@ -26,7 +26,7 @@ internal fun SongsHeaderShimmer(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = LocalDimensions.current.paddingMedium)
-            .padding(bottom = LocalDimensions.current.paddingSmall),
+            .padding(vertical = LocalDimensions.current.paddingSmall),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -37,7 +37,7 @@ internal fun SongsHeaderShimmer(
             Box(
                 modifier = Modifier
                     .width(80.dp)
-                    .height(14.dp)
+                    .height(16.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .shimmer()
             )
@@ -55,7 +55,7 @@ internal fun SongsHeaderShimmer(
                 Box(
                     modifier = Modifier
                         .width(60.dp)
-                        .height(14.dp)
+                        .height(16.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .shimmer()
                 )
@@ -64,7 +64,7 @@ internal fun SongsHeaderShimmer(
 
         Box(
             modifier = Modifier
-                .width(120.dp)
+                .width(160.dp)
                 .height(32.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .shimmer()

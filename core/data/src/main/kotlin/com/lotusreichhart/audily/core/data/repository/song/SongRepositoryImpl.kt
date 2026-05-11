@@ -1,9 +1,11 @@
 package com.lotusreichhart.audily.core.data.repository.song
 
+import android.app.RecoverableSecurityException
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.media.RingtoneManager
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
 import androidx.paging.Pager
@@ -102,6 +104,7 @@ internal class SongRepositoryImpl @Inject constructor(
     override suspend fun setAsRingtone(id: Long): RingtoneResult {
         // 1. Kiểm tra quyền WRITE_SETTINGS
         if (!Settings.System.canWrite(context)) {
+            Timber.d("SongRepositoryImpl - NO_PERMISSION")
             return RingtoneResult.NO_PERMISSION
         }
 
@@ -128,6 +131,9 @@ internal class SongRepositoryImpl @Inject constructor(
             Timber.d("SongRepositoryImpl - Successfully set ringtone for id: $id")
             RingtoneResult.SUCCESS
         } catch (e: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e is RecoverableSecurityException) {
+                return RingtoneResult.NEED_SCOPED_STORAGE_PERMISSION(e.userAction.actionIntent.intentSender)
+            }
             Timber.e(e, "SongRepositoryImpl - Failed to set ringtone for id: $id")
             RingtoneResult.FAILED
         }

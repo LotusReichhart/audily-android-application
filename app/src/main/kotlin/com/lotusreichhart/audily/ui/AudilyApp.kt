@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -38,6 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
+import android.app.Activity
+import android.content.Intent
+import android.provider.Settings
+import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
 import com.lotusreichhart.audily.core.designsystem.component.AudilyBottomSheet
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
 import com.lotusreichhart.audily.core.ui.AudilySheetController
@@ -59,21 +73,17 @@ import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
 import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
 import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSize
 import com.lotusreichhart.audily.core.designsystem.adaptive.toAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
-import android.app.Activity
-import androidx.compose.foundation.gestures.snapTo
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import com.lotusreichhart.audily.core.ui.util.findActivity
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun AudilyApp(
     modifier: Modifier = Modifier,
     appState: AudilyAppState,
+    globalUiEventBus: GlobalUiEventBus
 ) {
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -84,22 +94,23 @@ fun AudilyApp(
         windowSizeClass.toAudilyWindowSize()
     }
 
-    LaunchedEffect(isOffline) {
-        if (isOffline) {
-            snackbarHostState.showSnackbar(
-                message = "Bạn đang ở chế độ Offline. Chuyển sang nhạc Local.",
-                duration = SnackbarDuration.Indefinite
-            )
-        }
-    }
-
     AudilyApp(
         appState = appState,
         windowSize = audilyWindowSize,
         snackbarHostState = snackbarHostState,
+        globalUiEventBus = globalUiEventBus,
         modifier = modifier,
     )
 }
+
+data class AudilySheetState(
+    val content: (@Composable () -> Unit)? = null,
+    val isFullScreen: Boolean = false,
+    val showDragHandle: Boolean = false,
+    val enableSwipeToDismiss: Boolean = true,
+    val containerColor: Color = Color.Transparent,
+    val skipPartiallyExpanded: Boolean = false
+)
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -109,18 +120,14 @@ internal fun AudilyApp(
     shouldExpandPlayer: Boolean = false,
     windowSize: AudilyWindowSize,
     snackbarHostState: SnackbarHostState,
+    globalUiEventBus: GlobalUiEventBus,
     nowPlayingViewModel: NowPlayingViewModel = hiltViewModel()
 ) {
     var fullHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
 
     // Quản lý trạng thái của Bottom Sheet toàn cục
-    var sheetContent by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
-    var isSheetFullScreen by remember { mutableStateOf(false) }
-    var isShowDragHandle by remember { mutableStateOf(false) }
-    var isSheetSwipeEnabled by remember { mutableStateOf(true) }
-    var sheetContainerColor by remember { mutableStateOf(Color.Transparent) }
-    var isSkipPartiallyExpanded by remember { mutableStateOf(false) }
+    var sheetState by remember { mutableStateOf(AudilySheetState()) }
 
     val sheetController = remember {
         object : AudilySheetController {
@@ -132,24 +139,24 @@ internal fun AudilyApp(
                 containerColor: Color,
                 skipPartiallyExpanded: Boolean
             ) {
-                sheetContent = content
-                isSheetFullScreen = isFullScreen
-                isShowDragHandle = showDragHandle
-                isSheetSwipeEnabled = enableSwipeToDismiss
-                sheetContainerColor = containerColor
-                isSkipPartiallyExpanded = skipPartiallyExpanded
+                sheetState = AudilySheetState(
+                    content = content,
+                    isFullScreen = isFullScreen,
+                    showDragHandle = showDragHandle,
+                    enableSwipeToDismiss = enableSwipeToDismiss,
+                    containerColor = containerColor,
+                    skipPartiallyExpanded = skipPartiallyExpanded
+                )
             }
 
             override fun hideSheet() {
-                sheetContent = null
-                isSheetSwipeEnabled = true
+                sheetState = sheetState.copy(content = null)
             }
         }
     }
 
-    val globalUiEventBus: GlobalUiEventBus = remember { GlobalUiEventBus() }
-
     // Lắng nghe sự kiện từ GlobalUiEventBus
+    val context = LocalContext.current
     LaunchedEffect(globalUiEventBus) {
         globalUiEventBus.events.collect { event ->
             when (event) {
@@ -168,10 +175,45 @@ internal fun AudilyApp(
                 }
 
                 is GlobalUiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.message,
-                        actionLabel = event.actionLabel
-                    )
+                    launch {
+                        // Dismiss current snackbar to show the new one immediately and reset timer
+                        snackbarHostState.currentSnackbarData?.dismiss()
+
+                        val result = snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            duration = event.duration
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            event.onAction?.invoke()
+                        }
+                    }
+                }
+
+                GlobalUiEvent.OpenWriteSettingsPermission -> {
+                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
+                        data = "package:${context.packageName}".toUri()
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(intent)
+                }
+
+                is GlobalUiEvent.RequestFilePermission -> {
+                    val intentSender = event.intentSender as? android.content.IntentSender
+                    if (intentSender != null) {
+                        try {
+                            context.findActivity()?.startIntentSenderForResult(
+                                intentSender,
+                                1000, // custom request code
+                                null,
+                                0,
+                                0,
+                                0
+                            )
+                        } catch (e: Exception) {
+                            Timber.e(e, "AudilyApp - Failed to start IntentSender")
+                        }
+                    }
                 }
             }
         }
@@ -335,25 +377,42 @@ internal fun AudilyApp(
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier = Modifier
-                        .align(if (windowSize != AudilyWindowSize.Compact) Alignment.BottomEnd else Alignment.BottomCenter)
-                        .padding(if (windowSize != AudilyWindowSize.Compact) 16.dp else 0.dp)
-                        .padding(bottom = if (windowSize != AudilyWindowSize.Compact) 0.dp else dynamicPadding + 16.dp)
+                        .align(
+                            if (windowSize != AudilyWindowSize.Compact) Alignment.BottomEnd
+                            else Alignment.BottomCenter
+                        )
+                        .padding(
+                            if (windowSize != AudilyWindowSize.Compact) LocalDimensions.current.paddingMedium
+                            else 0.dp
+                        )
+                        .padding(
+                            bottom = if (windowSize != AudilyWindowSize.Compact || appState.expandProgress > 0.5f) LocalDimensions.current.paddingMedium
+                            else dynamicPadding + LocalDimensions.current.paddingMedium
+                        ),
+                    snackbar = { snackbarData ->
+                        Snackbar(
+                            snackbarData = snackbarData,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            actionColor = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 )
             }
 
             // Tầng Overlay cao nhất: BottomSheet
-            if (sheetContent != null) {
+            if (sheetState.content != null) {
                 AudilyBottomSheet(
-                    onDismissRequest = { 
-                        sheetController.hideSheet() 
+                    onDismissRequest = {
+                        sheetController.hideSheet()
                     },
-                    isFullScreen = isSheetFullScreen,
-                    showDragHandle = isShowDragHandle,
-                    enableSwipeToDismiss = isSheetSwipeEnabled,
-                    containerColor = sheetContainerColor,
-                    skipPartiallyExpanded = isSkipPartiallyExpanded
+                    isFullScreen = sheetState.isFullScreen,
+                    showDragHandle = sheetState.showDragHandle,
+                    enableSwipeToDismiss = sheetState.enableSwipeToDismiss,
+                    containerColor = sheetState.containerColor,
+                    skipPartiallyExpanded = sheetState.skipPartiallyExpanded
                 ) {
-                    sheetContent?.invoke()
+                    sheetState.content?.invoke()
                 }
             }
         }

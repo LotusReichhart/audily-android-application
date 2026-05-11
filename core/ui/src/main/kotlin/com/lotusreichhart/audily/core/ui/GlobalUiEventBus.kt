@@ -11,7 +11,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class GlobalUiEventBus @Inject constructor() {
-    private val _events = MutableSharedFlow<GlobalUiEvent>(extraBufferCapacity = 1)
+    private val _events = MutableSharedFlow<GlobalUiEvent>(extraBufferCapacity = 10)
     val events = _events.asSharedFlow()
 
     fun emit(event: GlobalUiEvent) {

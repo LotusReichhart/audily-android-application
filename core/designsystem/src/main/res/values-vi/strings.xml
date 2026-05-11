@@ -8,17 +8,9 @@
     <string name="core_designsystem_unknown_title">Không có tiêu đề</string>
     <string name="core_designsystem_unknown_cancel">Hủy bỏ</string>
 
-    <!-- Sort Order Labels -->
-    <string name="core_designsystem_sort_order_title">Tiêu đề</string>
-    <string name="core_designsystem_sort_order_artist">Nghệ sĩ</string>
-    <string name="core_designsystem_sort_order_album">Album</string>
-    <string name="core_designsystem_sort_order_duration">Thời lượng</string>
-    <string name="core_designsystem_sort_order_date_added">Ngày thêm</string>
-    <string name="core_designsystem_sort_order_name">Tên</string>
-    <string name="core_designsystem_sort_order_number_of_songs">Số bài hát</string>
-    <string name="core_designsystem_sort_order_created_date">Ngày tạo</string>
-
     <!-- Sort Type Labels -->
+    <string name="core_designsystem_sort_order">Thứ tự</string>
+    <string name="core_designsystem_sort_according_to">Theo</string>
     <string name="core_designsystem_sort_type_ascending">Tăng dần</string>
     <string name="core_designsystem_sort_type_descending">Giảm dần</string>
 </resources>

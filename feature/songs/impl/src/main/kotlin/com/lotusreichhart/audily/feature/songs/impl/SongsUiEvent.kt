@@ -24,6 +24,7 @@ internal sealed interface SongsUiEvent {
     data class SongClicked(val songId: Long) : SongsUiEvent
     data class PlayNextClicked(val song: Song) : SongsUiEvent
     data class ToggleFavoriteClicked(val songId: Long) : SongsUiEvent
+    object Refresh : SongsUiEvent
     
-    // TODO: (Sprint 2.4) Thêm các event khác: Refresh, AddToPlaylist, Delete, vv.
+    // TODO: (Sprint 2.4) Thêm các event khác: AddToPlaylist, Delete, vv.
 }
