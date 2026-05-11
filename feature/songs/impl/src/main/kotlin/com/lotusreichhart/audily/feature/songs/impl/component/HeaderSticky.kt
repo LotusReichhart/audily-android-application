@@ -24,7 +24,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
  * Header hiển thị thông tin tóm tắt danh sách bài hát và nút sắp xếp.
  */
 @Composable
-internal fun SongsHeader(
+internal fun HeaderSticky(
     songCount: Int,
     totalDuration: String,
     sortText: String,
@@ -36,7 +36,7 @@ internal fun SongsHeader(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
             .padding(horizontal = LocalDimensions.current.paddingMedium)
-            .padding(bottom = LocalDimensions.current.paddingSmall),
+            .padding(vertical = LocalDimensions.current.paddingSmall),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

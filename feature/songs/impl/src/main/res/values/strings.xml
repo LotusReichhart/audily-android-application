@@ -9,7 +9,35 @@
     <string name="feature_songs_impl_menu_add_to_playlist">Add to Playlist</string>
     <string name="feature_songs_impl_menu_add_to_favorite">Add to Favorite</string>
     <string name="feature_songs_impl_menu_remove_from_favorite">Remove from Favorite</string>
+    <string name="feature_songs_impl_menu_info">Info</string>
     <string name="feature_songs_impl_menu_edit_tag">Edit Tag</string>
+    <string name="feature_songs_impl_menu_ringtone">Set as Ringtone</string>
     <string name="feature_songs_impl_menu_share">Share</string>
     <string name="feature_songs_impl_menu_delete">Delete</string>
+
+    <string name="feature_songs_impl_info_title">Title</string>
+    <string name="feature_songs_impl_info_artist">Artist</string>
+    <string name="feature_songs_impl_info_album">Album</string>
+    <string name="feature_songs_impl_info_duration">Duration</string>
+    <string name="feature_songs_impl_info_path">File Path</string>
+    <string name="feature_songs_impl_info_size">File Size</string>
+    <string name="feature_songs_impl_info_year">Year</string>
+    <string name="feature_songs_impl_info_close">Close</string>
+
+    <string name="feature_songs_impl_empty_title">No melodies here yet</string>
+    <string name="feature_songs_impl_empty_description">Start your musical journey by scanning your device or adding new tracks.</string>
+    <string name="feature_songs_impl_empty_action_scan">Scan for music</string>
+
+    <string name="feature_songs_impl_songs_sort">Sort Songs</string>
+    <string name="feature_songs_impl_songs_sort_default">Default</string>
+    <string name="feature_songs_impl_songs_sort_accept">Accept</string>
+
+    <!-- Sort Order Labels -->
+    <string name="feature_songs_impl_sort_order_title">Title</string>
+    <string name="feature_songs_impl_sort_order_artist">Artist</string>
+    <string name="feature_songs_impl_sort_order_album">Album</string>
+    <string name="feature_songs_impl_sort_order_duration">Duration</string>
+    <string name="feature_songs_impl_sort_order_date_added">Date Added</string>
+    <string name="feature_songs_impl_sort_order_number_of_songs">Number of Songs</string>
+    <string name="feature_songs_impl_sort_order_created_date">Date Created</string>
 </resources>

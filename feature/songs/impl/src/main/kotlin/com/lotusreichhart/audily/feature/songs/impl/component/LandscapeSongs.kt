@@ -46,10 +46,16 @@ internal fun LandscapeSongs(
     sortType: SortOrderType,
     playbackState: PlaybackState,
     screenState: SongsScreenState,
+    onBack: () -> Unit,
+    onSearchClick: () -> Unit,
+    onSortClick: () -> Unit,
     onEvent: (SongsUiEvent) -> Unit,
     onMenuClick: (song: Song) -> Unit
 ) {
     AudilyScaffold(
+        topBar = {
+            SongsTopBar(onBack = onBack, onSearch = onSearchClick)
+        },
         containerColor = Color.Transparent,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
@@ -60,6 +66,11 @@ internal fun LandscapeSongs(
         ) { isLoading ->
             if (isLoading) {
                 SongsLoadingScreen(innerPadding = innerPadding)
+            } else if (songs.itemCount == 0) {
+                SongsEmptyScreen(
+                    innerPadding = innerPadding,
+                    onScanClick = { onEvent(SongsUiEvent.Refresh) }
+                )
             } else {
                 Box(
                     modifier = modifier
@@ -73,11 +84,11 @@ internal fun LandscapeSongs(
                     var headerHeightPx by remember { mutableFloatStateOf(0f) }
                     val headerHeightDp = with(LocalDensity.current) { headerHeightPx.toDp() }
 
-                    SongsHeader(
+                    HeaderSticky(
                         songCount = summary.totalCount,
                         totalDuration = TimeUtils.formatDuration(summary.totalDuration),
                         sortText = sortText,
-                        onSortClick = { },
+                        onSortClick = onSortClick,
                         modifier = Modifier
                             .zIndex(1f)
                             .fillMaxWidth()

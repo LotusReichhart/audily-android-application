@@ -1,6 +1,7 @@
 package com.lotusreichhart.audily.feature.songs.impl
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,9 +19,12 @@ import com.lotusreichhart.audily.core.ui.GlobalSheetKey
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
+import androidx.compose.material3.MaterialTheme
+import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
 import com.lotusreichhart.audily.feature.songs.impl.component.CompactSongs
 import com.lotusreichhart.audily.feature.songs.impl.component.ExpandedSongs
 import com.lotusreichhart.audily.feature.songs.impl.component.LandscapeSongs
+import com.lotusreichhart.audily.feature.songs.impl.component.SongsSortSheet
 
 /**
  * Điểm vào chính cho màn hình danh sách bài hát.
@@ -31,6 +35,8 @@ import com.lotusreichhart.audily.feature.songs.impl.component.LandscapeSongs
 internal fun SongsScreen(
     modifier: Modifier = Modifier,
     viewModel: SongsViewModel = hiltViewModel(),
+    onBack: () -> Unit,
+    onSearch: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -42,8 +48,14 @@ internal fun SongsScreen(
     val playbackState = uiState.playbackState
 
     val screenState = rememberSongsScreenState()
-
     val globalUiEventBus = LocalGlobalUiEventBus.current
+    val sheetController = LocalAudilySheetController.current
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant
+
+    // Tự động cuộn lên đầu khi thay đổi sắp xếp
+    LaunchedEffect(sortOrder, sortType) {
+        screenState.lazyListState.animateScrollToItem(0)
+    }
 
     SongsScreen(
         modifier = modifier,
@@ -55,6 +67,26 @@ internal fun SongsScreen(
         playbackState = playbackState,
         screenState = screenState,
         onEvent = viewModel::onEvent,
+        onBack = onBack,
+        onSearchClick = onSearch,
+        onSortClick = {
+            sheetController.showSheet(
+                content = {
+                    SongsSortSheet(
+                        initialSortOrder = sortOrder,
+                        initialSortType = sortType,
+                        onSave = { order, type ->
+                            viewModel.onEvent(SongsUiEvent.SortOrderChanged(order))
+                            viewModel.onEvent(SongsUiEvent.SortTypeChanged(type))
+                            sheetController.hideSheet()
+                        }
+                    )
+                },
+                showDragHandle = true,
+                containerColor = sheetContainerColor,
+                skipPartiallyExpanded = true
+            )
+        },
         onMenuClick = { song ->
             globalUiEventBus.emit(
                 GlobalUiEvent.OpenSheet(
@@ -82,6 +114,9 @@ internal fun SongsScreen(
     playbackState: PlaybackState,
     screenState: SongsScreenState,
     onEvent: (SongsUiEvent) -> Unit,
+    onBack: () -> Unit,
+    onSearchClick: () -> Unit,
+    onSortClick: () -> Unit,
     onMenuClick: (song: Song) -> Unit
 ) {
     AudilyAdaptiveLayout(
@@ -95,8 +130,11 @@ internal fun SongsScreen(
                 sortType = sortType,
                 playbackState = playbackState,
                 screenState = screenState,
+                onBack = onBack,
+                onSearchClick = onSearchClick,
+                onSortClick = onSortClick,
                 onEvent = onEvent,
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
             )
         },
         landscape = {
@@ -109,6 +147,9 @@ internal fun SongsScreen(
                 sortType = sortType,
                 playbackState = playbackState,
                 screenState = screenState,
+                onBack = onBack,
+                onSearchClick = onSearchClick,
+                onSortClick = onSortClick,
                 onEvent = onEvent,
                 onMenuClick = onMenuClick
             )
@@ -124,6 +165,9 @@ internal fun SongsScreen(
                 sortType = sortType,
                 playbackState = playbackState,
                 screenState = screenState,
+                onBack = onBack,
+                onSearchClick = onSearchClick,
+                onSortClick = onSortClick,
                 onEvent = onEvent,
                 onMenuClick = onMenuClick
             )
