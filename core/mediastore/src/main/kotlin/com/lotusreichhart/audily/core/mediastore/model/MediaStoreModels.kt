@@ -63,6 +63,7 @@ data class MediaStoreAlbumSortMetadata(
     val id: Long,
     val title: String,
     val artist: String,
+    val albumArtUri: String? = null,
     val songCount: Int
 )
 

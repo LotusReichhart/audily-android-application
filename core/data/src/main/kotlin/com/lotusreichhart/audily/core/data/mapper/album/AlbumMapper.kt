@@ -9,7 +9,7 @@ internal fun MediaStoreAlbumSortMetadata.toAlbum(): Album {
         id = id,
         title = title,
         artist = artist,
-        albumArtUri = "", // Sort metadata doesn't have art uri, usually fetched when needed or constructable
+        albumArtUri = albumArtUri ?: "",
         songCount = songCount
     )
 }

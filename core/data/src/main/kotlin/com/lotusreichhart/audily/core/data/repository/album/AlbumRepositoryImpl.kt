@@ -21,7 +21,7 @@ internal class AlbumRepositoryImpl @Inject constructor(
         sortOrder: AlbumSortOrder,
         sortType: SortOrderType
     ): Flow<List<Album>> {
-        return mediaStoreDataSource.getAlbumsSortMetadata(searchQuery).map { metadataList ->
+        return mediaStoreDataSource.getAlbums(searchQuery).map { metadataList ->
             AlbumSorter.sort(metadataList, sortOrder, sortType).map { it.toAlbum() }
         }
     }
