@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.core.designsystem.resource
 import com.lotusreichhart.audily.core.designsystem.R
 
 object AudilyIcons {
+    val ArrowLeft = R.drawable.core_designsystem_ic_arrow_left
     val ArrowDown = R.drawable.core_designsystem_ic_arrow_down
     val Delete = R.drawable.core_designsystem_ic_delete
     val Edit = R.drawable.core_designsystem_ic_edit
@@ -23,7 +24,9 @@ object AudilyIcons {
     val Search = R.drawable.core_designsystem_ic_search
     val Share = R.drawable.core_designsystem_ic_share
     val Shuffle = R.drawable.core_designsystem_ic_shuffle
+    val SongEmpty = R.drawable.core_designsystem_ic_song_empty
     val Sort = R.drawable.core_designsystem_ic_sort
     val Timer = R.drawable.core_designsystem_ic_timer
     val VerticalDot = R.drawable.core_designsystem_ic_vertical_dot
+    val Info = R.drawable.core_designsystem_ic_info
 }

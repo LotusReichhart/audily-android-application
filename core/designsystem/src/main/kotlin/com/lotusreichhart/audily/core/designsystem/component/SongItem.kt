@@ -113,7 +113,8 @@ fun SongItem(
             )
         }
 
-        // Section các nút chức năng (Drag Handle hiện tại và Menu Button) giữ độ sáng 1.0f
+        Spacer(modifier = Modifier.width(4.dp))
+
         SongMenuButton(onClick = onMenuClick, inNowPlaying = inNowPlaying)
     }
 }
@@ -241,9 +242,9 @@ private fun SongMenuButton(
     ) {
         Icon(
             painter = painterResource(id = AudilyIcons.VerticalDot),
-            contentDescription = null,
+            contentDescription = "Song Menu",
             modifier = Modifier
-                .size(20.dp)
+                .size(22.dp)
                 .offset(x = 7.dp),
             tint = if (inNowPlaying) OnSurfaceDark.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(
                 alpha = 0.9f

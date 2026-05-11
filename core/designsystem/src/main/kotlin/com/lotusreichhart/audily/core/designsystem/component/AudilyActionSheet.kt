@@ -36,7 +36,8 @@ data class ActionItem(
     val label: String,
     val icon: Int? = null,
     val onClick: () -> Unit,
-    val isDestructive: Boolean = false
+    val isDestructive: Boolean = false,
+    val autoDismiss: Boolean = true
 )
 
 @Composable
@@ -89,7 +90,9 @@ fun AudilyActionSheet(
                             .fillMaxWidth()
                             .clickable {
                                 item.onClick()
-                                onDismiss() // Tự động đóng sau khi click
+                                if (item.autoDismiss) {
+                                    onDismiss()
+                                }
                             }
                             .padding(
                                 horizontal = LocalDimensions.current.paddingMedium,

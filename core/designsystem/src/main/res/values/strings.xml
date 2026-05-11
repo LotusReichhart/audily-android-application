@@ -8,17 +8,9 @@
     <string name="core_designsystem_unknown_title">Unknown TItle</string>
     <string name="core_designsystem_unknown_cancel">Cancel</string>
 
-    <!-- Sort Order Labels -->
-    <string name="core_designsystem_sort_order_title">Title</string>
-    <string name="core_designsystem_sort_order_artist">Artist</string>
-    <string name="core_designsystem_sort_order_album">Album</string>
-    <string name="core_designsystem_sort_order_duration">Duration</string>
-    <string name="core_designsystem_sort_order_date_added">Date Added</string>
-    <string name="core_designsystem_sort_order_name">Name</string>
-    <string name="core_designsystem_sort_order_number_of_songs">Number of Songs</string>
-    <string name="core_designsystem_sort_order_created_date">Date Created</string>
-
     <!-- Sort Type Labels -->
+    <string name="core_designsystem_sort_order">Order</string>
+    <string name="core_designsystem_sort_according_to">According to</string>
     <string name="core_designsystem_sort_type_ascending">Ascending</string>
     <string name="core_designsystem_sort_type_descending">Descending</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import android.content.Intent
 import com.lotusreichhart.audily.core.designsystem.theme.AudilyTheme
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
+import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.permission.PermissionHandler
 import com.lotusreichhart.audily.core.ui.permission.PermissionScreen
 import com.lotusreichhart.audily.ui.AudilyApp
@@ -31,6 +32,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var restorePlaybackSessionUseCase: RestorePlaybackSessionUseCase
+    
+    @Inject
+    lateinit var globalUiEventBus: GlobalUiEventBus
 
     private var shouldExpandPlayer by mutableStateOf(false)
 
@@ -45,19 +49,19 @@ class MainActivity : ComponentActivity() {
             )
 
             // Tự động mở NowPlaying nếu Intent yêu cầu
-//            LaunchedEffect(shouldExpandPlayer) {
-//                if (shouldExpandPlayer) {
-//                    appState.expandPanel()
-//                    shouldExpandPlayer = false
-//                }
-//            }
+            LaunchedEffect(shouldExpandPlayer) {
+                if (shouldExpandPlayer) {
+                    appState.expandPanel()
+                    shouldExpandPlayer = false
+                }
+            }
 
             AudilyTheme {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(
                             appState = appState,
-//                            shouldExpandPlayer = shouldExpandPlayer
+                            globalUiEventBus = globalUiEventBus
                         )
                     },
                     deniedContent = { shouldShowRationale, onRequestPermission ->
