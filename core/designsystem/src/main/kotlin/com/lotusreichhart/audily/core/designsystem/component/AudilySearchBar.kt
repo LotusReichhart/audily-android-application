@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -33,7 +34,7 @@ fun AudilySearchBar(
         Icon(
             painter = painterResource(id = AudilyIcons.Search),
             contentDescription = "Search Bar Icon",
-            modifier = Modifier.size(LocalDimensions.current.iconSizeMedium),
+            modifier = Modifier.size(20.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
     },
@@ -44,7 +45,7 @@ fun AudilySearchBar(
             .padding(1.dp)
             .height(LocalDimensions.current.buttonHeight),
         shape = RoundedCornerShape(LocalDimensions.current.cornerRadiusSmall),
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.onPrimary,
         tonalElevation = 0.dp,
         shadowElevation = 2.dp,
     ) {
@@ -53,7 +54,7 @@ fun AudilySearchBar(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxSize(),
             textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color.Black.copy(alpha = 0.7f)
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             singleLine = true,
