@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,12 +23,14 @@ import com.lotusreichhart.audily.core.common.util.TimeUtils
 import com.lotusreichhart.audily.core.designsystem.component.AudilyIconButton
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.feature.nowplaying.R
 
 @Composable
 internal fun QueueTopBar(
+    isExpanded: Boolean = false,
     queueSummary: SongsSummary,
     onCloseClick: () -> Unit,
     onMenuClick: () -> Unit,
@@ -35,7 +38,7 @@ internal fun QueueTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(if (isExpanded) Color.Transparent else MaterialTheme.colorScheme.surface)
             .statusBarsPadding()
             .padding(
                 vertical = LocalDimensions.current.paddingSmall,
@@ -48,21 +51,23 @@ internal fun QueueTopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
         ) {
-            AudilyIconButton(
-                onClick = onCloseClick,
-                painter = painterResource(id = AudilyIcons.ArrowDown),
-                contentDescription = "Close",
-                containerSize = 24.dp,
-                iconSize = 24.dp,
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+            if (!isExpanded) {
+                AudilyIconButton(
+                    onClick = onCloseClick,
+                    painter = painterResource(id = AudilyIcons.ArrowDown),
+                    contentDescription = "Close",
+                    containerSize = 24.dp,
+                    iconSize = 24.dp,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
             Column(
                 verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingExtraSmall)
             ) {
                 Text(
                     text = stringResource(id = R.string.feature_nowplaying_queue_title),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = if (isExpanded) OnSurfaceDark else MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
@@ -72,12 +77,14 @@ internal fun QueueTopBar(
                     Text(
                         text = "${queueSummary.totalCount} ${stringResource(coreR.string.core_designsystem_songs)} - ",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = if (isExpanded) OnSurfaceDark else MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = TimeUtils.formatDuration(queueSummary.totalDuration),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                        color = if (isExpanded) OnSurfaceDark.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.9f
+                        )
                     )
                 }
             }
@@ -90,7 +97,7 @@ internal fun QueueTopBar(
             modifier = Modifier.offset(x = 8.dp),
             containerSize = 24.dp,
             iconSize = 24.dp,
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = if (isExpanded) OnSurfaceDark else MaterialTheme.colorScheme.onSurface
         )
     }
 }

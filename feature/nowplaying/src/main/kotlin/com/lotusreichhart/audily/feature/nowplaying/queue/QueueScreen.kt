@@ -1,6 +1,7 @@
 package com.lotusreichhart.audily.feature.nowplaying.queue
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,6 +54,7 @@ import java.util.UUID
 internal fun QueueScreen(
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
+    isExpanded: Boolean = false,
     viewModel: QueueViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
@@ -70,6 +72,7 @@ internal fun QueueScreen(
     QueueScreen(
         modifier = modifier,
         uiState = uiState,
+        isExpanded = isExpanded,
         onEvent = viewModel::onEvent,
         onClose = onClose,
         onQueueMenuClick = { showQueueMenu = true },
@@ -182,6 +185,7 @@ internal fun QueueScreen(
 internal fun QueueScreen(
     modifier: Modifier = Modifier,
     uiState: QueueUiState,
+    isExpanded: Boolean = true,
     onEvent: (QueueUiEvent) -> Unit,
     onClose: () -> Unit,
     onQueueMenuClick: () -> Unit,
@@ -221,8 +225,10 @@ internal fun QueueScreen(
 
     Scaffold(
         modifier = modifier.fillMaxWidth(),
+        containerColor = if (isExpanded) Color.Transparent else MaterialTheme.colorScheme.background,
         topBar = {
             QueueTopBar(
+                isExpanded = isExpanded,
                 queueSummary = uiState.queueSummary,
                 onCloseClick = onClose,
                 onMenuClick = onQueueMenuClick
@@ -230,7 +236,9 @@ internal fun QueueScreen(
         }
     ) { paddingValues ->
         Column(
-            modifier = Modifier
+            modifier = if (isExpanded) Modifier
+                .padding(paddingValues)
+            else Modifier
                 .padding(paddingValues)
                 .nowPlayingBackground(uiState.paletteColors)
         ) {
@@ -266,7 +274,8 @@ internal fun QueueScreen(
                         }
                         val onDragStopped = {
                             val from = initialIndex
-                            val to = localQueueWrappers.indexOfFirst { it.stableId == wrapper.stableId }
+                            val to =
+                                localQueueWrappers.indexOfFirst { it.stableId == wrapper.stableId }
                             if (from != null && to != -1 && from != to) {
                                 onEvent(QueueUiEvent.OnMoveQueueItem(from, to))
                             }

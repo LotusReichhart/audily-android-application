@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
@@ -93,7 +94,7 @@ internal fun NowPlayingArtworkPager(
         val isCurrentPage = page == uiState.currentIndex
 
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.wrapContentSize(),
             contentAlignment = Alignment.Center
         ) {
             with(sharedTransitionScope) {

@@ -32,13 +32,14 @@ import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.StatusBarColorEffect
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingMenu
-import com.lotusreichhart.audily.feature.nowplaying.component.ExpandedNowPlaying
-import com.lotusreichhart.audily.feature.nowplaying.component.CompactNowPlaying
-import com.lotusreichhart.audily.feature.nowplaying.component.LandscapeNowPlaying
+import com.lotusreichhart.audily.feature.nowplaying.layout.ExpandedNowPlayingLayout
+import com.lotusreichhart.audily.feature.nowplaying.layout.PortraitNowPlayingLayout
+import com.lotusreichhart.audily.feature.nowplaying.layout.LandscapeNowPlayingLayout
 import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackParametersSheet
 import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackSkipDurationSheet
 import com.lotusreichhart.audily.feature.nowplaying.component.PlaybackTimerSheet
 import com.lotusreichhart.audily.feature.nowplaying.component.SleepTimerCountdownDialog
+import com.lotusreichhart.audily.feature.nowplaying.layout.MediumNowPlayingLayout
 import com.lotusreichhart.audily.feature.nowplaying.queue.QueueScreen
 import com.lotusreichhart.audily.feature.nowplaying.util.nowPlayingBackground
 
@@ -177,8 +178,8 @@ internal fun NowPlayingScreen(
     ) {
         SharedTransitionLayout {
             AudilyAdaptiveLayout(
-                compact = {
-                    CompactNowPlaying(
+                portrait = {
+                    PortraitNowPlayingLayout(
                         uiState = uiState,
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
@@ -191,7 +192,7 @@ internal fun NowPlayingScreen(
                     )
                 },
                 landscape = {
-                    LandscapeNowPlaying(
+                    LandscapeNowPlayingLayout(
                         uiState = uiState,
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
@@ -203,16 +204,26 @@ internal fun NowPlayingScreen(
                         sharedTransitionScope = this@SharedTransitionLayout
                     )
                 },
-                expanded = {
-                    // Logic: Tablet/Fold sẽ dùng Landscape cho đến khi có Two-Pane đặc thù
-                    ExpandedNowPlaying(
+                medium = {
+                    MediumNowPlayingLayout(
                         uiState = uiState,
                         onMenuClick = onMenuClick,
                         onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
                         onExtendClick = { isMenuVisible = !isMenuVisible },
                         onTimerActiveClick = onTimerActiveClick,
                         onCloseClick = onCloseClick,
-                        onOpenQueue = onOpenQueue,
+                        onEvent = onEvent,
+                        sharedTransitionScope = this@SharedTransitionLayout
+                    )
+                },
+                expanded = {
+                    ExpandedNowPlayingLayout(
+                        uiState = uiState,
+                        onMenuClick = onMenuClick,
+                        onLyricsToggle = { onEvent(NowPlayingUiEvent.OnToggleLyrics) },
+                        onExtendClick = { isMenuVisible = !isMenuVisible },
+                        onTimerActiveClick = onTimerActiveClick,
+                        onCloseClick = onCloseClick,
                         onEvent = onEvent,
                         sharedTransitionScope = this@SharedTransitionLayout
                     )
