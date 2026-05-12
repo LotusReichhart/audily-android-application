@@ -39,8 +39,10 @@ internal fun PortraitHomeLayout(
             }
 
             is HomeUiState.Success -> {
+                val canResume = uiState.playbackState.currentSongId != null || uiState.playbackState.queueIds.isNotEmpty()
                 HomeContent(
                     homeVibe = uiState.homeVibe,
+                    canResume = canResume,
                     onNavigateToSongs = onNavigateToSongs,
                     onEvent = onEvent,
                     contentPadding = innerPadding

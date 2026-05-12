@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -36,10 +37,11 @@ import com.lotusreichhart.audily.feature.home.impl.R
 
 @Composable
 internal fun HomeContent(
-    modifier: Modifier = Modifier,
     homeVibe: HomeVibe,
+    canResume: Boolean,
     onNavigateToSongs: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
+    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val uiInfo = getGreetingUiInfo(homeVibe.greetingType)
@@ -107,6 +109,7 @@ internal fun HomeContent(
                     GreetingSection(
                         greeting = stringResource(id = uiInfo.textRes),
                         greetingColor = uiInfo.color,
+                        canResume = canResume,
                         onShuffleAllClick = { onEvent(HomeUiEvent.OnShuffleAll) },
                         onResumeClick = { onEvent(HomeUiEvent.OnResume) },
                         modifier = Modifier.padding(
@@ -218,6 +221,7 @@ private fun getGreetingUiInfo(type: GreetingType): GreetingUiInfo {
 private fun GreetingSection(
     greeting: String,
     greetingColor: Color,
+    canResume: Boolean,
     onShuffleAllClick: () -> Unit,
     onResumeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -244,9 +248,11 @@ private fun GreetingSection(
             )
 
             AudilyButton(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f),
                 text = stringResource(R.string.feature_home_impl_action_resume),
                 leadingIcon = AudilyIcons.Resume,
+                enabled = canResume,
                 containerColor = MaterialTheme.colorScheme.onBackground,
                 contentColor = MaterialTheme.colorScheme.surfaceVariant,
                 onClick = onResumeClick,

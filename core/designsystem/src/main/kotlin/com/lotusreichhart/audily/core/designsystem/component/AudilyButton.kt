@@ -1,11 +1,9 @@
 package com.lotusreichhart.audily.core.designsystem.component
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -33,9 +31,9 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
  */
 @Composable
 fun AudilyButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     leadingIcon: Int? = null,
     enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
@@ -45,7 +43,6 @@ fun AudilyButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .wrapContentSize()
             .height(LocalDimensions.current.buttonHeight),
         enabled = enabled,
         shape = shape,
