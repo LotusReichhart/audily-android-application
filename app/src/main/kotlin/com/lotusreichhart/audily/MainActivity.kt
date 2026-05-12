@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import android.content.Intent
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.Modifier
 import com.lotusreichhart.audily.core.designsystem.theme.AudilyTheme
 import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
@@ -60,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(
+                            modifier = Modifier.navigationBarsPadding(),
                             appState = appState,
                             globalUiEventBus = globalUiEventBus
                         )

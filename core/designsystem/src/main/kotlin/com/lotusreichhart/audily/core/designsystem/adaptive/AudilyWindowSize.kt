@@ -1,40 +1,61 @@
 package com.lotusreichhart.audily.core.designsystem.adaptive
 
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import android.annotation.SuppressLint
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * Định nghĩa các loại kích thước màn hình cho Audily.
  */
 @Immutable
 sealed interface AudilyWindowSize {
-    /** Điện thoại dọc (Compact Width) */
-    data object Compact : AudilyWindowSize
-
-    /** Điện thoại xoay ngang (Compact Height, Width > Height) */
-    data object Landscape : AudilyWindowSize
-
-    /** Tablet hoặc Màn hình gập (Expanded Width) */
-    data object Expanded : AudilyWindowSize
+    data object Portrait : AudilyWindowSize          // Dọc hẹp
+    data object Landscape : AudilyWindowSize         // Ngang hẹp
+    data object Medium : AudilyWindowSize            // Vuông dọc (2:3)
+    data object Expanded : AudilyWindowSize          // Vuông ngang (3:2)
 }
 
-/**
- * Chuyển đổi từ WindowSizeClass của Material 3 sang AudilyWindowSize.
- */
-fun WindowSizeClass.toAudilyWindowSize(): AudilyWindowSize {
-    return when {
-        widthSizeClass == WindowWidthSizeClass.Expanded -> AudilyWindowSize.Expanded
-        heightSizeClass == WindowHeightSizeClass.Compact -> AudilyWindowSize.Landscape
-        else -> AudilyWindowSize.Compact
+@SuppressLint("ConfigurationScreenWidthHeight")
+@Composable
+fun rememberAudilyWindowSize(): AudilyWindowSize {
+    val configuration = LocalConfiguration.current
+
+    val width = configuration.screenWidthDp.toFloat()
+    val height = configuration.screenHeightDp.toFloat()
+
+    return remember(width, height) {
+        // Kiểm tra xem màn hình đang nằm ngang hay nằm dọc
+        val isLandscapeOrientation = width > height
+
+        if (isLandscapeOrientation) {
+            // ==========================================
+            // NHÓM MÀN HÌNH NGANG (Width > Height)
+            // ==========================================
+            if (height < 480f) {
+                // Chiều cao rất hẹp (< 480dp) -> Điện thoại xoay ngang
+                AudilyWindowSize.Landscape
+            } else {
+                // Chiều cao đủ lớn -> Tablet xoay ngang hoặc Fold khi đang cầm dọc
+                AudilyWindowSize.Expanded
+            }
+        } else {
+            // ==========================================
+            // NHÓM MÀN HÌNH DỌC (Height >= Width)
+            // ==========================================
+            if (width < 600f) {
+                // Chiều rộng nhỏ (< 600dp) -> Điện thoại dọc
+                AudilyWindowSize.Portrait
+            } else {
+                // Chiều rộng lớn (>= 600dp) -> Tablet dọc hoặc Fold mở khi đang cầm ngang
+                AudilyWindowSize.Medium
+            }
+        }
     }
 }
 
-/**
- * CompositionLocal cung cấp thông tin kích thước màn hình toàn cục.
- */
 val LocalAudilyWindowSize = staticCompositionLocalOf<AudilyWindowSize> {
-    AudilyWindowSize.Compact
+    AudilyWindowSize.Portrait
 }

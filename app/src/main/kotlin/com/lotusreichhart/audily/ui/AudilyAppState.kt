@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import androidx.compose.runtime.derivedStateOf
+import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
 import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
 
 enum class AudilyPanelState {
@@ -168,11 +169,11 @@ class AudilyAppState(
     /**
      * Cập nhật các điểm neo (anchors) cho trình phát nhạc dựa trên kích thước màn hình.
      */
-    fun updatePlayerAnchors(fullHeight: Float, windowSize: com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize) {
+    fun updatePlayerAnchors(fullHeight: Float, windowSize: AudilyWindowSize) {
         if (fullHeight <= 0) return
 
         val expandedY = 0f
-        val isWide = windowSize != com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize.Compact
+        val isWide = windowSize != AudilyWindowSize.Portrait
         
         val collapsedY = if (isWide) {
             (fullHeight - panelHeightPx).coerceAtLeast(0f)
