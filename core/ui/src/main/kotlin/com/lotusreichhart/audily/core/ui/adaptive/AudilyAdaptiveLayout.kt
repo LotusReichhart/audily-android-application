@@ -10,15 +10,17 @@ import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSiz
  */
 @Composable
 fun AudilyAdaptiveLayout(
-    compact: @Composable () -> Unit,
+    portrait: @Composable () -> Unit,
     landscape: @Composable () -> Unit,
+    medium: @Composable () -> Unit,
     expanded: @Composable () -> Unit
 ) {
     val windowSize = LocalAudilyWindowSize.current
-    
+
     when (windowSize) {
-        AudilyWindowSize.Compact -> compact()
+        AudilyWindowSize.Portrait -> portrait()
         AudilyWindowSize.Landscape -> landscape()
+        AudilyWindowSize.Medium -> medium()
         AudilyWindowSize.Expanded -> expanded()
     }
 }

@@ -40,4 +40,8 @@
     <string name="feature_songs_impl_sort_order_date_added">Ngày thêm</string>
     <string name="feature_songs_impl_sort_order_number_of_songs">Số bài hát</string>
     <string name="feature_songs_impl_sort_order_created_date">Ngày tạo</string>
+
+    <string name="feature_songs_impl_not_found_title">Vẫn chưa tìm thấy bài hát nào</string>
+    <string name="feature_songs_impl_not_found_description">Audily đã quét thiết bị nhưng không tìm thấy file âm thanh nào. Hãy đảm bảo bạn đã tải nhạc trực tiếp về máy nhé.</string>
+    <string name="feature_songs_impl_action_refresh">Quét lại</string>
 </resources>

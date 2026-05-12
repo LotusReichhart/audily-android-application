@@ -13,4 +13,8 @@
     <string name="feature_home_impl_section_discovery">Gợi ý</string>
     <string name="feature_home_impl_action_shuffle_all">Phát ngẫu nhiên</string>
     <string name="feature_home_impl_action_resume">Tiếp tục</string>
+
+    <string name="feature_home_impl_empty_title">Chào mừng đến với Audily</string>
+    <string name="feature_home_impl_empty_subtitle">Hành trình âm nhạc của bạn bắt đầu từ đây. Hãy chuyển sang tab Bài hát để tìm và phát những giai điệu yêu thích.</string>
+    <string name="feature_home_impl_empty_action">Tìm nhạc ngay</string>
 </resources>

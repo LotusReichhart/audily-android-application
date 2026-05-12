@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.feature.nowplaying.component
+package com.lotusreichhart.audily.feature.nowplaying.layout
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -26,19 +25,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
 import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceVariantDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiState
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingArtworkPager
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingControls
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingExtension
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingInfo
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingNoLyrics
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingProgress
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingTopBar
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-internal fun LandscapeNowPlaying(
+internal fun LandscapeNowPlayingLayout(
     modifier: Modifier = Modifier,
     uiState: NowPlayingUiState,
     onMenuClick: () -> Unit,
@@ -50,13 +58,13 @@ internal fun LandscapeNowPlaying(
     onEvent: (NowPlayingUiEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope
 ) {
-    Scaffold(
+    AudilyScaffold(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding(),
         containerColor = Color.Transparent,
         topBar = {
-            NowPlayingHeader(
+            NowPlayingTopBar(
                 modifier = modifier
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingMedium),
@@ -64,11 +72,11 @@ internal fun LandscapeNowPlaying(
                 onMenuClick = onMenuClick
             )
         },
-    ) { paddingValues ->
+    ) { innerPadding ->
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(innerPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Trái: Ảnh bìa

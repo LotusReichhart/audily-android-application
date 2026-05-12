@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -37,6 +38,8 @@ import com.lotusreichhart.audily.feature.home.impl.R
 @Composable
 internal fun HomeContent(
     homeVibe: HomeVibe,
+    canResume: Boolean,
+    onNavigateToSongs: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -66,111 +69,119 @@ internal fun HomeContent(
                 )
         )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-                .drawWithContent {
-                    drawContent()
+        if (homeVibe.sections.isEmpty()) {
+            HomeEmptyContent(
+                onNavigateToSongs = onNavigateToSongs,
+                modifier = Modifier.padding(contentPadding)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                    .drawWithContent {
+                        drawContent()
 
-                    // Logic mờ dần:
-                    // - Bên dưới vùng (topPadding + fadeLength): Alpha = 1 (Hiện rõ)
-                    // - Từ (topPadding + fadeLength) tới topPadding: Alpha giảm từ 1 về 0 (Mờ dần)
-                    // - Từ topPadding trở lên (vùng của TopBar): Alpha = 0 (Biến mất hẳn)
+                        // Logic mờ dần:
+                        // - Bên dưới vùng (topPadding + fadeLength): Alpha = 1 (Hiện rõ)
+                        // - Từ (topPadding + fadeLength) tới topPadding: Alpha giảm từ 1 về 0 (Mờ dần)
+                        // - Từ topPadding trở lên (vùng của TopBar): Alpha = 0 (Biến mất hẳn)
 
-                    val fadeStart = (topPaddingPx) / size.height
-                    val fadeEnd = (topPaddingPx + fadeLengthPx) / size.height
+                        val fadeStart = (topPaddingPx) / size.height
+                        val fadeEnd = (topPaddingPx + fadeLengthPx) / size.height
 
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colorStops = arrayOf(
-                                0f to Color.Transparent,
-                                fadeStart.coerceIn(0f, 1f) to Color.Transparent,
-                                fadeEnd.coerceIn(0f, 1f) to Color.Black,
-                                1f to Color.Black
-                            )
-                        ),
-                        blendMode = BlendMode.DstIn
-                    )
-                },
-            contentPadding = contentPadding,
-            verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingLarge)
-        ) {
-            item {
-                GreetingSection(
-                    greeting = stringResource(id = uiInfo.textRes),
-                    greetingColor = uiInfo.color,
-                    onShuffleAllClick = { onEvent(HomeUiEvent.OnShuffleAll) },
-                    onResumeClick = { onEvent(HomeUiEvent.OnResume) },
-                    modifier = Modifier.padding(
-                        top = LocalDimensions.current.paddingMedium,
-                        start = LocalDimensions.current.paddingMedium,
-                        end = LocalDimensions.current.paddingMedium
-                    )
-                )
-            }
-
-            if (homeVibe.topPlayed.isNotEmpty()) {
-                item {
-                    TopPlayedSection(
-                        songs = homeVibe.topPlayed,
-                        onSongClick = { id ->
-                            onEvent(
-                                HomeUiEvent.OnSongClick(
-                                    id,
-                                    homeVibe.topPlayed
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0f to Color.Transparent,
+                                    fadeStart.coerceIn(0f, 1f) to Color.Transparent,
+                                    fadeEnd.coerceIn(0f, 1f) to Color.Black,
+                                    1f to Color.Black
                                 )
-                            )
-                        }
+                            ),
+                            blendMode = BlendMode.DstIn
+                        )
+                    },
+                contentPadding = contentPadding,
+                verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingLarge)
+            ) {
+                item {
+                    GreetingSection(
+                        greeting = stringResource(id = uiInfo.textRes),
+                        greetingColor = uiInfo.color,
+                        canResume = canResume,
+                        onShuffleAllClick = { onEvent(HomeUiEvent.OnShuffleAll) },
+                        onResumeClick = { onEvent(HomeUiEvent.OnResume) },
+                        modifier = Modifier.padding(
+                            top = LocalDimensions.current.paddingMedium,
+                            start = LocalDimensions.current.paddingMedium,
+                            end = LocalDimensions.current.paddingMedium
+                        )
                     )
                 }
-            }
 
-            if (homeVibe.recentHistory.isNotEmpty()) {
-                item {
-                    RecentlyPlayedSection(
-                        songs = homeVibe.recentHistory,
-                        onSongClick = { id ->
-                            onEvent(
-                                HomeUiEvent.OnSongClick(
-                                    id,
-                                    homeVibe.recentHistory
+                if (homeVibe.topPlayed.isNotEmpty()) {
+                    item {
+                        TopPlayedSection(
+                            songs = homeVibe.topPlayed,
+                            onSongClick = { id ->
+                                onEvent(
+                                    HomeUiEvent.OnSongClick(
+                                        id,
+                                        homeVibe.topPlayed
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            }
+                        )
+                    }
                 }
-            }
 
-            if (homeVibe.discovery.isNotEmpty()) {
-                item {
-                    DiscoverySection(
-                        songs = homeVibe.discovery,
-                        onSongClick = { id ->
-                            onEvent(HomeUiEvent.OnSongClick(id, homeVibe.discovery))
-                        }
-                    )
-                }
-            }
-
-            if (homeVibe.recentlyAdded.isNotEmpty()) {
-                item {
-                    RecentlyAddedSection(
-                        songs = homeVibe.recentlyAdded,
-                        onSongClick = { id ->
-                            onEvent(
-                                HomeUiEvent.OnSongClick(
-                                    id,
-                                    homeVibe.recentlyAdded
+                if (homeVibe.recentHistory.isNotEmpty()) {
+                    item {
+                        RecentlyPlayedSection(
+                            songs = homeVibe.recentHistory,
+                            onSongClick = { id ->
+                                onEvent(
+                                    HomeUiEvent.OnSongClick(
+                                        id,
+                                        homeVibe.recentHistory
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            }
+                        )
+                    }
                 }
-            }
 
-            item {
-                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
+                if (homeVibe.discovery.isNotEmpty()) {
+                    item {
+                        DiscoverySection(
+                            songs = homeVibe.discovery,
+                            onSongClick = { id ->
+                                onEvent(HomeUiEvent.OnSongClick(id, homeVibe.discovery))
+                            }
+                        )
+                    }
+                }
+
+                if (homeVibe.recentlyAdded.isNotEmpty()) {
+                    item {
+                        RecentlyAddedSection(
+                            songs = homeVibe.recentlyAdded,
+                            onSongClick = { id ->
+                                onEvent(
+                                    HomeUiEvent.OnSongClick(
+                                        id,
+                                        homeVibe.recentlyAdded
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
+                }
             }
         }
     }
@@ -210,6 +221,7 @@ private fun getGreetingUiInfo(type: GreetingType): GreetingUiInfo {
 private fun GreetingSection(
     greeting: String,
     greetingColor: Color,
+    canResume: Boolean,
     onShuffleAllClick: () -> Unit,
     onResumeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -236,9 +248,11 @@ private fun GreetingSection(
             )
 
             AudilyButton(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f),
                 text = stringResource(R.string.feature_home_impl_action_resume),
                 leadingIcon = AudilyIcons.Resume,
+                enabled = canResume,
                 containerColor = MaterialTheme.colorScheme.onBackground,
                 contentColor = MaterialTheme.colorScheme.surfaceVariant,
                 onClick = onResumeClick,

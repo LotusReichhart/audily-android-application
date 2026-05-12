@@ -5,14 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.lotusreichhart.audily.core.domain.usecase.home.GetHomeVibeUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongIdsUseCase
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
@@ -22,17 +23,18 @@ import javax.inject.Inject
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
     getHomeVibeUseCase: GetHomeVibeUseCase,
+    observePlaybackStateUseCase: ObservePlaybackStateUseCase,
     private val playFromQueueUseCase: PlayFromQueueUseCase,
     private val resumeSongUseCase: ResumeSongUseCase,
     private val getSongIdsUseCase: GetSongIdsUseCase,
 ) : ViewModel() {
 
-    val uiState: StateFlow<HomeUiState> = getHomeVibeUseCase()
-        .onStart { delay(2000) }
-        .map<_, HomeUiState> { homeVibe ->
-            HomeUiState.Success(homeVibe)
-        }
-        .catch { emit(HomeUiState.Error(it.message)) }
+    val uiState: StateFlow<HomeUiState> = combine(
+        getHomeVibeUseCase().onStart { delay(2000) },
+        observePlaybackStateUseCase()
+    ) { homeVibe, playbackState ->
+        HomeUiState.Success(homeVibe, playbackState) as HomeUiState
+    }.catch { emit(HomeUiState.Error(it.message)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

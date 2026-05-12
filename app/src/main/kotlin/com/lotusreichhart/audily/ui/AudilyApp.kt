@@ -38,13 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
-import android.app.Activity
 import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -63,10 +61,8 @@ import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.impl.navigation.homeEntry
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingViewModel
-import com.lotusreichhart.audily.feature.search.api.SearchNavKey
 import com.lotusreichhart.audily.feature.search.impl.navigation.searchEntry
 import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
-import com.lotusreichhart.audily.feature.songs.api.navigation.SongsNavKey
 import com.lotusreichhart.audily.feature.songs.impl.navigation.songsEntry
 import com.lotusreichhart.audily.navigation.NAV_BAR_ITEMS
 import com.lotusreichhart.audily.core.navigation.toEntries
@@ -75,7 +71,8 @@ import com.lotusreichhart.audily.ui.component.AudilyNowPlayingOverlay
 import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
 import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
 import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSize
-import com.lotusreichhart.audily.core.designsystem.adaptive.toAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.adaptive.rememberAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.model.AudilySheetState
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
@@ -91,29 +88,16 @@ fun AudilyApp(
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val context = LocalContext.current
-    val windowSizeClass = calculateWindowSizeClass(context as Activity)
-    val audilyWindowSize = remember(windowSizeClass) {
-        windowSizeClass.toAudilyWindowSize()
-    }
+    val audilyWindowSize = rememberAudilyWindowSize()
 
     AudilyApp(
+        modifier = modifier,
         appState = appState,
         windowSize = audilyWindowSize,
         snackbarHostState = snackbarHostState,
         globalUiEventBus = globalUiEventBus,
-        modifier = modifier,
     )
 }
-
-data class AudilySheetState(
-    val content: (@Composable () -> Unit)? = null,
-    val isFullScreen: Boolean = false,
-    val showDragHandle: Boolean = false,
-    val enableSwipeToDismiss: Boolean = true,
-    val containerColor: Color = Color.Transparent,
-    val skipPartiallyExpanded: Boolean = false
-)
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -382,15 +366,15 @@ internal fun AudilyApp(
                     hostState = snackbarHostState,
                     modifier = Modifier
                         .align(
-                            if (windowSize != AudilyWindowSize.Compact) Alignment.BottomEnd
+                            if (windowSize != AudilyWindowSize.Portrait) Alignment.BottomEnd
                             else Alignment.BottomCenter
                         )
                         .padding(
-                            if (windowSize != AudilyWindowSize.Compact) LocalDimensions.current.paddingMedium
+                            if (windowSize != AudilyWindowSize.Portrait) LocalDimensions.current.paddingMedium
                             else 0.dp
                         )
                         .padding(
-                            bottom = if (windowSize != AudilyWindowSize.Compact || appState.expandProgress > 0.5f) LocalDimensions.current.paddingMedium
+                            bottom = if (windowSize != AudilyWindowSize.Portrait || appState.expandProgress > 0.5f) LocalDimensions.current.paddingMedium
                             else dynamicPadding + LocalDimensions.current.paddingMedium
                         ),
                     snackbar = { snackbarData ->

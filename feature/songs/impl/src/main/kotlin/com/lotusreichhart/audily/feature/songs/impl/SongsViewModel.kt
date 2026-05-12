@@ -65,6 +65,8 @@ internal class SongsViewModel @Inject constructor(
     private val _sortType = _userPrefs.map { it?.songSortType ?: SongsUiState().sortType }
 
     private val _isInitialLoading = MutableStateFlow(true)
+    private val _isRefreshing = MutableStateFlow(false)
+    private val _wasRefreshed = MutableStateFlow(false)
     private val _isDataLoadingStarted = MutableStateFlow(false)
 
     init {
@@ -82,11 +84,12 @@ internal class SongsViewModel @Inject constructor(
         combine(
             _sortOrder,
             _sortType,
-            _isDataLoadingStarted
-        ) { order, type, isStarted ->
-            Triple(order, type, isStarted)
-        }.flatMapLatest { (order, type, isStarted) ->
-            if (!isStarted) {
+            _isDataLoadingStarted,
+            _isRefreshing
+        ) { order, type, isStarted, isRefreshing ->
+            Quadruple(order, type, isStarted, isRefreshing)
+        }.flatMapLatest { (order, type, isStarted, isRefreshing) ->
+            if (!isStarted || isRefreshing) {
                 flowOf(PagingData.empty())
             } else {
                 getSongsPagedUseCase(sortOrder = order, sortType = type)
@@ -98,11 +101,12 @@ internal class SongsViewModel @Inject constructor(
         combine(
             _sortOrder,
             _sortType,
-            _isDataLoadingStarted
-        ) { order, type, isStarted ->
-            Triple(order, type, isStarted)
-        }.flatMapLatest { (order, type, isStarted) ->
-            if (!isStarted) {
+            _isDataLoadingStarted,
+            _isRefreshing
+        ) { order, type, isStarted, isRefreshing ->
+            Quadruple(order, type, isStarted, isRefreshing)
+        }.flatMapLatest { (order, type, isStarted, isRefreshing) ->
+            if (!isStarted || isRefreshing) {
                 flowOf(emptyList())
             } else {
                 getSongIdsUseCase(sortOrder = order, sortType = type)
@@ -120,17 +124,23 @@ internal class SongsViewModel @Inject constructor(
         observePlaybackStateUseCase(),
         combine(
             _allSongIds,
-            _isInitialLoading
-        ) { ids, loading -> ids to loading }
-    ) { sort, type, summary, playback, (allSongIds, isLoading) ->
+            _isInitialLoading,
+            _isRefreshing,
+            _wasRefreshed
+        ) { ids, loading, refreshing, refreshed ->
+            RefreshedState(ids, loading, refreshing, refreshed)
+        }
+    ) { sort, type, summary, playback, state ->
         SongsUiState(
             songs = _songs,
             summary = summary,
             sortOrder = sort,
             sortType = type,
             playbackState = playback,
-            allSongIds = allSongIds,
-            isLoading = isLoading
+            allSongIds = state.allSongIds,
+            isLoading = state.isLoading,
+            isRefreshing = state.isRefreshing,
+            wasRefreshed = state.wasRefreshed
         )
     }.stateIn(
         scope = viewModelScope,
@@ -147,8 +157,12 @@ internal class SongsViewModel @Inject constructor(
                 is SongsUiEvent.PlayNextClicked -> handlePlayNext(event.song)
                 is SongsUiEvent.ToggleFavoriteClicked -> toggleFavoriteUseCase(event.songId)
                 is SongsUiEvent.Refresh -> {
+                    _isRefreshing.value = true
                     updateSongSortOrderUseCase(SongSortOrder.TITLE)
                     updateSongSortTypeUseCase(SortOrderType.ASC)
+                    delay(2000)
+                    _isRefreshing.value = false
+                    _wasRefreshed.value = true
                 }
             }
         }
@@ -176,4 +190,13 @@ internal class SongsViewModel @Inject constructor(
 
         playNextUseCase(song)
     }
+
+    private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
+
+    private data class RefreshedState(
+        val allSongIds: List<Long>,
+        val isLoading: Boolean,
+        val isRefreshing: Boolean,
+        val wasRefreshed: Boolean
+    )
 }

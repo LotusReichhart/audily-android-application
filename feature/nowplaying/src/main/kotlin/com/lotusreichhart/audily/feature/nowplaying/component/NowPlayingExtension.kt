@@ -13,7 +13,6 @@ import androidx.compose.ui.res.painterResource
 import com.lotusreichhart.audily.core.designsystem.component.AudilyIconButton
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
-import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 
 import androidx.compose.animation.core.*
@@ -24,6 +23,7 @@ internal fun NowPlayingExtension(
     modifier: Modifier = Modifier,
     isLyricsVisible: Boolean,
     sleepTimerActive: Boolean,
+    isOpenQueue: Boolean = true,
     onQueueClick: () -> Unit,
     onLyricsClick: () -> Unit,
     onTimerClick: () -> Unit,
@@ -46,15 +46,17 @@ internal fun NowPlayingExtension(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AudilyIconButton(
-                onClick = onQueueClick,
-                painter = painterResource(id = AudilyIcons.QueueMusic),
-                contentDescription = "Queue",
-                containerSize = 28.dp,
-                iconSize = 28.dp,
-                tint = OnSurfaceDark
-            )
-            Spacer(modifier = Modifier.width(12.dp))
+            if (isOpenQueue) {
+                AudilyIconButton(
+                    onClick = onQueueClick,
+                    painter = painterResource(id = AudilyIcons.QueueMusic),
+                    contentDescription = "Queue",
+                    containerSize = 28.dp,
+                    iconSize = 28.dp,
+                    tint = OnSurfaceDark
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+            }
             AudilyIconButton(
                 onClick = onLyricsClick,
                 painter = painterResource(
@@ -65,7 +67,7 @@ internal fun NowPlayingExtension(
                 iconSize = 24.dp,
                 tint = OnSurfaceDark
             )
-            
+
             if (sleepTimerActive) {
                 Spacer(modifier = Modifier.width(12.dp))
                 AudilyIconButton(

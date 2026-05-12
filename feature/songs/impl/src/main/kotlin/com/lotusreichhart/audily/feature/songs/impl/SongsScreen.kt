@@ -21,10 +21,11 @@ import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import androidx.compose.material3.MaterialTheme
 import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
-import com.lotusreichhart.audily.feature.songs.impl.component.CompactSongs
-import com.lotusreichhart.audily.feature.songs.impl.component.ExpandedSongs
-import com.lotusreichhart.audily.feature.songs.impl.component.LandscapeSongs
+import com.lotusreichhart.audily.feature.songs.impl.layout.PortraitSongsLayout
+import com.lotusreichhart.audily.feature.songs.impl.layout.ExpandedSongsLayout
+import com.lotusreichhart.audily.feature.songs.impl.layout.LandscapeSongsLayout
 import com.lotusreichhart.audily.feature.songs.impl.component.SongsSortSheet
+import com.lotusreichhart.audily.feature.songs.impl.layout.MediumSongsLayout
 
 /**
  * Điểm vào chính cho màn hình danh sách bài hát.
@@ -41,6 +42,8 @@ internal fun SongsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val isLoading = uiState.isLoading
+    val isRefreshing = uiState.isRefreshing
+    val wasRefreshed = uiState.wasRefreshed
     val songs = uiState.songs.collectAsLazyPagingItems()
     val summary = uiState.summary
     val sortOrder = uiState.sortOrder
@@ -60,6 +63,8 @@ internal fun SongsScreen(
     SongsScreen(
         modifier = modifier,
         isLoading = isLoading,
+        isRefreshing = isRefreshing,
+        wasRefreshed = wasRefreshed,
         songs = songs,
         summary = summary,
         sortOrder = sortOrder,
@@ -107,6 +112,8 @@ internal fun SongsScreen(
 internal fun SongsScreen(
     modifier: Modifier = Modifier,
     isLoading: Boolean = true,
+    isRefreshing: Boolean = false,
+    wasRefreshed: Boolean = false,
     songs: LazyPagingItems<Song>,
     summary: SongsSummary,
     sortOrder: SongSortOrder,
@@ -120,10 +127,12 @@ internal fun SongsScreen(
     onMenuClick: (song: Song) -> Unit
 ) {
     AudilyAdaptiveLayout(
-        compact = {
-            CompactSongs(
+        portrait = {
+            PortraitSongsLayout(
                 modifier = modifier,
                 isLoading = isLoading,
+                isRefreshing = isRefreshing,
+                wasRefreshed = wasRefreshed,
                 songs = songs,
                 summary = summary,
                 sortOrder = sortOrder,
@@ -138,9 +147,30 @@ internal fun SongsScreen(
             )
         },
         landscape = {
-            LandscapeSongs(
+            LandscapeSongsLayout(
                 modifier = modifier,
                 isLoading = isLoading,
+                isRefreshing = isRefreshing,
+                wasRefreshed = wasRefreshed,
+                songs = songs,
+                summary = summary,
+                sortOrder = sortOrder,
+                sortType = sortType,
+                playbackState = playbackState,
+                screenState = screenState,
+                onBack = onBack,
+                onSearchClick = onSearchClick,
+                onSortClick = onSortClick,
+                onEvent = onEvent,
+                onMenuClick = onMenuClick
+            )
+        },
+        medium = {
+            MediumSongsLayout(
+                modifier = modifier,
+                isLoading = isLoading,
+                isRefreshing = isRefreshing,
+                wasRefreshed = wasRefreshed,
                 songs = songs,
                 summary = summary,
                 sortOrder = sortOrder,
@@ -155,10 +185,11 @@ internal fun SongsScreen(
             )
         },
         expanded = {
-            // Logic: Tablet/Fold sẽ dùng Landscape cho đến khi có Two-Pane đặc thù
-            ExpandedSongs(
+            ExpandedSongsLayout(
                 modifier = modifier,
                 isLoading = isLoading,
+                isRefreshing = isRefreshing,
+                wasRefreshed = wasRefreshed,
                 songs = songs,
                 summary = summary,
                 sortOrder = sortOrder,

@@ -19,7 +19,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 import com.lotusreichhart.audily.feature.nowplaying.R
 
 @Composable
-internal fun NowPlayingHeader(
+internal fun NowPlayingTopBar(
     onCloseClick: () -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
