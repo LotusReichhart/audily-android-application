@@ -52,7 +52,7 @@ internal fun HomeContentShimmer(
                     contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
                 ) {
-                    items(5) {
+                    items(10) {
                         HomeSongCardShimmer(size = 135.dp)
                     }
                 }
@@ -65,7 +65,7 @@ internal fun HomeContentShimmer(
                     contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
                 ) {
-                    items(5) {
+                    items(10) {
                         HomeSongCardShimmer(size = 80.dp)
                     }
                 }
@@ -82,7 +82,7 @@ internal fun HomeContentShimmer(
                     contentPadding = PaddingValues(horizontal = LocalDimensions.current.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
                 ) {
-                    items(3) {
+                    items(10) {
                         Box(
                             modifier = Modifier
                                 .width(220.dp)

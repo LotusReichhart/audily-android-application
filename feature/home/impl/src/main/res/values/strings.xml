@@ -13,4 +13,8 @@
     <string name="feature_home_impl_section_discovery">Quick picks</string>
     <string name="feature_home_impl_action_shuffle_all">Shuffle all</string>
     <string name="feature_home_impl_action_resume">Resume</string>
+
+    <string name="feature_home_impl_empty_title">Welcome to Audily</string>
+    <string name="feature_home_impl_empty_subtitle">It\'s a bit quiet here. Head over to your library to scan and bring this space to life.</string>
+    <string name="feature_home_impl_empty_action">Open library</string>
 </resources>

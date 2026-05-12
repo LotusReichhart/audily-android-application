@@ -26,9 +26,9 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.feature.songs.impl.R
 
 @Composable
-internal fun SongsEmptyScreen(
+internal fun SongsNotFoundScreen(
     innerPadding: PaddingValues,
-    onScanClick: () -> Unit,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -44,15 +44,15 @@ internal fun SongsEmptyScreen(
         Icon(
             imageVector = ImageVector.vectorResource(id = AudilyIcons.SongEmpty),
             contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+            modifier = Modifier.size(80.dp),
+            tint = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(dimensions.paddingLarge))
 
         Text(
-            text = stringResource(id = R.string.feature_songs_impl_empty_title),
-            style = MaterialTheme.typography.headlineSmall,
+            text = stringResource(id = R.string.feature_songs_impl_not_found_title),
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -60,19 +60,17 @@ internal fun SongsEmptyScreen(
         Spacer(modifier = Modifier.height(dimensions.paddingSmall))
 
         Text(
-            text = stringResource(id = R.string.feature_songs_impl_empty_description),
+            text = stringResource(id = R.string.feature_songs_impl_not_found_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = dimensions.paddingMedium)
+            textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(dimensions.paddingExtraLarge))
+        Spacer(modifier = Modifier.height(dimensions.paddingLarge))
 
         AudilyButton(
-            text = stringResource(id = R.string.feature_songs_impl_empty_action_scan),
-            leadingIcon = AudilyIcons.Search,
-            onClick = onScanClick
+            text = stringResource(id = R.string.feature_songs_impl_action_refresh),
+            onClick = onRefreshClick
         )
     }
 }

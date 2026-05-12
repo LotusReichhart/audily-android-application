@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.feature.songs.impl.component
+package com.lotusreichhart.audily.feature.songs.impl.layout
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -33,23 +33,31 @@ import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import com.lotusreichhart.audily.feature.songs.impl.SongsScreenState
 import com.lotusreichhart.audily.feature.songs.impl.SongsUiEvent
+import com.lotusreichhart.audily.feature.songs.impl.component.HeaderSticky
+import com.lotusreichhart.audily.feature.songs.impl.component.SongSwipeItem
+import com.lotusreichhart.audily.feature.songs.impl.component.SongsEmptyScreen
+import com.lotusreichhart.audily.feature.songs.impl.component.SongsLoadingScreen
+import com.lotusreichhart.audily.feature.songs.impl.component.SongsNotFoundScreen
+import com.lotusreichhart.audily.feature.songs.impl.component.SongsTopBar
 import com.lotusreichhart.audily.feature.songs.impl.util.getPlaybackStatus
 import com.lotusreichhart.audily.feature.songs.impl.util.labelResId
 
 @Composable
-internal fun CompactSongs(
+internal fun LandscapeSongsLayout(
     modifier: Modifier = Modifier,
     isLoading: Boolean = true,
+    isRefreshing: Boolean = false,
+    wasRefreshed: Boolean = false,
     songs: LazyPagingItems<Song>,
     summary: SongsSummary,
     sortOrder: SongSortOrder,
     sortType: SortOrderType,
     playbackState: PlaybackState,
     screenState: SongsScreenState,
-    onEvent: (SongsUiEvent) -> Unit,
     onBack: () -> Unit,
     onSearchClick: () -> Unit,
     onSortClick: () -> Unit,
+    onEvent: (SongsUiEvent) -> Unit,
     onMenuClick: (song: Song) -> Unit
 ) {
     AudilyScaffold(
@@ -60,17 +68,24 @@ internal fun CompactSongs(
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Crossfade(
-            targetState = isLoading,
+            targetState = isLoading || isRefreshing,
             animationSpec = tween(durationMillis = 500),
             label = "SongsLoadingCrossfade"
-        ) { isLoading ->
-            if (isLoading) {
+        ) { loading ->
+            if (loading) {
                 SongsLoadingScreen(innerPadding = innerPadding)
             } else if (songs.itemCount == 0) {
-                SongsEmptyScreen(
-                    innerPadding = innerPadding,
-                    onScanClick = { onEvent(SongsUiEvent.Refresh) }
-                )
+                if (wasRefreshed) {
+                    SongsNotFoundScreen(
+                        innerPadding = innerPadding,
+                        onRefreshClick = { onEvent(SongsUiEvent.Refresh) }
+                    )
+                } else {
+                    SongsEmptyScreen(
+                        innerPadding = innerPadding,
+                        onScanClick = { onEvent(SongsUiEvent.Refresh) }
+                    )
+                }
             } else {
                 Box(
                     modifier = modifier

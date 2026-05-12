@@ -16,5 +16,7 @@ internal data class SongsUiState(
     val sortType: SortOrderType = SortOrderType.ASC,
     val playbackState: PlaybackState = PlaybackState.INITIAL,
     val allSongIds: List<Long> = emptyList(),
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val wasRefreshed: Boolean = false
 )

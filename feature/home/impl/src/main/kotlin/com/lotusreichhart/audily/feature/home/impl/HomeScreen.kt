@@ -7,9 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
-import com.lotusreichhart.audily.feature.home.impl.component.CompactHome
-import com.lotusreichhart.audily.feature.home.impl.component.ExpandedHome
-import com.lotusreichhart.audily.feature.home.impl.component.LandscapeHome
+import com.lotusreichhart.audily.feature.home.impl.layout.PortraitHomeLayout
+import com.lotusreichhart.audily.feature.home.impl.layout.ExpandedHomeLayout
+import com.lotusreichhart.audily.feature.home.impl.layout.LandscapeHomeLayout
+import com.lotusreichhart.audily.feature.home.impl.layout.MediumHomeLayout
 
 @Composable
 internal fun HomeScreen(
@@ -51,8 +52,8 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     AudilyAdaptiveLayout(
-        compact = {
-            CompactHome(
+        portrait = {
+            PortraitHomeLayout(
                 uiState = uiState,
                 modifier = modifier,
                 onNavigateToSongs = onNavigateToSongs,
@@ -63,7 +64,18 @@ internal fun HomeScreen(
             )
         },
         landscape = {
-            LandscapeHome(
+            LandscapeHomeLayout(
+                uiState = uiState,
+                modifier = modifier,
+                onNavigateToSongs = onNavigateToSongs,
+                onNavigateToPlaylists = onNavigateToPlaylists,
+                onNavigateToAlbums = onNavigateToAlbums,
+                onSearchClick = onSearchClick,
+                onEvent = onEvent
+            )
+        },
+        medium = {
+            MediumHomeLayout(
                 uiState = uiState,
                 modifier = modifier,
                 onNavigateToSongs = onNavigateToSongs,
@@ -74,7 +86,7 @@ internal fun HomeScreen(
             )
         },
         expanded = {
-            ExpandedHome(
+            ExpandedHomeLayout(
                 uiState = uiState,
                 modifier = modifier,
                 onNavigateToSongs = onNavigateToSongs,
