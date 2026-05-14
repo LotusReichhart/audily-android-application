@@ -24,7 +24,7 @@
 
     <string name="feature_nowplaying_sheet_speed">Tốc độ</string>
     <string name="feature_nowplaying_sheet_pitch">Cao độ</string>
-    <string name="feature_nowplaying_sheet_reset_to_default">Khôi phục mặc định</string>
+    <string name="feature_nowplaying_sheet_reset_to_default">Mặc định</string>
     <string name="feature_nowplaying_sheet_speed_save">Lưu</string>
 
     <string name="feature_nowplaying_sheet_seconds">Giây</string>

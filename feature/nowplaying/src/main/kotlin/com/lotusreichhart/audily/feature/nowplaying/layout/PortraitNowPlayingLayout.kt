@@ -13,15 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -69,9 +65,6 @@ internal fun PortraitNowPlayingLayout(
         containerColor = Color.Transparent,
         topBar = {
             NowPlayingTopBar(
-                modifier = modifier
-                    .padding(horizontal = LocalDimensions.current.paddingMedium)
-                    .padding(bottom = LocalDimensions.current.paddingMedium),
                 onCloseClick = onCloseClick,
                 onMenuClick = onMenuClick
             )
@@ -95,7 +88,7 @@ internal fun PortraitNowPlayingLayout(
                 .padding(innerPadding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
@@ -112,16 +105,17 @@ internal fun PortraitNowPlayingLayout(
                     ) { lyricsVisible ->
                         if (lyricsVisible) {
                             Column(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(LocalDimensions.current.paddingMedium)
+                                        .padding(horizontal = LocalDimensions.current.paddingMedium)
                                         .clip(RoundedCornerShape(12.dp))
                                         .background(SurfaceVariantDark.copy(alpha = 0.7f))
                                         .padding(LocalDimensions.current.paddingSmall),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall),
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     AudilyArtwork(
                                         artworkUri = uiState.currentSong?.basic?.artworkUri,
@@ -132,10 +126,9 @@ internal fun PortraitNowPlayingLayout(
                                                 ),
                                                 animatedVisibilityScope = this@AnimatedContent
                                             )
-                                            .size(56.dp)
+                                            .size(52.dp)
                                             .clip(RoundedCornerShape(12.dp))
                                     )
-                                    Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
                                     NowPlayingInfo(
                                         title = uiState.currentSong?.basic?.title
                                             ?: stringResource(coreR.string.core_designsystem_unknown_title),
@@ -145,16 +138,19 @@ internal fun PortraitNowPlayingLayout(
                                         onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) }
                                     )
                                 }
-                                NowPlayingNoLyrics(modifier = Modifier.fillMaxHeight())
+                                NowPlayingNoLyrics(modifier = Modifier.fillMaxWidth())
                             }
                         } else {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(
+                                    space = LocalDimensions.current.paddingSmall,
+                                    alignment = Alignment.CenterVertically
+                                )
                             ) {
                                 NowPlayingArtworkPager(
                                     modifier = Modifier
-                                        .weight(1f)
                                         .fillMaxWidth(),
                                     artworkModifier = Modifier
                                         .fillMaxWidth()
@@ -164,7 +160,6 @@ internal fun PortraitNowPlayingLayout(
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = this@AnimatedContent
                                 )
-                                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingSmall))
                                 NowPlayingInfo(
                                     modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
                                     title = uiState.currentSong?.basic?.title
@@ -180,10 +175,14 @@ internal fun PortraitNowPlayingLayout(
                 }
             }
 
-            Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
-
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .weight(0.3f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(
+                    space = LocalDimensions.current.paddingExtraSmall,
+                    alignment = Alignment.CenterVertically
+                )
             ) {
                 NowPlayingProgress(
                     modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
@@ -199,12 +198,8 @@ internal fun PortraitNowPlayingLayout(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingLarge))
-
                 NowPlayingControls(
-                    modifier = Modifier
-                        .padding(horizontal = LocalDimensions.current.paddingMedium)
-                        .padding(bottom = LocalDimensions.current.paddingMedium),
+                    modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
                     isPlaying = uiState.playbackState.nowPlayingState == NowPlayingState.PLAYING,
                     isShuffleOn = uiState.playbackState.isShuffleOn,
                     repeatMode = uiState.playbackState.repeatMode,
@@ -219,7 +214,6 @@ internal fun PortraitNowPlayingLayout(
                     hasPrevious = uiState.hasPrevious
                 )
             }
-            Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
         }
     }
 }

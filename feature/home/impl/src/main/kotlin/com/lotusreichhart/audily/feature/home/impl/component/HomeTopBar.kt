@@ -38,6 +38,7 @@ internal fun HomeTopBar(
         modifier = Modifier
             .statusBarsPadding()
             .fillMaxWidth()
+            .padding(top = LocalDimensions.current.paddingExtraSmall)
             .padding(bottom = LocalDimensions.current.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall)
     ) {

@@ -29,8 +29,7 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRai
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRailItem
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import androidx.compose.runtime.movableContentOf
-import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationDrawerItem
-import com.lotusreichhart.audily.core.designsystem.component.AudilyPermanentNavigationDrawer
+
 import kotlin.math.roundToInt
 
 /**
@@ -130,7 +129,7 @@ fun AudilyNavigationSuiteScaffold(
                 }
             }
 
-            AudilyWindowSize.Landscape, AudilyWindowSize.Medium -> {
+            AudilyWindowSize.Landscape, AudilyWindowSize.Medium, AudilyWindowSize.Expanded -> {
                 Row(modifier = Modifier.fillMaxSize()) {
                     AudilyNavigationRail {
                         navItems.forEach { item ->
@@ -156,47 +155,6 @@ fun AudilyNavigationSuiteScaffold(
                                     Text(
                                         text = stringResource(id = item.iconTextId),
                                         style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    ) {
-                        movableMainContent()
-                    }
-                }
-            }
-
-            AudilyWindowSize.Expanded -> {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    AudilyPermanentNavigationDrawer {
-                        navItems.forEach { item ->
-                            val selected = currentKey == item.key
-                            AudilyNavigationDrawerItem(
-                                selected = selected,
-                                onClick = { onNavItemClick(item.key) },
-                                icon = {
-                                    Icon(
-                                        painter = painterResource(id = item.unselectedIcon),
-                                        contentDescription = stringResource(id = item.iconTextId),
-                                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
-                                    )
-                                },
-                                selectedIcon = {
-                                    Icon(
-                                        painter = painterResource(id = item.selectedIcon),
-                                        contentDescription = stringResource(id = item.iconTextId),
-                                        modifier = Modifier.size(LocalDimensions.current.iconSizeMedium)
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(id = item.iconTextId),
-                                        style = MaterialTheme.typography.labelLarge
                                     )
                                 }
                             )

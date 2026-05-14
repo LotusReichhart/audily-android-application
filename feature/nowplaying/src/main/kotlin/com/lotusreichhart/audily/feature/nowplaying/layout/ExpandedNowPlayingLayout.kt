@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,8 +26,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
@@ -70,19 +67,16 @@ internal fun ExpandedNowPlayingLayout(
         containerColor = Color.Transparent,
         topBar = {
             NowPlayingTopBar(
-                modifier = modifier
-                    .padding(horizontal = LocalDimensions.current.paddingMedium)
-                    .padding(bottom = LocalDimensions.current.paddingMedium),
                 onCloseClick = onCloseClick,
                 onMenuClick = onMenuClick
             )
         },
         bottomBar = {
             Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(4f))
+                Spacer(modifier = Modifier.weight(0.55f))
                 NowPlayingExtension(
                     modifier = Modifier
-                        .weight(3f)
+                        .weight(0.45f)
                         .padding(horizontal = LocalDimensions.current.paddingMedium)
                         .padding(bottom = LocalDimensions.current.paddingMedium),
                     isLyricsVisible = uiState.isLyricsVisible,
@@ -104,17 +98,17 @@ internal fun ExpandedNowPlayingLayout(
         ) {
             QueueScreen(
                 modifier = Modifier
-                    .weight(4f)
+                    .weight(0.55f)
                     .fillMaxHeight(),
                 isExpanded = true
             )
 
             Column(
                 modifier = Modifier
-                    .weight(3f)
+                    .weight(0.45f)
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Box(
                     modifier = Modifier
@@ -131,16 +125,17 @@ internal fun ExpandedNowPlayingLayout(
                         ) { lyricsVisible ->
                             if (lyricsVisible) {
                                 Column(
-                                    modifier = Modifier.wrapContentSize()
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(LocalDimensions.current.paddingMedium)
+                                            .padding(horizontal = LocalDimensions.current.paddingMedium)
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(SurfaceVariantDark.copy(alpha = 0.7f))
                                             .padding(LocalDimensions.current.paddingSmall),
-                                        verticalAlignment = Alignment.CenterVertically
+                                        horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall),
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         AudilyArtwork(
                                             artworkUri = uiState.currentSong?.basic?.artworkUri,
@@ -151,10 +146,9 @@ internal fun ExpandedNowPlayingLayout(
                                                     ),
                                                     animatedVisibilityScope = this@AnimatedContent
                                                 )
-                                                .size(56.dp)
+                                                .size(52.dp)
                                                 .clip(RoundedCornerShape(12.dp))
                                         )
-                                        Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
                                         NowPlayingInfo(
                                             title = uiState.currentSong?.basic?.title
                                                 ?: stringResource(coreR.string.core_designsystem_unknown_title),
@@ -164,15 +158,20 @@ internal fun ExpandedNowPlayingLayout(
                                             onFavoriteClick = { onEvent(NowPlayingUiEvent.OnToggleFavorite) }
                                         )
                                     }
-                                    NowPlayingNoLyrics(modifier = Modifier.fillMaxHeight())
+                                    NowPlayingNoLyrics(modifier = Modifier.fillMaxWidth())
                                 }
                             } else {
                                 Column(
-                                    verticalArrangement = Arrangement.Top,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(
+                                        space = LocalDimensions.current.paddingSmall,
+                                        alignment = Alignment.CenterVertically
+                                    )
                                 ) {
                                     NowPlayingArtworkPager(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
                                         artworkModifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = LocalDimensions.current.paddingMedium),
@@ -181,7 +180,6 @@ internal fun ExpandedNowPlayingLayout(
                                         sharedTransitionScope = sharedTransitionScope,
                                         animatedVisibilityScope = this@AnimatedContent
                                     )
-                                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingSmall))
                                     NowPlayingInfo(
                                         modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
                                         title = uiState.currentSong?.basic?.title
@@ -197,13 +195,13 @@ internal fun ExpandedNowPlayingLayout(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingMedium))
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.spacedBy(
+                        space = LocalDimensions.current.paddingExtraSmall,
+                        alignment = Alignment.CenterVertically
+                    )
                 ) {
                     NowPlayingProgress(
                         modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
@@ -218,8 +216,6 @@ internal fun ExpandedNowPlayingLayout(
                             }
                         }
                     )
-
-                    Spacer(modifier = Modifier.height(LocalDimensions.current.paddingSmall))
 
                     NowPlayingControls(
                         modifier = Modifier.padding(horizontal = LocalDimensions.current.paddingMedium),
@@ -236,8 +232,6 @@ internal fun ExpandedNowPlayingLayout(
                         hasNext = uiState.hasNext,
                         hasPrevious = uiState.hasPrevious
                     )
-
-                    Spacer(Modifier.height(LocalDimensions.current.paddingMedium))
                 }
             }
         }

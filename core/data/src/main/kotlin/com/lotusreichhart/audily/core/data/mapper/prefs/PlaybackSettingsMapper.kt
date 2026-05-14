@@ -7,7 +7,7 @@ import com.lotusreichhart.audily.core.model.prefs.PlaybackSettings
 
 internal fun PlaybackSettingsProto.toDomain(): PlaybackSettings {
     return PlaybackSettings(
-        skipDuration = if (skipDuration > 0) skipDuration else 10_000,
+        skipDuration = if (skipDuration > 0) skipDuration else 10,
         pauseOnUnplug = pauseOnUnplug,
         playbackSpeed = if (playbackSpeed > 0f) playbackSpeed else 1.0f,
         playbackPitch = if (playbackPitch > 0f) playbackPitch else 1.0f,
