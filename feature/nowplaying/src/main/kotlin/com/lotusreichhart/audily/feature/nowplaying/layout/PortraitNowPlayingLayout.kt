@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -91,9 +93,7 @@ internal fun PortraitNowPlayingLayout(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
-                modifier = Modifier
-                    .weight(0.6f)
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 with(sharedTransitionScope) {
                     AnimatedContent(
@@ -176,11 +176,9 @@ internal fun PortraitNowPlayingLayout(
             }
 
             Column(
-                modifier = Modifier
-                    .weight(0.3f)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(
-                    space = LocalDimensions.current.paddingExtraSmall,
+                    space = LocalDimensions.current.paddingSmall,
                     alignment = Alignment.CenterVertically
                 )
             ) {
@@ -214,6 +212,7 @@ internal fun PortraitNowPlayingLayout(
                     hasPrevious = uiState.hasPrevious
                 )
             }
+            Spacer(modifier = Modifier.height(LocalDimensions.current.paddingExtraSmall))
         }
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
@@ -113,9 +114,7 @@ internal fun MediumNowPlayingLayout(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Box(
-                    modifier = Modifier
-                        .weight(0.6f)
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     with(sharedTransitionScope) {
                         AnimatedContent(
@@ -198,11 +197,9 @@ internal fun MediumNowPlayingLayout(
                 }
 
                 Column(
-                    modifier = Modifier
-                        .weight(0.3f)
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(
-                        space = LocalDimensions.current.paddingExtraSmall,
+                        space = LocalDimensions.current.paddingSmall,
                         alignment = Alignment.CenterVertically
                     )
                 ) {
@@ -236,6 +233,7 @@ internal fun MediumNowPlayingLayout(
                         hasPrevious = uiState.hasPrevious
                     )
                 }
+                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingExtraSmall))
             }
         }
     }
