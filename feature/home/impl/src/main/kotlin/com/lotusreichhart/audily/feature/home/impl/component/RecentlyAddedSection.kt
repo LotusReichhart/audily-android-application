@@ -53,8 +53,8 @@ internal fun RecentlyAddedSection(
                         AudilyArtwork(
                             artworkUri = song.basic.artworkUri,
                             modifier = Modifier
-                                .width(220.dp)
-                                .height(150.dp)
+                                .width(260.dp)
+                                .height(180.dp)
                                 .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium)),
                             isAspectRatio = false
                         )
