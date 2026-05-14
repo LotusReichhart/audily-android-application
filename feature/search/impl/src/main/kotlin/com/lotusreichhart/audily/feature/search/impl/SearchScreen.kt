@@ -18,9 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,8 +34,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
 import com.lotusreichhart.audily.core.designsystem.component.SongItem
-import com.lotusreichhart.audily.core.designsystem.component.SongPlaybackStatus
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.util.getSongPlaybackStatus
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
 import com.lotusreichhart.audily.core.ui.GlobalParams
@@ -96,6 +99,7 @@ internal fun SearchScreen(
 ) {
     val dimensions = LocalDimensions.current
     val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         delay(300)
@@ -109,7 +113,13 @@ internal fun SearchScreen(
             uiState.playlists.isEmpty()
 
     AudilyScaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            },
         topBar = {
             SearchTopBar(
                 query = uiState.query,
@@ -159,7 +169,10 @@ internal fun SearchScreen(
                                     items(uiState.albums) { album ->
                                         SearchAlbumItem(
                                             album = album,
-                                            onClick = { onEvent(SearchUiEvent.OnAlbumClick(it.id)) },
+                                            onClick = {
+                                                onEvent(SearchUiEvent.OnAlbumClick(it.id))
+                                                focusManager.clearFocus()
+                                            },
                                             isVertical = true
                                         )
                                     }
@@ -188,7 +201,10 @@ internal fun SearchScreen(
                                     items(uiState.playlists) { playlist ->
                                         SearchPlaylistItem(
                                             playlist = playlist,
-                                            onClick = { onEvent(SearchUiEvent.OnPlaylistClick(it.id)) },
+                                            onClick = {
+                                                onEvent(SearchUiEvent.OnPlaylistClick(it.id))
+                                                focusManager.clearFocus()
+                                            },
                                             isVertical = true
                                         )
                                     }
@@ -213,6 +229,8 @@ internal fun SearchScreen(
                             items(songs.itemCount) { index ->
                                 val song = songs[index]
                                 if (song != null) {
+                                    val playbackStatus =
+                                        getSongPlaybackStatus(song.id, uiState.playbackState)
                                     SongItem(
                                         title = song.basic.title,
                                         artist = song.basic.artist,
@@ -222,11 +240,14 @@ internal fun SearchScreen(
                                                 modifier = Modifier.fillMaxSize()
                                             )
                                         },
-                                        onClick = { onEvent(SearchUiEvent.OnSongClick(song.id)) },
+                                        onClick = {
+                                            onEvent(SearchUiEvent.OnSongClick(song.id))
+                                            focusManager.clearFocus()
+                                        },
                                         onMenuClick = { onMenuClick(song) },
                                         isMissing = song.isMissing,
                                         isFavorite = song.isFavorite,
-                                        playbackStatus = SongPlaybackStatus.NONE
+                                        playbackStatus = playbackStatus,
                                     )
                                 }
                             }
@@ -244,6 +265,8 @@ internal fun SearchScreen(
                                 items(songs.itemCount) { index ->
                                     val song = songs[index]
                                     if (song != null) {
+                                        val playbackStatus =
+                                            getSongPlaybackStatus(song.id, uiState.playbackState)
                                         SongItem(
                                             title = song.basic.title,
                                             artist = song.basic.artist,
@@ -253,11 +276,14 @@ internal fun SearchScreen(
                                                     modifier = Modifier.fillMaxSize()
                                                 )
                                             },
-                                            onClick = { onEvent(SearchUiEvent.OnSongClick(song.id)) },
+                                            onClick = {
+                                                onEvent(SearchUiEvent.OnSongClick(song.id))
+                                                focusManager.clearFocus()
+                                            },
                                             onMenuClick = { onMenuClick(song) },
                                             isMissing = song.isMissing,
                                             isFavorite = song.isFavorite,
-                                            playbackStatus = SongPlaybackStatus.NONE
+                                            playbackStatus = playbackStatus,
                                         )
                                     }
                                 }
@@ -267,7 +293,10 @@ internal fun SearchScreen(
                                 items(uiState.albums) { album ->
                                     SearchAlbumItem(
                                         album = album,
-                                        onClick = { onEvent(SearchUiEvent.OnAlbumClick(it.id)) },
+                                        onClick = {
+                                            onEvent(SearchUiEvent.OnAlbumClick(it.id))
+                                            focusManager.clearFocus()
+                                        },
                                         isVertical = false
                                     )
                                 }
@@ -277,7 +306,10 @@ internal fun SearchScreen(
                                 items(uiState.playlists) { playlist ->
                                     SearchPlaylistItem(
                                         playlist = playlist,
-                                        onClick = { onEvent(SearchUiEvent.OnPlaylistClick(it.id)) },
+                                        onClick = {
+                                            onEvent(SearchUiEvent.OnPlaylistClick(it.id))
+                                            focusManager.clearFocus()
+                                        },
                                         isVertical = false
                                     )
                                 }

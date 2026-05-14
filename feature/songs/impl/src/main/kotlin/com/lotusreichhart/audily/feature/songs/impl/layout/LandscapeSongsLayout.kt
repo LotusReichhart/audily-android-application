@@ -39,7 +39,7 @@ import com.lotusreichhart.audily.feature.songs.impl.component.SongsEmptyScreen
 import com.lotusreichhart.audily.feature.songs.impl.component.SongsLoadingScreen
 import com.lotusreichhart.audily.feature.songs.impl.component.SongsNotFoundScreen
 import com.lotusreichhart.audily.feature.songs.impl.component.SongsTopBar
-import com.lotusreichhart.audily.feature.songs.impl.util.getPlaybackStatus
+import com.lotusreichhart.audily.core.designsystem.util.getSongPlaybackStatus
 import com.lotusreichhart.audily.feature.songs.impl.util.labelResId
 
 @Composable
@@ -128,7 +128,7 @@ internal fun LandscapeSongsLayout(
                         ) { index ->
                             val song = songs[index]
                             if (song != null) {
-                                val playbackStatus = getPlaybackStatus(song.id, playbackState)
+                                val playbackStatus = getSongPlaybackStatus(song.id, playbackState)
 
                                 SongSwipeItem(
                                     song = song,

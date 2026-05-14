@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.lotusreichhart.audily.core.domain.usecase.album.GetAlbumsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.GetPlaylistsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongIdsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongsPagedUseCase
@@ -32,6 +33,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SearchViewModel @Inject constructor(
+    observePlaybackStateUseCase: ObservePlaybackStateUseCase,
     private val getSongsPagedUseCase: GetSongsPagedUseCase,
     private val getAlbumsUseCase: GetAlbumsUseCase,
     private val getPlaylistsUseCase: GetPlaylistsUseCase,
@@ -97,16 +99,17 @@ internal class SearchViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<SearchUiState> = combine(
-        _query,
-        _searchType,
+        combine(_query, _searchType) { q, t -> q to t },
         _albums,
         _playlists,
-        _allSongIds
-    ) { query, type, albums, playlists, allSongIds ->
+        _allSongIds,
+        observePlaybackStateUseCase()
+    ) { (query, type), albums, playlists, allSongIds, playbackState ->
         SearchUiState(
             query = query,
             searchType = type,
             songs = _songs,
+            playbackState = playbackState,
             albums = albums,
             playlists = playlists,
             allSongIds = allSongIds

@@ -5,21 +5,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
@@ -30,7 +25,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -191,96 +185,6 @@ fun AudilyNavigationRailItem(
                 if (label != null) {
                     label()
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun AudilyPermanentNavigationDrawer(
-    modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = AudilyNavigationDefaults.navigationContentColor(),
-    header: @Composable (() -> Unit)? = null,
-    windowInsets: WindowInsets = NavigationBarDefaults.windowInsets,
-    content: @Composable () -> Unit,
-) {
-    Surface(
-        color = containerColor,
-        contentColor = contentColor,
-        modifier = modifier
-            .fillMaxHeight()
-            .width(IntrinsicSize.Min)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .windowInsetsPadding(windowInsets)
-                .padding(top = LocalDimensions.current.paddingSmall)
-                .padding(horizontal = LocalDimensions.current.paddingMedium),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingExtraSmall)
-        ) {
-            if (header != null) {
-                header()
-                Spacer(modifier = Modifier.height(LocalDimensions.current.paddingLarge))
-            }
-            content()
-        }
-    }
-}
-
-@Composable
-fun AudilyNavigationDrawerItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-    label: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
-    enabled: Boolean = true,
-) {
-    val backgroundColor = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        Color.Transparent
-    }
-
-    val contentColor = if (selected) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        AudilyNavigationDefaults.navigationContentColor()
-    }
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Tab,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            )
-            .clip(CircleShape)
-            .background(backgroundColor)
-            .padding(
-                vertical = LocalDimensions.current.paddingSmall,
-                horizontal = LocalDimensions.current.paddingExtraLarge
-            ),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingMedium)
-            ) {
-                Box {
-                    if (selected) selectedIcon() else icon()
-                }
-                label()
             }
         }
     }
