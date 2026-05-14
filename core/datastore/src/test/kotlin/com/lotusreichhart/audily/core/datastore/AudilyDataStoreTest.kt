@@ -148,10 +148,10 @@ class AudilyDataStoreTest {
 
     @Test
     fun `Playback - update skip duration`() = testScope.runTest {
-        audilyDataStore.playback.updateSkipDuration(30_000)
+        audilyDataStore.playback.updateSkipDuration(30)
 
         val result = audilyDataStore.userPreferences.first()
-        assertEquals(30_000, result.playbackSettings.skipDuration)
+        assertEquals(30, result.playbackSettings.skipDuration)
     }
 
     @Test
