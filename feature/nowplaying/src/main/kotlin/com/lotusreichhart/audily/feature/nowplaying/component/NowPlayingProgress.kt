@@ -113,9 +113,9 @@ private fun AudilySlider(
     onValueChange: (Float) -> Unit,
     onValueChangeFinished: () -> Unit,
     modifier: Modifier = Modifier,
-    activeColor: Color = MaterialTheme.colorScheme.primary,
+    activeColor: Color = OnSurfaceDark.copy(alpha = 0.9f),
     inactiveColor: Color = OnSurfaceDark.copy(alpha = 0.1f),
-    thumbColor: Color = Color.White
+    thumbColor: Color = OnSurfaceDark
 ) {
     Slider(
         modifier = modifier,

@@ -2,10 +2,7 @@ package com.lotusreichhart.audily.feature.nowplaying.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +48,10 @@ internal fun NowPlayingControls(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.spacedBy(
+            space = 12.dp,
+            alignment = Alignment.CenterHorizontally
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Shuffle
@@ -64,7 +64,6 @@ internal fun NowPlayingControls(
             modifier = Modifier.alpha(if (isShuffleOn) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Previous
         AudilyIconButton(
             onClick = { if (hasPrevious) onSkipPreviousClick() },
@@ -75,7 +74,6 @@ internal fun NowPlayingControls(
             modifier = Modifier.alpha(if (hasPrevious) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Fast Rewind
         AudilyIconButton(
             onClick = onFastRewindClick,
@@ -85,20 +83,17 @@ internal fun NowPlayingControls(
             iconSize = 28.dp,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Play/Pause
         AudilyIconButton(
             onClick = onResumePauseClick,
             painter = painterResource(
-                id = if (isPlaying) NowPlayingIcons.Pause else NowPlayingIcons.Resume
+                id = if (isPlaying) NowPlayingIcons.PauseCircle else NowPlayingIcons.ResumeCircle
             ),
             contentDescription = "Play/Pause",
-            iconSize = 28.dp,
-            containerSize = 56.dp,
-            backgroundColor = MaterialTheme.colorScheme.primary,
+            iconSize = 60.dp,
+            containerSize = 60.dp,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Fast Forward
         AudilyIconButton(
             onClick = onFastForwardClick,
@@ -108,7 +103,6 @@ internal fun NowPlayingControls(
             iconSize = 28.dp,
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Next
         AudilyIconButton(
             onClick = { if (hasNext) onSkipNextClick() },
@@ -119,7 +113,6 @@ internal fun NowPlayingControls(
             modifier = Modifier.alpha(if (hasNext) 1f else 0.7f),
             tint = OnSurfaceDark
         )
-        Spacer(modifier = Modifier.width(12.dp))
         // Repeat
         AudilyIconButton(
             onClick = {
