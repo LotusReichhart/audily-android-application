@@ -1,4 +1,7 @@
 @file:Suppress("UnstableApiUsage")
+
+include(":feature:playlists:impl")
+
 pluginManagement {
     includeBuild("build-logic")
     repositories {

@@ -77,6 +77,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
 import com.lotusreichhart.audily.core.ui.util.findActivity
+import com.lotusreichhart.audily.feature.playlists.impl.navigation.playlistsEntry
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -163,12 +164,11 @@ internal fun AudilyApp(
 
                 is GlobalUiEvent.ShowSnackbar -> {
                     launch {
-                        // Dismiss current snackbar to show the new one immediately and reset timer
                         snackbarHostState.currentSnackbarData?.dismiss()
 
                         val result = snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.actionLabel,
+                            message = event.message.asString(context),
+                            actionLabel = event.actionLabel?.asString(context),
                             duration = event.duration
                         )
                         if (result == SnackbarResult.ActionPerformed) {
@@ -286,6 +286,7 @@ internal fun AudilyApp(
                     }
                 )
                 songsEntry(navigator = appState.navigator)
+                playlistsEntry(navigator = appState.navigator)
                 searchEntry(onBack = { appState.navigator.goBack() })
                 entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
                 entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }

@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.core.designsystem.resource
 import com.lotusreichhart.audily.core.designsystem.R
 
 object AudilyIcons {
+    val Add = R.drawable.core_designsystem_ic_add
     val ArrowLeft = R.drawable.core_designsystem_ic_arrow_left
     val ArrowDown = R.drawable.core_designsystem_ic_arrow_down
     val Close = R.drawable.core_designsystem_ic_close
