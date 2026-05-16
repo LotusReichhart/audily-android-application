@@ -9,8 +9,7 @@ data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    @ColumnInfo(name = "image_uri")
-    val imageUri: String?,
+    val description: String?,
     @ColumnInfo(name = "created_at")
     val createdAt: Long,
 )

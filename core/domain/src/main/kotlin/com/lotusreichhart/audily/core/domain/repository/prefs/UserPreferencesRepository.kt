@@ -53,9 +53,7 @@ interface UserPreferencesRepository {
         songId: Long?,
         position: Long,
         duration: Long,
-        queueIds: List<Long>,
-        sourceId: Long? = null,
-        sourceType: String? = null
+        queueIds: List<Long>
     )
 
     suspend fun clearPlaybackSession()

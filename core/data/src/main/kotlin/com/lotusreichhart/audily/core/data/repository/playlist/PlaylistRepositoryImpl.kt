@@ -18,6 +18,9 @@ import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.Song
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -38,8 +41,19 @@ internal class PlaylistRepositoryImpl @Inject constructor(
             sortOrder = sortOrder.toPlaylistDaoSortOrder(),
             sortType = sortType.toDaoSortOrderType()
         ).map { entities ->
-            entities.map { withCount ->
-                withCount.playlist.toPlaylist(songCount = withCount.songCount)
+            coroutineScope {
+                entities.map { withCount ->
+                    async {
+                        val topSongIds =
+                            playlistDao.getTopSongIdsInPlaylist(withCount.playlist.id, 4)
+                        val artworks = mediaStoreDataSource.getBasicSongs(topSongIds)
+                            .map { it.basic.artworkUri }
+                        withCount.playlist.toPlaylist(
+                            songCount = withCount.songCount,
+                            artworkUris = artworks
+                        )
+                    }
+                }.awaitAll()
             }
         }
     }
@@ -49,14 +63,23 @@ internal class PlaylistRepositoryImpl @Inject constructor(
             playlistDao.getPlaylistById(id),
             playlistDao.getSongIdsInPlaylist(id)
         ) { entity, ids ->
-            entity?.toPlaylist(songCount = ids.size)
+            if (entity == null) return@combine null
+
+            val topSongIds = ids.take(4)
+            val artworks =
+                mediaStoreDataSource.getBasicSongs(topSongIds).map { it.basic.artworkUri }
+
+            entity.toPlaylist(
+                songCount = ids.size,
+                artworkUris = artworks
+            )
         }
     }
 
     override suspend fun createPlaylist(name: String, description: String?): Long {
         val playlist = PlaylistEntity(
             name = name,
-            imageUri = null,
+            description = description,
             createdAt = System.currentTimeMillis()
         )
         return playlistDao.insertPlaylist(playlist)
@@ -94,7 +117,8 @@ internal class PlaylistRepositoryImpl @Inject constructor(
             }
         ).flow.map { pagingData ->
             pagingData.map { crossRef ->
-                mediaStoreDataSource.getSong(crossRef.songId)?.toSong(position = crossRef.position)
+                mediaStoreDataSource.getSong(crossRef.songId)
+                    ?.toSong(position = crossRef.position)
                     ?: Song(
                         id = crossRef.songId,
                         basic = BasicSongMetadata.EMPTY,

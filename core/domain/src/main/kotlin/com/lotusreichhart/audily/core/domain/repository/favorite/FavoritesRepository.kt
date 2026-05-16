@@ -20,6 +20,11 @@ interface FavoritesRepository {
     fun getFavoriteIds(): Flow<List<Long>>
 
     /**
+     * Lấy danh sách giới hạn bài hát yêu thích (dùng cho Preview/Artwork).
+     */
+    fun getFavoriteSongsSummary(limit: Int): Flow<List<Song>>
+
+    /**
      * Cập nhật thứ tự bài hát yêu thích sau khi kéo thả.
      */
     suspend fun updateFavoritePositions(songIds: List<Long>)

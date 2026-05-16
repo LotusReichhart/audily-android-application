@@ -67,6 +67,23 @@ internal class FavoritesRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getFavoriteSongsSummary(limit: Int): Flow<List<Song>> {
+        return favoritesDao.getFavoriteEntities(limit).map { entities ->
+            entities.map { favorite ->
+                mediaStoreDataSource.getSong(favorite.songId)
+                    ?.toSong(position = favorite.position)
+                    ?.copy(isFavorite = true)
+                    ?: Song(
+                        id = favorite.songId,
+                        basic = BasicSongMetadata.EMPTY,
+                        isFavorite = true,
+                        isMissing = true,
+                        position = favorite.position
+                    )
+            }
+        }
+    }
+
     override suspend fun updateFavoritePositions(songIds: List<Long>) {
         val time = System.currentTimeMillis()
         val favorites = songIds.mapIndexed { index, id ->

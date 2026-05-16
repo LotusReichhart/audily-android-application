@@ -13,7 +13,5 @@ data class PlaybackSessionEntity(
     val id: Int = 1,
     val currentSongId: Long?,
     val position: Long,
-    val duration: Long,
-    val sourceId: Long?,
-    val sourceType: String?
+    val duration: Long
 )
