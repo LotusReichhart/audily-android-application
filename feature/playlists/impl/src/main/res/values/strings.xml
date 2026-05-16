@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_playlists_impl_favorite_title">Favorite Vibes</string>
+
+    <string name="feature_playlists_impl_empty">You haven\'t created any playlists yet. Let\'s make your first one!</string>
+    <string name="feature_playlists_impl_add_new_playlist">Add a playlist</string>
+    <string name="feature_playlists_impl_add_new_playlist_description">Tap to get started</string>
+
+    <string name="feature_playlists_impl_playlist_sort">Sort Playlists</string>
+    <string name="feature_playlists_impl_playlist_sort_default">Default</string>
+    <string name="feature_playlists_impl_playlist_sort_accept">Accept</string>
+
+    <string name="feature_playlists_impl_sort_order_name">Name</string>
+    <string name="feature_playlists_impl_sort_order_created_date">Creation Date</string>
+    <string name="feature_playlists_impl_sort_order_number_of_songs">Number of Songs</string>
+
+    <string name="feature_playlists_impl_create_playlist">New Playlist</string>
+    <string name="feature_playlists_impl_playlist_name">Name</string>
+    <string name="feature_playlists_impl_playlist_name_placeholder">e.g., Summer Chill, Late Night Workout…</string>
+    <string name="feature_playlists_impl_playlist_name_empty_error">Playlist name cannot be empty</string>
+    <string name="feature_playlists_impl_playlist_description_optional">Description (optional)</string>
+    <string name="feature_playlists_impl_playlist_description_placeholder">What\'s the vibe of this playlist?</string>
+    <string name="feature_playlists_impl_create">Done</string>
+    <string name="feature_playlists_impl_playlist_created_success">Playlist created successfully</string>
+    <string name="feature_playlists_impl_playlist_created_failed">Failed to create playlist</string>
+</resources>

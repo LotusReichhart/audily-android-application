@@ -82,8 +82,7 @@ fun NowPlayingScreen(
                         GlobalParams.PARAM_SONG to uiState.currentSong,
                         GlobalParams.PARAM_CALLER to GlobalMenuCaller.NOW_PLAYING
                     ),
-                    isShowDragHandle = false,
-                    isFullScreen = false
+                    isShowDragHandle = false
                 )
             )
         },

@@ -19,6 +19,7 @@ import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
+import com.lotusreichhart.audily.core.ui.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -151,25 +152,22 @@ class SongMenuViewModel @Inject constructor(
             SongMenuAction.PlayNext -> playNextUseCase(song)
             SongMenuAction.AddToQueue -> addSongToQueueUseCase(song)
             SongMenuAction.ShowInfo -> {
-                Timber.d("Show info running.....")
-                Timber.d("Ui State Before: ${_uiState.value}")
                 val state = _uiState.value ?: return
                 _uiState.value = state.copy(isShowingInfoDialog = true)
-                Timber.d("Ui State After: ${_uiState.value}")
             }
 
             SongMenuAction.SetRingtone -> {
                 viewModelScope.launch {
                     when (val result = setRingtoneUseCase(song.id)) {
                         is RingtoneResult.SUCCESS -> {
-                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar("Successfully set as ringtone"))
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.DynamicString("Successfully set as ringtone")))
                         }
 
                         is RingtoneResult.NO_PERMISSION -> {
                             globalUiEventBus.emit(
                                 GlobalUiEvent.ShowSnackbar(
-                                    message = "Need Write Settings permission",
-                                    actionLabel = "GRANT",
+                                    message = UiText.DynamicString("Need Write Settings permission"),
+                                    actionLabel = UiText.DynamicString("GRANT"),
                                     onAction = {
                                         globalUiEventBus.emit(GlobalUiEvent.OpenWriteSettingsPermission)
                                     }
@@ -182,7 +180,7 @@ class SongMenuViewModel @Inject constructor(
                         }
 
                         is RingtoneResult.FAILED -> {
-                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar("Failed to set ringtone"))
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.DynamicString("Failed to set ringtone")))
                         }
                     }
                 }
