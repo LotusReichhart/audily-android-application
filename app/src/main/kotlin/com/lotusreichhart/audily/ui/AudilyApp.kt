@@ -287,7 +287,7 @@ internal fun AudilyApp(
                 )
                 songsEntry(navigator = appState.navigator)
                 playlistsEntry(navigator = appState.navigator)
-                searchEntry(onBack = { appState.navigator.goBack() })
+                searchEntry(navigator = appState.navigator)
                 entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
                 entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
             }
