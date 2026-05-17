@@ -12,5 +12,5 @@ import javax.inject.Inject
 class GetSongsUseCase @Inject constructor(
     private val songRepository: SongRepository
 ) {
-    operator fun invoke(ids: List<Long>): Flow<List<Song>> = songRepository.getSongs(ids)
+    operator fun invoke(ids: List<Long>): Flow<List<Song>> = songRepository.getSongsByIds(ids)
 }

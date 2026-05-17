@@ -23,6 +23,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -89,16 +90,28 @@ internal class PlaylistRepositoryImpl @Inject constructor(
         playlistDao.deletePlaylist(id)
     }
 
-    override suspend fun addSongToPlaylist(id: Long, songId: Long) {
+    override suspend fun updatePlaylist(id: Long, name: String, description: String?) {
+        val existing = playlistDao.getPlaylistById(id).map { it }.firstOrNull() ?: return
+        playlistDao.updatePlaylist(
+            existing.copy(
+                name = name,
+                description = description
+            )
+        )
+    }
+
+    override suspend fun addSongsToPlaylist(id: Long, songIds: List<Long>) {
         val maxPos = playlistDao.getMaxPositionInPlaylist(id) ?: -1
-        playlistDao.upsertSongToPlaylist(
+        val time = System.currentTimeMillis()
+        val crossRefs = songIds.mapIndexed { index, songId ->
             PlaylistSongCrossRef(
                 playlistId = id,
                 songId = songId,
-                addedAt = System.currentTimeMillis(),
-                position = maxPos + 1
+                addedAt = time,
+                position = maxPos + 1 + index
             )
-        )
+        }
+        playlistDao.upsertSongsToPlaylist(crossRefs)
     }
 
     override suspend fun removeSongFromPlaylist(id: Long, songId: Long) {

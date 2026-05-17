@@ -42,7 +42,7 @@ interface SongRepository {
     /**
      * Lấy thông tin đầy đủ của một danh sách bài hát theo ID.
      */
-    fun getSongs(ids: List<Long>): Flow<List<Song>>
+    fun getSongsByIds(ids: List<Long>): Flow<List<Song>>
 
     fun getBasicSong(id: Long): Flow<Song?>
     fun getBasicSongs(ids: List<Long>): Flow<List<Song>>

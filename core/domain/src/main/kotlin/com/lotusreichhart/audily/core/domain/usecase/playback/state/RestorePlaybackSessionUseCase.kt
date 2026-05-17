@@ -35,7 +35,7 @@ class RestorePlaybackSessionUseCase @Inject constructor(
             val userPrefs = userPreferencesRepository.getUserPreferences().first()
             val settings = userPrefs.playbackSettings
 
-            val songs = songRepository.getSongs(session.queueIds).first()
+            val songs = songRepository.getSongsByIds(session.queueIds).first()
 
             if (songs.isNotEmpty()) {
                 val startIndex = session.currentSongId?.let { id ->

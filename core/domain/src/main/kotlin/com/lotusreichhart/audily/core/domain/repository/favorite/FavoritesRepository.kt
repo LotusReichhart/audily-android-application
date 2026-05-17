@@ -10,7 +10,6 @@ interface FavoritesRepository {
     
     /**
      * Lấy danh sách bài hát yêu thích với hỗ trợ phân trang (dùng cho UI).
-     * Sắp xếp theo vị trí thủ công (Drag-and-drop).
      */
     fun getFavoriteSongsPaged(): Flow<PagingData<Song>>
 

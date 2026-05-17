@@ -19,6 +19,7 @@ import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.mediastore.MediaStoreDataSource
 import com.lotusreichhart.audily.core.mediastore.MediaStoreIdPagingSource
 import com.lotusreichhart.audily.core.model.common.SortOrderType
+import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.RingtoneResult
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
@@ -79,11 +80,17 @@ internal class SongRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getSongs(ids: List<Long>): Flow<List<Song>> {
+    override fun getSongsByIds(ids: List<Long>): Flow<List<Song>> {
         return flow {
             val songs = mediaStoreDataSource.getSongs(ids).map { it.toSong() }
             val songsMap = songs.associateBy { it.id }
-            emit(ids.mapNotNull { songsMap[it] })
+            emit(ids.map { id ->
+                songsMap[id] ?: Song(
+                    id = id,
+                    basic = BasicSongMetadata.EMPTY,
+                    isMissing = true
+                )
+            })
         }
     }
 
@@ -97,7 +104,13 @@ internal class SongRepositoryImpl @Inject constructor(
         return flow {
             val songs = mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() }
             val songsMap = songs.associateBy { it.id }
-            emit(ids.mapNotNull { songsMap[it] })
+            emit(ids.map { id ->
+                songsMap[id] ?: Song(
+                    id = id,
+                    basic = BasicSongMetadata.EMPTY,
+                    isMissing = true
+                )
+            })
         }
     }
 
