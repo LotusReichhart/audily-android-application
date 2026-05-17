@@ -2,7 +2,7 @@ package com.lotusreichhart.audily.feature.playlists.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
+import com.lotusreichhart.audily.core.domain.usecase.favorite.GetFavoriteIds
 import com.lotusreichhart.audily.core.domain.usecase.favorite.GetFavoriteSongsSummaryUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.CreatePlaylistUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.GetPlaylistsUseCase
@@ -40,7 +40,7 @@ internal class PlaylistsViewModel @Inject constructor(
     private val updatePlaylistSortOrderUseCase: UpdatePlaylistSortOrderUseCase,
     private val updatePlaylistSortTypeUseCase: UpdatePlaylistSortTypeUseCase,
     private val getFavoriteSongsSummaryUseCase: GetFavoriteSongsSummaryUseCase,
-    private val favoritesRepository: FavoritesRepository,
+    private val getFavoriteIds: GetFavoriteIds,
     private val globalUiEventBus: GlobalUiEventBus,
 ) : ViewModel() {
 
@@ -82,7 +82,7 @@ internal class PlaylistsViewModel @Inject constructor(
     }
 
     private val _favoriteIds = _isDataLoadingStarted.flatMapLatest { isStarted ->
-        if (!isStarted) flowOf(emptyList()) else favoritesRepository.getFavoriteIds()
+        if (!isStarted) flowOf(emptyList()) else getFavoriteIds()
     }
 
     private val _favoriteSummary = _isDataLoadingStarted.flatMapLatest { isStarted ->

@@ -40,14 +40,12 @@ internal fun PlaylistsLoadingScreen(
             PlaylistItemShimmer(
                 modifier = Modifier
                     .padding(top = dimensions.paddingMedium)
-                    .padding(bottom = dimensions.paddingSmall)
+                    .padding(bottom = dimensions.paddingExtraSmall)
             )
         }
 
         item {
-            PlaylistItemShimmer(
-                modifier = Modifier.padding(bottom = dimensions.paddingSmall)
-            )
+            PlaylistItemShimmer()
         }
 
         items(15) {

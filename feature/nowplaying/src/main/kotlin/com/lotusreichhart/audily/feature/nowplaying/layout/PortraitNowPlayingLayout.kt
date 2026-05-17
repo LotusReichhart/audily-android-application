@@ -75,7 +75,7 @@ internal fun PortraitNowPlayingLayout(
             NowPlayingExtension(
                 modifier = Modifier
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
-                    .padding(bottom = LocalDimensions.current.paddingMedium),
+                    .padding(bottom = LocalDimensions.current.paddingSmall),
                 isLyricsVisible = uiState.isLyricsVisible,
                 sleepTimerActive = uiState.sleepTimerStatus.isActive,
                 onQueueClick = onOpenQueue,

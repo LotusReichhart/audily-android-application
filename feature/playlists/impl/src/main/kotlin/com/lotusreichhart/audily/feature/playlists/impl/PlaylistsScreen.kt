@@ -65,7 +65,9 @@ internal fun PlaylistsScreen(
     modifier: Modifier = Modifier,
     viewModel: PlaylistsViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onPlaylistClick: (Long) -> Unit,
+    onFavoriteClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -130,11 +132,11 @@ internal fun PlaylistsScreen(
                 skipPartiallyExpanded = true
             )
         },
-        onFavoriteClick = {
-
-        },
+        onFavoriteClick = onFavoriteClick,
         onItemClick = { type, id ->
-
+            if (type == PlaylistType.PLAYLIST) {
+                onPlaylistClick(id)
+            }
         },
     )
 }
@@ -213,7 +215,6 @@ internal fun PlaylistsScreen(
                                     )
                                 }
                             )
-                            Spacer(Modifier.size(0.dp))
                         }
                     }
 

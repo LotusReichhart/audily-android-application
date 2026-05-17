@@ -84,7 +84,7 @@ fun SongItem(
             .padding(horizontal = LocalDimensions.current.paddingMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (showDragHandle) {
+        if (showDragHandle && !isMissing) {
             DragHandleIcon(modifier = dragHandleModifier, inNowPlaying = inNowPlaying)
             Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
         }
@@ -113,9 +113,10 @@ fun SongItem(
             )
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
-
-        SongMenuButton(onClick = onMenuClick, inNowPlaying = inNowPlaying)
+        if (!isMissing) {
+            Spacer(modifier = Modifier.width(4.dp))
+            SongMenuButton(onClick = onMenuClick, inNowPlaying = inNowPlaying)
+        }
     }
 }
 

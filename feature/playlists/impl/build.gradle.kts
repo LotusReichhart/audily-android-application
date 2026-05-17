@@ -16,6 +16,9 @@ dependencies {
 
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.compose.animation)
+
+    implementation(libs.drag.reorder)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
