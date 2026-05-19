@@ -57,7 +57,6 @@ import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsEmpty
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsLoadingScreen
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsSortSheet
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsTopBar
-import com.lotusreichhart.audily.feature.playlists.impl.model.PlaylistType
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -133,10 +132,8 @@ internal fun PlaylistsScreen(
             )
         },
         onFavoriteClick = onFavoriteClick,
-        onItemClick = { type, id ->
-            if (type == PlaylistType.PLAYLIST) {
-                onPlaylistClick(id)
-            }
+        onItemClick = { id ->
+            onPlaylistClick(id)
         },
     )
 }
@@ -153,7 +150,7 @@ internal fun PlaylistsScreen(
     onSortClick: () -> Unit,
     onAddClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    onItemClick: (type: PlaylistType, id: Long) -> Unit
+    onItemClick: (id: Long) -> Unit
 ) {
     val dimensions = LocalDimensions.current
 
@@ -228,7 +225,7 @@ internal fun PlaylistsScreen(
                             songCount = item.songCount,
                             artworkUris = item.artworkUris,
                             onClick = {
-                                onItemClick(PlaylistType.PLAYLIST, item.id)
+                                onItemClick(item.id)
                             }
                         )
                     }

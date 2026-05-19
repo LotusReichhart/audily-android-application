@@ -8,7 +8,7 @@ import com.lotusreichhart.audily.core.model.song.SongsSummary
 /**
  * Trạng thái giao diện cho màn hình chi tiết Playlist.
  */
-data class PlaylistDetailUiState(
+internal data class PlaylistDetailUiState(
     val playlist: Playlist? = null,
     val songs: List<Song> = emptyList(),
     val songsSummary: SongsSummary = SongsSummary(),

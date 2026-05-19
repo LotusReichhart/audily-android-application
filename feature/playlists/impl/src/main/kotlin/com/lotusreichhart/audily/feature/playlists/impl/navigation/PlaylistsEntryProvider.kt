@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.feature.playlists.impl.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lotusreichhart.audily.core.navigation.Navigator
+import com.lotusreichhart.audily.feature.favorites.api.navigation.FavoritesNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistDetailNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsNavKey
 import com.lotusreichhart.audily.feature.playlists.impl.PlaylistsScreen
@@ -27,7 +28,7 @@ fun EntryProviderScope<NavKey>.playlistsEntry(
                 navigator.navigate(PlaylistDetailNavKey(id = playlistId))
             },
             onFavoriteClick = {
-                // TODO: Navigate to Favorite Detail Screen
+                navigator.navigate(FavoritesNavKey)
             }
         )
     }

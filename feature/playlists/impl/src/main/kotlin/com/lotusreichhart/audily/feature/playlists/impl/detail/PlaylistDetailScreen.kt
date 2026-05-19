@@ -194,7 +194,6 @@ internal fun PlaylistDetailScreen(
     val lazyListState = rememberLazyListState()
     val dimensions = LocalDimensions.current
 
-
     data class SongWrapper(
         val song: Song,
         val stableId: String = UUID.randomUUID().toString()
