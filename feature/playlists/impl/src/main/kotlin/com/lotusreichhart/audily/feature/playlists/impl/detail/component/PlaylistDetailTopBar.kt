@@ -67,7 +67,10 @@ internal fun PlaylistDetailTopBar(
                         .width(140.dp)
                         .height(16.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .shimmer()
+                        .shimmer(
+                            primaryColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                            secondaryColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
+                        )
                 )
             } else {
                 Row(

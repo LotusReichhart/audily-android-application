@@ -11,5 +11,4 @@ internal sealed interface PlaylistDetailUiEvent {
     object PlayAll : PlaylistDetailUiEvent
     data class SongClicked(val songId: Long, val isMissing: Boolean) : PlaylistDetailUiEvent
     data class Init(val playlistId: Long) : PlaylistDetailUiEvent
-    object NavigateToAddSongs : PlaylistDetailUiEvent
 }

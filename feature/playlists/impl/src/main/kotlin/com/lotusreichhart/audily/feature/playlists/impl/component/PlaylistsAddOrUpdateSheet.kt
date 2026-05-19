@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.component.AudilyButton
 import com.lotusreichhart.audily.core.designsystem.component.AudilyInputField
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
@@ -37,12 +38,16 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.feature.playlists.impl.R
 
 @Composable
-internal fun PlaylistsAddSheet(
+internal fun PlaylistsAddOrUpdateSheet(
+    initialName: String = "",
+    initialDescription: String? = null,
+    titleRes: Int = R.string.feature_playlists_impl_create_playlist,
+    buttonRes: Int = coreR.string.core_designsystem_done,
     onDismiss: () -> Unit,
     onSave: (name: String, description: String?) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var name by remember(initialName) { mutableStateOf(initialName) }
+    var description by remember(initialDescription) { mutableStateOf(initialDescription ?: "") }
 
     val dimensions = LocalDimensions.current
     val focusManager = LocalFocusManager.current
@@ -67,7 +72,7 @@ internal fun PlaylistsAddSheet(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(id = R.string.feature_playlists_impl_create_playlist),
+                text = stringResource(id = titleRes),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -131,7 +136,7 @@ internal fun PlaylistsAddSheet(
 
         // Save Button
         AudilyButton(
-            text = stringResource(id = R.string.feature_playlists_impl_create),
+            text = stringResource(id = buttonRes),
             onClick = {
                 if (name.isNotBlank()) {
                     onSave(name, description.ifBlank { null })

@@ -375,8 +375,8 @@ internal fun AudilyApp(
                             else 0.dp
                         )
                         .padding(
-                            bottom = if (windowSize != AudilyWindowSize.Portrait || appState.expandProgress > 0.5f) LocalDimensions.current.paddingMedium
-                            else dynamicPadding + LocalDimensions.current.paddingMedium
+                            bottom = if (windowSize != AudilyWindowSize.Portrait || appState.expandProgress > 0.5f) LocalDimensions.current.paddingSmall
+                            else dynamicPadding + LocalDimensions.current.paddingSmall
                         ),
                     snackbar = { snackbarData ->
                         Snackbar(

@@ -7,25 +7,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.AudilyButton
 import com.lotusreichhart.audily.core.designsystem.component.AudilyIconButton
@@ -54,13 +52,16 @@ import com.lotusreichhart.audily.core.designsystem.component.PlaylistGridCover
 import com.lotusreichhart.audily.core.designsystem.component.SongItem
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
+import com.lotusreichhart.audily.core.designsystem.util.getSongPlaybackStatus
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
 import com.lotusreichhart.audily.core.ui.GlobalParams
 import com.lotusreichhart.audily.core.ui.GlobalSheetKey
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
+import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
 import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.feature.playlists.impl.R
+import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsAddOrUpdateSheet
 import com.lotusreichhart.audily.feature.playlists.impl.detail.component.PlaylistDetailEmptyContent
 import com.lotusreichhart.audily.feature.playlists.impl.detail.component.PlaylistDetailLoadingScreen
 import com.lotusreichhart.audily.feature.playlists.impl.detail.component.PlaylistDetailTopBar
@@ -78,6 +79,10 @@ internal fun PlaylistDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val globalUiEventBus = LocalGlobalUiEventBus.current
+    val sheetController = LocalAudilySheetController.current
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(playlistId) {
         viewModel.onEvent(PlaylistDetailUiEvent.Init(playlistId))
@@ -87,10 +92,28 @@ internal fun PlaylistDetailScreen(
         uiState = uiState,
         onBack = onBack,
         onEvent = viewModel::onEvent,
-        onEditClicked = {},
+        onEditClicked = {
+            sheetController.showSheet(
+                content = {
+                    PlaylistsAddOrUpdateSheet(
+                        initialName = uiState.playlist?.name ?: "",
+                        initialDescription = uiState.playlist?.description,
+                        titleRes = R.string.feature_playlists_impl_edit_playlist,
+                        buttonRes = coreR.string.core_designsystem_save,
+                        onDismiss = { sheetController.hideSheet() },
+                        onSave = { name, desc ->
+                            viewModel.onEvent(PlaylistDetailUiEvent.EditMetadata(name, desc))
+                            sheetController.hideSheet()
+                        }
+                    )
+                },
+                showDragHandle = true,
+                containerColor = sheetContainerColor,
+                skipPartiallyExpanded = true
+            )
+        },
         onDeleteClicked = {
-            viewModel.onEvent(PlaylistDetailUiEvent.DeletePlaylist)
-            onBack()
+            showDeleteDialog = true
         },
         onSongMenuClick = { song ->
             globalUiEventBus.emit(
@@ -98,7 +121,8 @@ internal fun PlaylistDetailScreen(
                     key = GlobalSheetKey.SONG_MENU,
                     params = mapOf(
                         GlobalParams.PARAM_SONG to song,
-                        GlobalParams.PARAM_CALLER to GlobalMenuCaller.LIST_SCREEN,
+                        GlobalParams.PARAM_PLAYLIST_ID to playlistId,
+                        GlobalParams.PARAM_CALLER to GlobalMenuCaller.PLAYLIST,
                         GlobalParams.PARAM_QUEUE_IDS to uiState.songIds
                     ),
                     isShowDragHandle = false
@@ -109,6 +133,51 @@ internal fun PlaylistDetailScreen(
             uiState.playlist?.id?.let { onNavigateToAddSongs(it) }
         }
     )
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.feature_playlists_impl_delete_playlist),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.feature_playlists_impl_delete_playlist_confirm),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.onEvent(PlaylistDetailUiEvent.DeletePlaylist)
+                        onBack()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(coreR.string.core_designsystem_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text(
+                        text = stringResource(coreR.string.core_designsystem_cancel),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -124,6 +193,7 @@ internal fun PlaylistDetailScreen(
 ) {
     val lazyListState = rememberLazyListState()
     val dimensions = LocalDimensions.current
+
 
     data class SongWrapper(
         val song: Song,
@@ -144,8 +214,10 @@ internal fun PlaylistDetailScreen(
     var initialIndex by remember { mutableStateOf<Int?>(null) }
 
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val fromIndex = (from.index - 2).coerceIn(0, localSongsWrappers.lastIndex)
+        val toIndex = (to.index - 2).coerceIn(0, localSongsWrappers.lastIndex)
         localSongsWrappers = localSongsWrappers.toMutableList().apply {
-            add(to.index - 1, removeAt(from.index - 1))
+            add(toIndex, removeAt(fromIndex))
         }
     }
 
@@ -206,7 +278,7 @@ internal fun PlaylistDetailScreen(
                         )
 
                         LaunchedEffect(dismissState.currentValue) {
-                            if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                            if (dismissState.currentValue == SwipeToDismissBoxValue.StartToEnd) {
                                 onEvent(PlaylistDetailUiEvent.RemoveSong(song.id))
                                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
                             }
@@ -214,27 +286,29 @@ internal fun PlaylistDetailScreen(
 
                         SwipeToDismissBox(
                             state = dismissState,
-                            enableDismissFromStartToEnd = false,
+                            enableDismissFromStartToEnd = true,
+                            enableDismissFromEndToStart = false,
                             backgroundContent = {
-                                val color =
-                                    if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                                        MaterialTheme.colorScheme.errorContainer
-                                    } else Color.Transparent
-
+                                val isSwiping =
+                                    dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(horizontal = dimensions.paddingMedium)
                                         .clip(RoundedCornerShape(dimensions.cornerRadiusMedium))
-                                        .background(color),
-                                    contentAlignment = Alignment.CenterEnd
+                                        .background(Color.Transparent),
+                                    contentAlignment = Alignment.CenterStart
                                 ) {
-                                    Icon(
-                                        painter = painterResource(id = AudilyIcons.Delete),
-                                        contentDescription = "Delete",
-                                        modifier = Modifier.padding(end = dimensions.paddingMedium),
-                                        tint = MaterialTheme.colorScheme.onErrorContainer
-                                    )
+                                    if (isSwiping) {
+                                        Icon(
+                                            painter = painterResource(id = AudilyIcons.Delete),
+                                            contentDescription = "Delete",
+                                            modifier = Modifier
+                                                .padding(start = dimensions.paddingMedium)
+                                                .size(24.dp),
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    }
                                 }
                             }
                         ) {
@@ -258,8 +332,12 @@ internal fun PlaylistDetailScreen(
                                     initialIndex = null
                                 }
 
+                                val playbackStatus =
+                                    getSongPlaybackStatus(song.id, uiState.playbackState)
+
                                 SongItem(
                                     modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.background)
                                         .zIndex(if (isDragging) 1f else 0f)
                                         .graphicsLayer { shadowElevation = elevation }
                                         .longPressDraggableHandle(
@@ -288,7 +366,8 @@ internal fun PlaylistDetailScreen(
                                     dragHandleModifier = Modifier.draggableHandle(
                                         onDragStarted = { onDragStarted() },
                                         onDragStopped = { onDragStopped() }
-                                    )
+                                    ),
+                                    playbackStatus = playbackStatus
                                 )
                             }
                         }

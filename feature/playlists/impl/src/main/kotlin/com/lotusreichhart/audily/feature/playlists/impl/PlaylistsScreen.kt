@@ -52,7 +52,7 @@ import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
-import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsAddSheet
+import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsAddOrUpdateSheet
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsEmptyScreen
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsLoadingScreen
 import com.lotusreichhart.audily.feature.playlists.impl.component.PlaylistsSortSheet
@@ -120,7 +120,7 @@ internal fun PlaylistsScreen(
         onAddClick = {
             sheetController.showSheet(
                 content = {
-                    PlaylistsAddSheet(
+                    PlaylistsAddOrUpdateSheet(
                         onDismiss = { sheetController.hideSheet() },
                         onSave = { name, description ->
                             viewModel.onEvent(PlaylistsUiEvent.CreatePlaylist(name, description))
@@ -210,7 +210,7 @@ internal fun PlaylistsScreen(
                                     Icon(
                                         painter = painterResource(id = AudilyIcons.FavoriteFill),
                                         contentDescription = null,
-                                        modifier = Modifier.size(dimensions.iconSizeSmall),
+                                        modifier = Modifier.size(dimensions.iconSizeMedium),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }

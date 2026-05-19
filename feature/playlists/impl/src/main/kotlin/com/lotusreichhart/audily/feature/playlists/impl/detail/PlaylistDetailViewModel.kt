@@ -2,12 +2,16 @@ package com.lotusreichhart.audily.feature.playlists.impl.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.control.PauseSongUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlaybackStateUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.DeletePlaylistUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.GetPlaylistWithSongsUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.RemoveSongFromPlaylistUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.UpdatePlaylistMetadataUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.UpdatePlaylistSongsOrderUseCase
+import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongsSummary
@@ -27,12 +31,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class PlaylistDetailViewModel @Inject constructor(
+    observePlaybackStateUseCase: ObservePlaybackStateUseCase,
     private val getPlaylistWithSongsUseCase: GetPlaylistWithSongsUseCase,
     private val updatePlaylistSongsOrderUseCase: UpdatePlaylistSongsOrderUseCase,
     private val updatePlaylistMetadataUseCase: UpdatePlaylistMetadataUseCase,
     private val deletePlaylistUseCase: DeletePlaylistUseCase,
     private val removeSongFromPlaylistUseCase: RemoveSongFromPlaylistUseCase,
     private val playFromQueueUseCase: PlayFromQueueUseCase,
+    private val resumeSongUseCase: ResumeSongUseCase,
+    private val pauseSongUseCase: PauseSongUseCase,
 ) : ViewModel() {
 
     private val _playlistId = MutableStateFlow<Long?>(null)
@@ -42,10 +49,10 @@ internal class PlaylistDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             // Chờ animation trượt của BottomBar hoàn tất
-            delay(1000)
+            delay(500)
             _isDataLoadingStarted.value = true
             // Tổng thời gian hiện Shimmer
-            delay(2000)
+            delay(1500)
             _isInitialLoading.value = false
         }
     }
@@ -62,8 +69,9 @@ internal class PlaylistDetailViewModel @Inject constructor(
 
     val uiState: StateFlow<PlaylistDetailUiState> = combine(
         _isInitialLoading,
-        _playlistAndSongs
-    ) { isInitialLoading, data ->
+        _playlistAndSongs,
+        observePlaybackStateUseCase()
+    ) { isInitialLoading, data, playback ->
         val songs = data?.second ?: emptyList()
         PlaylistDetailUiState(
             playlist = data?.first,
@@ -73,7 +81,8 @@ internal class PlaylistDetailViewModel @Inject constructor(
                 totalDuration = songs.sumOf { it.basic.duration }
             ),
             songIds = songs.map { it.id },
-            isLoading = isInitialLoading
+            isLoading = isInitialLoading,
+            playbackState = playback
         )
     }.stateIn(
         scope = viewModelScope,
@@ -134,14 +143,20 @@ internal class PlaylistDetailViewModel @Inject constructor(
             is PlaylistDetailUiEvent.SongClicked -> {
                 if (!event.isMissing) {
                     viewModelScope.launch {
-                        val songIds = uiState.value.songs.map { it.id }
-                        playFromQueueUseCase(songId = event.songId, queueIds = songIds)
+                        val state = uiState.value
+                        val currentPlayback = state.playbackState
+                        if (currentPlayback.currentSongId == event.songId) {
+                            if (currentPlayback.nowPlayingState == NowPlayingState.PLAYING) {
+                                pauseSongUseCase()
+                            } else {
+                                resumeSongUseCase()
+                            }
+                        } else {
+                            val songIds = state.songs.map { it.id }
+                            playFromQueueUseCase(songId = event.songId, queueIds = songIds)
+                        }
                     }
                 }
-            }
-
-            PlaylistDetailUiEvent.NavigateToAddSongs -> {
-                // Handled in Screen
             }
         }
     }

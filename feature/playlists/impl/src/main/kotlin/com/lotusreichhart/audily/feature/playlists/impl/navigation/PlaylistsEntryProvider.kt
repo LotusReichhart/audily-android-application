@@ -10,6 +10,8 @@ import com.lotusreichhart.audily.feature.playlists.impl.detail.PlaylistDetailScr
 import com.lotusreichhart.audily.feature.search.api.SearchNavKey
 import com.lotusreichhart.audily.feature.search.api.SearchType
 
+import com.lotusreichhart.audily.feature.songs.api.navigation.SongsPickerNavKey
+
 fun EntryProviderScope<NavKey>.playlistsEntry(
     navigator: Navigator
 ) {
@@ -37,7 +39,7 @@ fun EntryProviderScope<NavKey>.playlistsEntry(
                 navigator.goBack()
             },
             onNavigateToAddSongs = { playlistId ->
-                // TODO: navigator.navigate(PlaylistPickerNavKey(playlistId))
+                navigator.navigate(SongsPickerNavKey(id = playlistId))
             }
         )
     }

@@ -20,7 +20,17 @@
     <string name="feature_playlists_impl_playlist_name_empty_error">Tên không được để trống</string>
     <string name="feature_playlists_impl_playlist_description_optional">Mô tả (Tùy chọn)</string>
     <string name="feature_playlists_impl_playlist_description_placeholder">Vài dòng cảm nghĩ về playlist này…</string>
-    <string name="feature_playlists_impl_create">Xong</string>
     <string name="feature_playlists_impl_playlist_created_success">Tạo danh sách phát thành công</string>
     <string name="feature_playlists_impl_playlist_created_failed">Tạo danh sách phát thất bại</string>
+
+    <!-- Playlist Detail -->
+    <string name="feature_playlists_impl_edit_playlist">Chỉnh sửa danh sách phát</string>
+    <string name="feature_playlists_impl_delete_playlist">Xóa danh sách phát</string>
+    <string name="feature_playlists_impl_delete_playlist_confirm">Xóa danh sách phát này? Thao tác này không thể hoàn tác.</string>
+    <string name="feature_playlists_impl_remove_from_playlist">Xóa khỏi danh sách phát</string>
+    <string name="feature_playlists_impl_add_songs">Thêm bài hát</string>
+    <string name="feature_playlists_impl_playlist_play">Phát</string>
+    <string name="feature_playlists_impl_songs_count">%1$d bài hát</string>
+    <string name="feature_playlists_impl_unknown_playlist">Danh sách phát không rõ</string>
+    <string name="feature_playlists_impl_playlist_empty_description">Chưa có bài hát nào ở đây. Hãy thêm vài giai điệu để bắt đầu nhé!</string>
 </resources>
