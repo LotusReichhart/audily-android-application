@@ -150,7 +150,7 @@ fun AudilyActionSheet(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.core_designsystem_unknown_cancel),
+                    text = stringResource(R.string.core_designsystem_cancel),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp

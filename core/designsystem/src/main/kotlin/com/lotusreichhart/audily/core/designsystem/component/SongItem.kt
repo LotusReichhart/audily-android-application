@@ -66,6 +66,7 @@ fun SongItem(
     isFavorite: Boolean = false,
     showDragHandle: Boolean = false,
     dragHandleModifier: Modifier = Modifier,
+    showMenu: Boolean = true,
     playbackStatus: SongPlaybackStatus = SongPlaybackStatus.NONE,
     inNowPlaying: Boolean = false
 ) {
@@ -113,7 +114,7 @@ fun SongItem(
             )
         }
 
-        if (!isMissing) {
+        if (showMenu && !isMissing) {
             Spacer(modifier = Modifier.width(4.dp))
             SongMenuButton(onClick = onMenuClick, inNowPlaying = inNowPlaying)
         }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_search_impl_all_placeholder">Tìm bài hát, album...</string>
-    <string name="feature_search_impl_songs_placeholder">Tìm tên bài hát...</string>
-    <string name="feature_search_impl_playlists_placeholder">Tìm danh sách phát...</string>
-    <string name="feature_search_impl_albums_placeholder">Tìm tên album...</string>
+    <string name="feature_search_impl_all_placeholder">Tìm bài hát, album…</string>
+    <string name="feature_search_impl_songs_placeholder">Tìm tên bài hát…</string>
+    <string name="feature_search_impl_playlists_placeholder">Tìm danh sách phát…</string>
+    <string name="feature_search_impl_albums_placeholder">Tìm tên album…</string>
 
     <!-- Tìm kiếm: Trạng thái chờ (Mời gọi tìm kiếm) -->
     <string name="feature_search_impl_all_query_empty">Bạn đang tìm gì thế?</string>

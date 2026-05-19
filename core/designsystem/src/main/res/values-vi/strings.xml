@@ -6,7 +6,10 @@
     <string name="core_designsystem_unknown_artist">Nghệ sĩ vô danh</string>
     <string name="core_designsystem_unknown_album">Album không rõ</string>
     <string name="core_designsystem_unknown_title">Không có tiêu đề</string>
-    <string name="core_designsystem_unknown_cancel">Hủy bỏ</string>
+    <string name="core_designsystem_cancel">Hủy bỏ</string>
+    <string name="core_designsystem_delete">Xóa</string>
+    <string name="core_designsystem_done">Xong</string>
+    <string name="core_designsystem_save">Lưu</string>
 
     <!-- Sort Type Labels -->
     <string name="core_designsystem_sort_order">Thứ tự</string>

@@ -6,6 +6,7 @@ object AudilyIcons {
     val Add = R.drawable.core_designsystem_ic_add
     val ArrowLeft = R.drawable.core_designsystem_ic_arrow_left
     val ArrowDown = R.drawable.core_designsystem_ic_arrow_down
+    val Check = R.drawable.core_designsystem_ic_check
     val Close = R.drawable.core_designsystem_ic_close
     val Delete = R.drawable.core_designsystem_ic_delete
     val Edit = R.drawable.core_designsystem_ic_edit
