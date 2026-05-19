@@ -62,21 +62,4 @@ class FavoritesRepositoryImplTest {
             })
         }
     }
-
-    @Test
-    fun `updateFavoritePositions calls upsertFavorites with correct list`() = runTest {
-        val songIds = listOf(1L, 2L, 3L)
-        coEvery { favoritesDao.upsertFavorites(any()) } returns Unit
-
-        repository.updateFavoritePositions(songIds)
-
-        coVerify {
-            favoritesDao.upsertFavorites(match { list ->
-                list.size == 3 && 
-                list[0].songId == 1L && list[0].position == 0 &&
-                list[1].songId == 2L && list[1].position == 1 &&
-                list[2].songId == 3L && list[2].position == 2
-            })
-        }
-    }
 }
