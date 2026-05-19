@@ -76,6 +76,8 @@ dependencies {
     implementation(projects.feature.songs.impl)
     implementation(projects.feature.playlists.api)
     implementation(projects.feature.playlists.impl)
+    implementation(projects.feature.favorites.api)
+    implementation(projects.feature.favorites.impl)
     implementation(projects.feature.search.api)
     implementation(projects.feature.search.impl)
     implementation(projects.feature.nowplaying)

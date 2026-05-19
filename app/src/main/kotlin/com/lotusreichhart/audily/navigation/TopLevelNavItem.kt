@@ -6,6 +6,7 @@ import com.lotusreichhart.audily.feature.home.api.R as homeApiR
 import com.lotusreichhart.audily.feature.focus.api.R as focusApiR
 import com.lotusreichhart.audily.feature.settings.api.R as settingsApiR
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
+import com.lotusreichhart.audily.feature.favorites.api.navigation.FavoritesNavKey
 import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.api.navigation.HomeNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsNavKey
@@ -58,7 +59,8 @@ val NAV_BAR_ITEMS = mapOf(
  */
 val TOP_LEVEL_NAV_ITEMS = NAV_BAR_ITEMS.keys + setOf(
     SongsNavKey,
-    PlaylistsNavKey
+    PlaylistsNavKey,
+    FavoritesNavKey
     // PlaylistsNavKey, // Bổ sung sau
     // AlbumsNavKey,    // Bổ sung sau
 )

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_favorites_impl_menu_play_all">Play all</string>
+    <string name="feature_favorites_impl_menu_clear_all">Clear all</string>
+    <string name="feature_favorites_impl_clear_title">Clear Favorites</string>
+    <string name="feature_favorites_impl_clear_confirm">Are you sure you want to remove all songs from your favorites list? This action cannot be undone.</string>
+</resources>
