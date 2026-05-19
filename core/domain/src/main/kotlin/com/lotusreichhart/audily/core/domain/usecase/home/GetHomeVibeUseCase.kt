@@ -40,7 +40,7 @@ class GetHomeVibeUseCase @Inject constructor(
             sortOrder = SongSortOrder.DATE_ADDED,
             sortType = SortOrderType.DESC
         ).map { it.take(10) }.flatMapLatest { ids ->
-            songRepository.getSongs(ids)
+            songRepository.getSongsByIds(ids)
         }.map { songs ->
             HomeSection(
                 titleRes = 0,
@@ -51,7 +51,7 @@ class GetHomeVibeUseCase @Inject constructor(
 
         val recentlyPlayedFlow = historyRepository.getRecentHistory(15).flatMapLatest { historyList ->
             val ids = historyList.map { it.songId }
-            songRepository.getSongs(ids).map { songs ->
+            songRepository.getSongsByIds(ids).map { songs ->
                 HomeSection(
                     titleRes = 0,
                     songs = songs,
@@ -62,7 +62,7 @@ class GetHomeVibeUseCase @Inject constructor(
 
         val heavyRotationFlow = historyRepository.getTopPlayed(10).flatMapLatest { historyList ->
             val ids = historyList.map { it.songId }
-            songRepository.getSongs(ids).map { songs ->
+            songRepository.getSongsByIds(ids).map { songs ->
                 HomeSection(
                     titleRes = 0,
                     songs = songs,
@@ -72,7 +72,7 @@ class GetHomeVibeUseCase @Inject constructor(
         }
 
         val discoveryFlow = songRepository.getSongIds().map { it.shuffled().take(10) }.flatMapLatest { ids ->
-            songRepository.getSongs(ids)
+            songRepository.getSongsByIds(ids)
         }.map { songs ->
             HomeSection(
                 titleRes = 0,

@@ -62,4 +62,7 @@ abstract class PlaylistDao {
 
     @Query("SELECT MAX(position) FROM playlist_song_cross_ref WHERE playlist_id = :playlistId")
     abstract suspend fun getMaxPositionInPlaylist(playlistId: Long): Int?
+
+    @Query("SELECT song_id FROM playlist_song_cross_ref WHERE playlist_id = :playlistId ORDER BY position ASC LIMIT :limit")
+    abstract suspend fun getTopSongIdsInPlaylist(playlistId: Long, limit: Int): List<Long>
 }

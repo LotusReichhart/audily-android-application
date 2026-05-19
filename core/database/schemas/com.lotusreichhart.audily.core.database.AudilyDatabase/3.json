@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "b73af081ff12563189e6fd3ae17a2247",
+    "identityHash": "f306e9417707fafd6840b000f8796864",
     "entities": [
       {
         "tableName": "favorites",
@@ -36,7 +36,7 @@
       },
       {
         "tableName": "playlists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `image_uri` TEXT, `created_at` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `created_at` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -49,11 +49,6 @@
             "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "imageUri",
-            "columnName": "image_uri",
-            "affinity": "TEXT"
           },
           {
             "fieldPath": "createdAt",
@@ -132,7 +127,7 @@
       },
       {
         "tableName": "playback_session",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `currentSongId` INTEGER, `position` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `sourceId` INTEGER, `sourceType` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `currentSongId` INTEGER, `position` INTEGER NOT NULL, `duration` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -156,16 +151,6 @@
             "columnName": "duration",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "sourceId",
-            "columnName": "sourceId",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "sourceType",
-            "columnName": "sourceType",
-            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -238,7 +223,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b73af081ff12563189e6fd3ae17a2247')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f306e9417707fafd6840b000f8796864')"
     ]
   }
 }

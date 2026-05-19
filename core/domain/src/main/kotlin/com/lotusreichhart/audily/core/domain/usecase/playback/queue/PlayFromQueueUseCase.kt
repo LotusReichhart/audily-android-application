@@ -32,7 +32,7 @@ class PlayFromQueueUseCase @Inject constructor(
             }
 
             // GIAI ĐOẠN 2: Lấy toàn bộ queue trong background và chèn hai đầu (Smart Queue)
-            val songs = songRepository.getSongs(queueIds).first()
+            val songs = songRepository.getSongsByIds(queueIds).first()
             val indexInFull = songs.indexOfFirst { it.id == songId }
 
             if (indexInFull != -1) {

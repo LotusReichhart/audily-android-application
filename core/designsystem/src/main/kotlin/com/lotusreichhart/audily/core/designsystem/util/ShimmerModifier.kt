@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 
@@ -24,7 +25,11 @@ import androidx.compose.ui.unit.IntSize
  * Modifier tạo hiệu ứng Shimmer (ánh sáng quét qua).
  * Sử dụng cho các component đang trong trạng thái loading.
  */
-fun Modifier.shimmer(): Modifier = composed {
+@Composable
+fun Modifier.shimmer(
+    primaryColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+    secondaryColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.4f)
+): Modifier = composed {
     var size by remember { mutableStateOf(IntSize.Zero) }
     val transition = rememberInfiniteTransition(label = "shimmer")
     val startOffsetX by transition.animateFloat(
@@ -38,9 +43,9 @@ fun Modifier.shimmer(): Modifier = composed {
     )
 
     val colors = listOf(
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
-        MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.4f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+        primaryColor,
+        secondaryColor,
+        primaryColor
     )
 
     background(

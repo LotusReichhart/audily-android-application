@@ -24,6 +24,9 @@ interface FavoritesDao {
     @Query("SELECT * FROM favorites ORDER BY position ASC")
     fun getFavoriteEntitiesPaging(): PagingSource<Int, FavoriteEntity>
 
+    @Query("SELECT * FROM favorites ORDER BY position ASC LIMIT :limit")
+    fun getFavoriteEntities(limit: Int): Flow<List<FavoriteEntity>>
+
     @Query("SELECT MAX(position) FROM favorites")
     suspend fun getMaxPosition(): Int?
 

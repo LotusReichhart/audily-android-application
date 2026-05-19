@@ -7,6 +7,7 @@
     <string name="feature_songs_impl_menu_play_next">Play Next</string>
     <string name="feature_songs_impl_menu_add_to_queue">Add to Queue</string>
     <string name="feature_songs_impl_menu_add_to_playlist">Add to Playlist</string>
+    <string name="feature_songs_impl_menu_remove_from_playlist">Remove from Playlist</string>
     <string name="feature_songs_impl_menu_add_to_favorite">Add to Favorite</string>
     <string name="feature_songs_impl_menu_remove_from_favorite">Remove from Favorite</string>
     <string name="feature_songs_impl_menu_info">Info</string>
@@ -44,4 +45,10 @@
     <string name="feature_songs_impl_not_found_title">Still no tracks found</string>
     <string name="feature_songs_impl_not_found_description">We scanned your device but couldn\'t find any audio files. Make sure your music is downloaded directly to your phone.</string>
     <string name="feature_songs_impl_action_refresh">Scan again</string>
+
+    <string name="feature_songs_impl_picker_title">Select Songs</string>
+    <string name="feature_songs_impl_picker_selected">Selected</string>
+    <string name="feature_songs_impl_picker_empty_title">Nothing to select yet</string>
+    <string name="feature_songs_impl_picker_find_placeholder">Find a track…</string>
+    <string name="feature_songs_impl_picker_not_found_title">Couldn\'t find that song</string>
 </resources>

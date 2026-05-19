@@ -22,7 +22,7 @@ import com.lotusreichhart.audily.core.database.dao.HistoryDao
         PlayingQueueEntity::class,
         HistoryEntity::class,
     ],
-    version = 3,
+    version = 5,
     exportSchema = true,
 )
 abstract class AudilyDatabase : RoomDatabase() {

@@ -32,7 +32,7 @@ import com.lotusreichhart.audily.feature.songs.impl.R
 import com.lotusreichhart.audily.feature.songs.impl.resource.SongsIcons
 
 @Composable
-internal fun SongMenu(
+internal fun SongMenuSheet(
     params: Any?,
     viewModel: SongMenuViewModel = hiltViewModel()
 ) {
@@ -43,12 +43,13 @@ internal fun SongMenu(
     LaunchedEffect(params) {
         if (params is Map<*, *>) {
             val song = params[GlobalParams.PARAM_SONG] as? Song
+            val playlistId = params[GlobalParams.PARAM_PLAYLIST_ID] as? Long
             val caller = params[GlobalParams.PARAM_CALLER] as? String ?: ""
             val queueIds =
                 (params[GlobalParams.PARAM_QUEUE_IDS] as? List<*>)?.filterIsInstance<Long>()
                     ?: emptyList()
             if (song != null) {
-                viewModel.init(song, caller, queueIds)
+                viewModel.init(song, playlistId, caller, queueIds)
             }
         }
     }
@@ -62,7 +63,9 @@ internal fun SongMenu(
                 label = stringResource(label),
                 icon = icon,
                 onClick = { viewModel.onEvent(SongMenuUiEvent.OnActionClick(action)) },
-                isDestructive = action is SongMenuAction.Delete
+                isDestructive = action is SongMenuAction.Delete ||
+                        action is SongMenuAction.RemoveFromPlaylist,
+                autoDismiss = action !is SongMenuAction.SetRingtone
             )
         }
 
@@ -75,7 +78,10 @@ internal fun SongMenu(
                     quickActions = quickActions,
                     onActionClick = { action ->
                         viewModel.onEvent(SongMenuUiEvent.OnActionClick(action))
-                        if (action !is SongMenuAction.ShowInfo) {
+                        if (action !is SongMenuAction.ResumePause
+                            && action !is SongMenuAction.ToggleFavorite
+                            && action !is SongMenuAction.ShowInfo
+                        ) {
                             sheetController.hideSheet()
                         }
                     }
@@ -208,6 +214,7 @@ private fun getActionDisplayInfo(action: SongMenuAction): Pair<Int, Int> {
         SongMenuAction.PlayNext -> R.string.feature_songs_impl_menu_play_next to AudilyIcons.PlayNext
         SongMenuAction.AddToQueue -> R.string.feature_songs_impl_menu_add_to_queue to AudilyIcons.QueueMusic
         SongMenuAction.AddToPlaylist -> R.string.feature_songs_impl_menu_add_to_playlist to AudilyIcons.Playlist
+        is SongMenuAction.RemoveFromPlaylist -> R.string.feature_songs_impl_menu_remove_from_playlist to AudilyIcons.Delete
         is SongMenuAction.ToggleFavorite -> {
             if (action.isFavorite) R.string.feature_songs_impl_menu_remove_from_favorite to AudilyIcons.FavoriteOutline
             else R.string.feature_songs_impl_menu_add_to_favorite to AudilyIcons.FavoriteFill

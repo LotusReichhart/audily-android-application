@@ -7,7 +7,5 @@ data class PlaybackSession(
     val currentSongId: Long?,
     val position: Long,
     val duration: Long,
-    val queueIds: List<Long>,
-    val sourceId: Long?,
-    val sourceType: String?
+    val queueIds: List<Long>
 )

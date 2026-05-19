@@ -43,7 +43,7 @@ fun AudilySearchBar(
     Surface(
         modifier = modifier
             .padding(1.dp)
-            .height(LocalDimensions.current.buttonHeight),
+            .height(40.dp),
         shape = RoundedCornerShape(LocalDimensions.current.cornerRadiusSmall),
         color = MaterialTheme.colorScheme.onPrimary,
         tonalElevation = 0.dp,

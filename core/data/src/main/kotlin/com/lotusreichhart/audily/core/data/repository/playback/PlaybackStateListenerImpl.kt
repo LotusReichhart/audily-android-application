@@ -25,9 +25,7 @@ class PlaybackStateListenerImpl @Inject constructor(
                 songId,
                 position,
                 duration,
-                queueIds,
-                sourceId,
-                sourceType
+                queueIds
             )
         } else {
             Timber.d("Audily Service Kill - PlaybackStateListener(Position): Blocked saving empty queueIds")
@@ -48,9 +46,7 @@ class PlaybackStateListenerImpl @Inject constructor(
                 songId,
                 position,
                 duration,
-                queueIds,
-                sourceId,
-                sourceType
+                queueIds
             )
         } else {
             Timber.d("Audily Service Kill - PlaybackStateListener(StateChanged): Blocked saving empty queueIds")
@@ -70,9 +66,7 @@ class PlaybackStateListenerImpl @Inject constructor(
                 songId,
                 position,
                 duration,
-                queueIds,
-                sourceId,
-                sourceType
+                queueIds
             )
         } else {
             Timber.d("Audily Service Kill - PlaybackStateListener(SessionEnded): Blocked saving empty queueIds")

@@ -17,6 +17,7 @@ import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
@@ -126,9 +127,7 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         songId: Long?,
         position: Long,
         duration: Long,
-        queueIds: List<Long>,
-        sourceId: Long?,
-        sourceType: String?
+        queueIds: List<Long>
     ) {
         if (queueIds.isEmpty()) {
             Timber.d("Audily Service Kill - UserPreferencesRepository: Blocked saving empty session")
@@ -139,9 +138,7 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         val session = PlaybackSessionEntity(
             currentSongId = songId,
             position = position,
-            duration = duration,
-            sourceId = sourceId,
-            sourceType = sourceType
+            duration = duration
         )
         val queueItems = queueIds.mapIndexed { index, id ->
             PlayingQueueEntity(
@@ -157,7 +154,7 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
     }
 
     override fun getPlaybackSession(): Flow<PlaybackSession?> {
-        return kotlinx.coroutines.flow.combine(
+        return combine(
             playbackDao.getSession(),
             playbackDao.getQueue()
         ) { session, queue ->
@@ -166,9 +163,7 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
                     currentSongId = it.currentSongId,
                     position = it.position,
                     duration = it.duration,
-                    queueIds = queue.map { item -> item.songId },
-                    sourceId = it.sourceId,
-                    sourceType = it.sourceType
+                    queueIds = queue.map { item -> item.songId }
                 )
             }
         }

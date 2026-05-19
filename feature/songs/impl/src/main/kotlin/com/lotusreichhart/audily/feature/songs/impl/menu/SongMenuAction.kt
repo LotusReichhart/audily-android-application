@@ -9,6 +9,7 @@ sealed class SongMenuAction {
     object PlayNext : SongMenuAction()
     object AddToQueue : SongMenuAction()
     object AddToPlaylist : SongMenuAction()
+    data class RemoveFromPlaylist(val playlistId: Long? = null, val songId: Long) : SongMenuAction()
     object ShowInfo : SongMenuAction()
     object EditTags : SongMenuAction()
     object SetRingtone : SongMenuAction()

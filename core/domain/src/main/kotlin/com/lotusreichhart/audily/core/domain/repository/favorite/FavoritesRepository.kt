@@ -10,7 +10,6 @@ interface FavoritesRepository {
     
     /**
      * Lấy danh sách bài hát yêu thích với hỗ trợ phân trang (dùng cho UI).
-     * Sắp xếp theo vị trí thủ công (Drag-and-drop).
      */
     fun getFavoriteSongsPaged(): Flow<PagingData<Song>>
 
@@ -18,6 +17,11 @@ interface FavoritesRepository {
      * Lấy toàn bộ danh sách ID yêu thích (dùng cho logic phát nhạc/Shuffle).
      */
     fun getFavoriteIds(): Flow<List<Long>>
+
+    /**
+     * Lấy danh sách giới hạn bài hát yêu thích (dùng cho Preview/Artwork).
+     */
+    fun getFavoriteSongsSummary(limit: Int): Flow<List<Song>>
 
     /**
      * Cập nhật thứ tự bài hát yêu thích sau khi kéo thả.
