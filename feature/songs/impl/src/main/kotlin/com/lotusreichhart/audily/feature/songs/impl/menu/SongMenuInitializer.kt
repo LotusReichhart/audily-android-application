@@ -6,7 +6,7 @@ import com.lotusreichhart.audily.core.ui.GlobalSheetRegistry
 object SongMenuInitializer {
     fun initialize() {
         GlobalSheetRegistry.register(GlobalSheetKey.SONG_MENU) { params ->
-            SongMenu(params = params)
+            SongMenuSheet(params = params)
         }
     }
 }

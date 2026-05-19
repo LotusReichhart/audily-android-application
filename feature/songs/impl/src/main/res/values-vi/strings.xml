@@ -7,6 +7,7 @@
     <string name="feature_songs_impl_menu_play_next">Phát kế tiếp</string>
     <string name="feature_songs_impl_menu_add_to_queue">Thêm vào hàng chờ</string>
     <string name="feature_songs_impl_menu_add_to_playlist">Thêm vào danh sách phát</string>
+    <string name="feature_songs_impl_menu_remove_from_playlist">Xóa khỏi danh sách phát</string>
     <string name="feature_songs_impl_menu_add_to_favorite">Yêu thích</string>
     <string name="feature_songs_impl_menu_remove_from_favorite">Bỏ yêu thích</string>
     <string name="feature_songs_impl_menu_info">Thông tin</string>
@@ -44,4 +45,10 @@
     <string name="feature_songs_impl_not_found_title">Vẫn chưa tìm thấy bài hát nào</string>
     <string name="feature_songs_impl_not_found_description">Audily đã quét thiết bị nhưng không tìm thấy file âm thanh nào. Hãy đảm bảo bạn đã tải nhạc trực tiếp về máy nhé.</string>
     <string name="feature_songs_impl_action_refresh">Quét lại</string>
+
+    <string name="feature_songs_impl_picker_title">Chọn bài hát</string>
+    <string name="feature_songs_impl_picker_selected">Đã chọn</string>
+    <string name="feature_songs_impl_picker_empty_title">Chưa có nhạc để thêm vào</string>
+    <string name="feature_songs_impl_picker_find_placeholder">Tìm tên bài hát…</string>
+    <string name="feature_songs_impl_picker_not_found_title">Không tìm thấy bài hát nào</string>
 </resources>
