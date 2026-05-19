@@ -12,11 +12,11 @@ interface FavoritesDao {
     @Upsert
     suspend fun upsertFavorite(favorite: FavoriteEntity)
 
-    @Upsert
-    suspend fun upsertFavorites(favorites: List<FavoriteEntity>)
-
     @Query("DELETE FROM favorites WHERE song_id = :songId")
     suspend fun deleteFavorite(songId: Long)
+
+    @Query("DELETE FROM favorites")
+    suspend fun deleteAllFavorites()
 
     @Query("SELECT song_id FROM favorites ORDER BY position ASC")
     fun getFavoriteIds(): Flow<List<Long>>

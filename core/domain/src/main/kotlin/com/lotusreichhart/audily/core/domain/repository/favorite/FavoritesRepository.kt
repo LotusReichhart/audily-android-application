@@ -24,7 +24,7 @@ interface FavoritesRepository {
     fun getFavoriteSongsSummary(limit: Int): Flow<List<Song>>
 
     /**
-     * Cập nhật thứ tự bài hát yêu thích sau khi kéo thả.
+     * Xóa toàn bộ danh sách bài hát yêu thích.
      */
-    suspend fun updateFavoritePositions(songIds: List<Long>)
+    suspend fun clearFavorites()
 }

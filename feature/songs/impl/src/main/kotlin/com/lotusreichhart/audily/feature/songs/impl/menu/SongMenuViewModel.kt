@@ -1,10 +1,9 @@
 package com.lotusreichhart.audily.feature.songs.impl.menu
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lotusreichhart.audily.core.domain.usecase.favorite.ToggleFavoriteUseCase
+import com.lotusreichhart.audily.core.domain.usecase.favorite.CheckSongFavoriteStatusUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.PauseSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.AddSongToQueueUseCase
@@ -22,8 +21,14 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,13 +42,55 @@ class SongMenuViewModel @Inject constructor(
     private val addSongToQueueUseCase: AddSongToQueueUseCase,
     private val removeSongFromPlaylistUseCase: RemoveSongFromPlaylistUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val checkSongFavoriteStatusUseCase: CheckSongFavoriteStatusUseCase,
     private val setRingtoneUseCase: SetRingtoneUseCase,
     private val getSongUseCase: GetSongUseCase,
     private val globalUiEventBus: GlobalUiEventBus
 ) : ViewModel() {
 
-    private val _uiState = mutableStateOf<SongMenuUiState?>(null)
-    val uiState: State<SongMenuUiState?> = _uiState
+    private val _params = MutableStateFlow<SongMenuParams?>(null)
+    private val _isShowingInfoDialog = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<SongMenuUiState?> = _params
+        .flatMapLatest { params ->
+            if (params == null) {
+                flowOf(null)
+            } else {
+                combine(
+                    getSongUseCase(params.song.id),
+                    observeNowPlayingUseCase(),
+                    checkSongFavoriteStatusUseCase(params.song.id),
+                    _isShowingInfoDialog
+                ) { fullSong, playbackState, isFavorite, isShowingInfo ->
+                    val updatedSong = fullSong ?: params.song
+                    val isCurrentSong = playbackState.song?.id == updatedSong.id
+                    val isPlaying =
+                        playbackState.playbackState.nowPlayingState == NowPlayingState.PLAYING
+
+                    val options = buildMenuOptions(
+                        isCurrentSong = isCurrentSong,
+                        isPlaying = isPlaying,
+                        caller = params.caller,
+                        isFavorite = isFavorite,
+                        songId = updatedSong.id
+                    )
+                    SongMenuUiState(
+                        song = updatedSong,
+                        caller = params.caller,
+                        options = options,
+                        isShowingInfoDialog = isShowingInfo,
+                        isFavorite = isFavorite
+                    )
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null
+        )
+
     private var _playlistId: Long? = null
     private var _queueIds: List<Long> = emptyList()
 
@@ -53,41 +100,13 @@ class SongMenuViewModel @Inject constructor(
         caller: String,
         queueIds: List<Long> = emptyList()
     ) {
-        if (_uiState.value?.song?.id == song.id && _uiState.value?.caller == caller) return
+        if (_params.value?.song?.id == song.id && _params.value?.caller == caller) return
 
         this._playlistId = playlistId
         this._queueIds = queueIds
+        this._isShowingInfoDialog.value = false
 
-        // Khởi tạo trạng thái với các options mặc định để tránh Menu trống trong lần đầu app chạy
-        _uiState.value = SongMenuUiState(
-            song = song,
-            caller = caller,
-            options = buildMenuOptions(isCurrentSong = false, isPlaying = false, caller = caller)
-        )
-
-        // Tải thông tin đầy đủ của bài hát từ Database
-        getSongUseCase(song.id)
-            .onEach { fullSong ->
-                if (fullSong != null) {
-                    val state = _uiState.value ?: return@onEach
-                    _uiState.value = state.copy(song = fullSong)
-                }
-            }
-            .launchIn(viewModelScope)
-
-        // Observe playback state to update Play/Pause icon in real-time
-        observeNowPlayingUseCase()
-            .onEach { playbackState ->
-                val state = _uiState.value ?: return@onEach
-                val isCurrentSong = playbackState.song?.id == state.song.id
-                val isPlaying =
-                    playbackState.playbackState.nowPlayingState == NowPlayingState.PLAYING
-
-                _uiState.value = state.copy(
-                    options = buildMenuOptions(isCurrentSong, isPlaying, state.caller)
-                )
-            }
-            .launchIn(viewModelScope)
+        _params.value = SongMenuParams(song, playlistId, caller, queueIds)
     }
 
     fun onEvent(event: SongMenuUiEvent) {
@@ -95,8 +114,7 @@ class SongMenuViewModel @Inject constructor(
             when (event) {
                 is SongMenuUiEvent.OnActionClick -> handleAction(event.action)
                 SongMenuUiEvent.OnDismissInfoDialog -> {
-                    val state = _uiState.value ?: return@launch
-                    _uiState.value = state.copy(isShowingInfoDialog = false)
+                    _isShowingInfoDialog.value = false
                 }
             }
         }
@@ -105,10 +123,10 @@ class SongMenuViewModel @Inject constructor(
     private fun buildMenuOptions(
         isCurrentSong: Boolean,
         isPlaying: Boolean,
-        caller: String
+        caller: String,
+        isFavorite: Boolean,
+        songId: Long
     ): List<SongMenuAction> {
-        val songId = _uiState.value?.song?.id ?: 0L
-
         return buildList {
             when (caller) {
                 GlobalMenuCaller.NOW_PLAYING -> {
@@ -152,7 +170,7 @@ class SongMenuViewModel @Inject constructor(
                 }
             }
 
-            add(SongMenuAction.ToggleFavorite(_uiState.value?.song?.isFavorite ?: false))
+            add(SongMenuAction.ToggleFavorite(isFavorite))
             add(SongMenuAction.ShowInfo)
             add(SongMenuAction.EditTags)
             add(SongMenuAction.Share)
@@ -161,7 +179,7 @@ class SongMenuViewModel @Inject constructor(
     }
 
     private suspend fun handleAction(action: SongMenuAction) {
-        val song = _uiState.value?.song ?: return
+        val song = uiState.value?.song ?: return
         when (action) {
             is SongMenuAction.Play -> {
                 playFromQueueUseCase(action.songId, action.queueIds)
@@ -187,8 +205,7 @@ class SongMenuViewModel @Inject constructor(
             SongMenuAction.PlayNext -> playNextUseCase(song)
             SongMenuAction.AddToQueue -> addSongToQueueUseCase(song)
             SongMenuAction.ShowInfo -> {
-                val state = _uiState.value ?: return
-                _uiState.value = state.copy(isShowingInfoDialog = true)
+                _isShowingInfoDialog.value = true
             }
 
             SongMenuAction.SetRingtone -> {
@@ -226,3 +243,10 @@ class SongMenuViewModel @Inject constructor(
         }
     }
 }
+
+private data class SongMenuParams(
+    val song: Song,
+    val playlistId: Long?,
+    val caller: String,
+    val queueIds: List<Long>
+)

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lotusreichhart.audily.core.designsystem.component.ActionItem
 import com.lotusreichhart.audily.core.designsystem.component.AudilyActionSheet
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
@@ -36,7 +37,7 @@ internal fun SongMenuSheet(
     params: Any?,
     viewModel: SongMenuViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetController = LocalAudilySheetController.current
 
     // Initialize ViewModel with params
@@ -216,8 +217,8 @@ private fun getActionDisplayInfo(action: SongMenuAction): Pair<Int, Int> {
         SongMenuAction.AddToPlaylist -> R.string.feature_songs_impl_menu_add_to_playlist to AudilyIcons.Playlist
         is SongMenuAction.RemoveFromPlaylist -> R.string.feature_songs_impl_menu_remove_from_playlist to AudilyIcons.Delete
         is SongMenuAction.ToggleFavorite -> {
-            if (action.isFavorite) R.string.feature_songs_impl_menu_remove_from_favorite to AudilyIcons.FavoriteOutline
-            else R.string.feature_songs_impl_menu_add_to_favorite to AudilyIcons.FavoriteFill
+            if (action.isFavorite) R.string.feature_songs_impl_menu_remove_from_favorite to AudilyIcons.FavoriteFill
+            else R.string.feature_songs_impl_menu_add_to_favorite to AudilyIcons.FavoriteOutline
         }
 
         SongMenuAction.ShowInfo -> R.string.feature_songs_impl_menu_info to AudilyIcons.Info

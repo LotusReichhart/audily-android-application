@@ -84,15 +84,7 @@ internal class FavoritesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateFavoritePositions(songIds: List<Long>) {
-        val time = System.currentTimeMillis()
-        val favorites = songIds.mapIndexed { index, id ->
-            FavoriteEntity(
-                songId = id,
-                createdAt = time,
-                position = index
-            )
-        }
-        favoritesDao.upsertFavorites(favorites)
+    override suspend fun clearFavorites() {
+        favoritesDao.deleteAllFavorites()
     }
 }

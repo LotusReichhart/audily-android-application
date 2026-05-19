@@ -2,6 +2,8 @@ package com.lotusreichhart.audily.feature.nowplaying
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lotusreichhart.audily.core.domain.usecase.favorite.CheckSongFavoriteStatusUseCase
+import com.lotusreichhart.audily.core.domain.usecase.favorite.ToggleFavoriteUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlaybackControlUseCases
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
 import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdatePlaybackParametersUseCase
@@ -13,10 +15,13 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,34 +35,47 @@ class NowPlayingViewModel @Inject constructor(
     private val updatePlaybackParameters: UpdatePlaybackParametersUseCase,
     private val setSleepTimer: SetSleepTimerUseCase,
     private val updateSkipDuration: UpdateSkipDurationUseCase,
+    private val checkSongFavoriteStatusUseCase: CheckSongFavoriteStatusUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
 ) : ViewModel() {
 
     private val _isLyricsVisible = MutableStateFlow(false)
 
-    val uiState: StateFlow<NowPlayingUiState> = combine(
-        observeNowPlaying(),
-        observePlaybackPosition(),
-        observeSleepTimer(),
-        _isLyricsVisible
-    ) { data, position, timer, isLyricsVisible ->
-        NowPlayingUiState(
-            playbackState = data.playbackState,
-            playbackPositionMs = position,
-            sleepTimerStatus = timer,
-            currentSong = data.song,
-            queue = data.queue,
-            currentIndex = data.currentIndex,
-            skipDuration = data.skipDuration,
-            paletteColors = data.colors?.toUiPalette(),
-            hasNext = data.hasNext,
-            hasPrevious = data.hasPrevious,
-            isLyricsVisible = isLyricsVisible
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<NowPlayingUiState> = observeNowPlaying()
+        .flatMapLatest { data ->
+            val songId = data.song?.id ?: -1L
+            val favoriteFlow = if (songId != -1L) {
+                checkSongFavoriteStatusUseCase(songId)
+            } else {
+                flowOf(false)
+            }
+
+            combine(
+                favoriteFlow,
+                observePlaybackPosition(),
+                observeSleepTimer(),
+                _isLyricsVisible
+            ) { isFavorite, position, timer, isLyricsVisible ->
+                NowPlayingUiState(
+                    playbackState = data.playbackState,
+                    playbackPositionMs = position,
+                    sleepTimerStatus = timer,
+                    currentSong = data.song?.copy(isFavorite = isFavorite),
+                    queue = data.queue,
+                    currentIndex = data.currentIndex,
+                    skipDuration = data.skipDuration,
+                    paletteColors = data.colors?.toUiPalette(),
+                    hasNext = data.hasNext,
+                    hasPrevious = data.hasPrevious,
+                    isLyricsVisible = isLyricsVisible
+                )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NowPlayingUiState()
         )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = NowPlayingUiState()
-    )
 
     fun onEvent(event: NowPlayingUiEvent) {
         viewModelScope.launch {
@@ -91,7 +109,11 @@ class NowPlayingViewModel @Inject constructor(
                     controls.setRepeatMode(nextMode)
                 }
 
-                NowPlayingUiEvent.OnToggleFavorite -> { /* TODO */
+                NowPlayingUiEvent.OnToggleFavorite -> {
+                    val songId = uiState.value.currentSong?.id
+                    if (songId != null) {
+                        toggleFavoriteUseCase(songId)
+                    }
                 }
 
                 NowPlayingUiEvent.OnToggleLyrics -> {
