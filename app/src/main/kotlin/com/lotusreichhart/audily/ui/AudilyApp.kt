@@ -66,6 +66,7 @@ import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
 import com.lotusreichhart.audily.feature.songs.impl.navigation.songsEntry
 import com.lotusreichhart.audily.navigation.NAV_BAR_ITEMS
 import com.lotusreichhart.audily.core.navigation.toEntries
+import com.lotusreichhart.audily.core.navigation.LocalNavigator
 import com.lotusreichhart.audily.ui.component.AudilyNavHost
 import com.lotusreichhart.audily.ui.component.AudilyNowPlayingOverlay
 import com.lotusreichhart.audily.ui.constants.AudilyAppConstants
@@ -260,6 +261,9 @@ internal fun AudilyApp(
         // Nếu màn hình hiện tại không nằm trong danh sách hiển thị của Bottom Bar -> Ẩn nó đi
         val shouldShow = appState.navigationState.currentKey in NAV_BAR_ITEMS.keys
         appState.isBottomBarShown = shouldShow
+        if (appState.isExpanded) {
+            appState.collapsePanel()
+        }
     }
 
     LaunchedEffect(
@@ -298,6 +302,7 @@ internal fun AudilyApp(
         val dynamicPadding = appState.getContentBottomPadding(density)
 
         CompositionLocalProvider(
+            LocalNavigator provides appState.navigator,
             LocalDynamicBottomPadding provides dynamicPadding,
             LocalAudilySheetController provides sheetController,
             LocalGlobalUiEventBus provides globalUiEventBus,

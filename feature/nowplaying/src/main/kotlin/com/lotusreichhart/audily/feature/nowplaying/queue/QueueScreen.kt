@@ -45,6 +45,12 @@ import com.lotusreichhart.audily.feature.nowplaying.R
 import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 import com.lotusreichhart.audily.feature.nowplaying.util.nowPlayingBackground
 import sh.calvin.reorderable.ReorderableItem
+import com.lotusreichhart.audily.core.navigation.LocalNavigator
+import com.lotusreichhart.audily.feature.nowplaying.queue.component.QueueSavePlaylistSheet
+import com.lotusreichhart.audily.feature.nowplaying.queue.component.QueueSongItem
+import com.lotusreichhart.audily.feature.nowplaying.queue.component.QueueTopBar
+import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistDetailNavKey
+import kotlinx.coroutines.flow.collectLatest
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.util.UUID
 
@@ -61,6 +67,22 @@ internal fun QueueScreen(
     var selectedIndexForMenu by remember { mutableStateOf<Int?>(null) }
     var selectedSongForMenu by remember { mutableStateOf<Song?>(null) }
     var showSongMenu by remember { mutableStateOf(false) }
+    var showSavePlaylistSheet by remember { mutableStateOf(false) }
+
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant
+    val navigator = LocalNavigator.current
+
+    LaunchedEffect(viewModel.uiEffect) {
+        viewModel.uiEffect.collectLatest { effect ->
+            when (effect) {
+                is QueueUiEffect.NavigateToPlaylist -> {
+                    showSavePlaylistSheet = false
+                    onClose() // Closes the QueueScreen sheet
+                    navigator.navigate(PlaylistDetailNavKey(effect.playlistId))
+                }
+            }
+        }
+    }
 
     LaunchedEffect(uiState.queue, uiState.playbackState.isInitialized) {
         if (uiState.playbackState.isInitialized && uiState.queue.isEmpty()) {
@@ -95,7 +117,10 @@ internal fun QueueScreen(
                     ActionItem(
                         label = stringResource(R.string.feature_nowplaying_queue_save_as_playlist),
                         icon = AudilyIcons.Playlist,
-                        onClick = { /* Xử lý */ }
+                        onClick = {
+                            showQueueMenu = false
+                            showSavePlaylistSheet = true
+                        }
                     ),
                     ActionItem(
                         label = stringResource(R.string.feature_nowplaying_queue_stop),
@@ -108,6 +133,29 @@ internal fun QueueScreen(
                     )
                 ),
                 onDismiss = { showQueueMenu = false }
+            )
+        }
+    }
+
+    if (showSavePlaylistSheet) {
+        AudilyBottomSheet(
+            onDismissRequest = { showSavePlaylistSheet = false },
+            isFullScreen = false,
+            showDragHandle = true,
+            enableSwipeToDismiss = true,
+            containerColor = sheetContainerColor,
+            skipPartiallyExpanded = true
+        ) {
+            QueueSavePlaylistSheet(
+                onDismiss = { showSavePlaylistSheet = false },
+                onSave = { name, description ->
+                    viewModel.onEvent(
+                        QueueUiEvent.OnSaveQueueAsPlaylist(
+                            name,
+                            description
+                        )
+                    )
+                }
             )
         }
     }

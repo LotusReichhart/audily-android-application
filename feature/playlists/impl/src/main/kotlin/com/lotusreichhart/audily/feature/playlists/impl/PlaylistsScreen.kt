@@ -188,7 +188,6 @@ internal fun PlaylistsScreen(
                                 .padding(top = dimensions.paddingMedium)
                                 .padding(horizontal = dimensions.paddingMedium)
                         )
-                        Spacer(Modifier.size(0.dp))
                     }
 
                     item(key = "favorite_playlist_item") {
@@ -198,7 +197,9 @@ internal fun PlaylistsScreen(
                             exit = fadeOut() + shrinkVertically()
                         ) {
                             PlaylistItem(
-                                modifier = Modifier.padding(horizontal = dimensions.paddingMedium),
+                                modifier = Modifier
+                                    .padding(vertical = dimensions.paddingSmall)
+                                    .padding(horizontal = dimensions.paddingMedium),
                                 name = stringResource(id = R.string.feature_playlists_impl_favorite_title),
                                 songCount = favoriteCount,
                                 artworkUris = favoriteArtworkUris,

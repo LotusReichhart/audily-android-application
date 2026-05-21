@@ -12,6 +12,7 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.designsystem)
     implementation(projects.core.ui)
+    implementation(projects.feature.playlists.api)
 
     implementation(libs.androidx.compose.animation)
     implementation(libs.drag.reorder)

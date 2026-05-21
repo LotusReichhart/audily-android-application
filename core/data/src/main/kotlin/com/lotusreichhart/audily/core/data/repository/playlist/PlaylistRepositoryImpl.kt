@@ -114,6 +114,10 @@ internal class PlaylistRepositoryImpl @Inject constructor(
         playlistDao.upsertSongsToPlaylist(crossRefs)
     }
 
+    override suspend fun addSongToPlaylists(playlistIds: List<Long>, songId: Long) {
+        playlistDao.addSongToPlaylists(playlistIds, songId)
+    }
+
     override suspend fun removeSongFromPlaylist(id: Long, songId: Long) {
         playlistDao.deleteSongFromPlaylist(id, songId)
     }

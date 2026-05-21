@@ -28,9 +28,14 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalParams
+import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
+import com.lotusreichhart.audily.core.ui.util.UiText
+import com.lotusreichhart.audily.core.navigation.LocalNavigator
+import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsPickerNavKey
 import com.lotusreichhart.audily.feature.songs.impl.R
 import com.lotusreichhart.audily.feature.songs.impl.resource.SongsIcons
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 internal fun SongMenuSheet(
@@ -39,6 +44,7 @@ internal fun SongMenuSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetController = LocalAudilySheetController.current
+    val navigator = LocalNavigator.current
 
     // Initialize ViewModel with params
     LaunchedEffect(params) {
@@ -51,6 +57,17 @@ internal fun SongMenuSheet(
                     ?: emptyList()
             if (song != null) {
                 viewModel.init(song, playlistId, caller, queueIds)
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel.uiEffect) {
+        viewModel.uiEffect.collectLatest { effect ->
+            when (effect) {
+                is SongMenuUiEffect.AddSongToPlaylists -> {
+                    sheetController.hideSheet()
+                    navigator.navigate(PlaylistsPickerNavKey(effect.songId))
+                }
             }
         }
     }

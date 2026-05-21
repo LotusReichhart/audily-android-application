@@ -29,4 +29,11 @@
 
     <string name="feature_nowplaying_sheet_seconds">Seconds</string>
     <string name="feature_nowplaying_sheet_duration_save">Save</string>
+    <string name="feature_nowplaying_playlist_created_success">Playlist created successfully</string>
+    <string name="feature_nowplaying_playlist_created_failed">Failed to create playlist</string>
+    <string name="feature_nowplaying_create_playlist">Create Playlist</string>
+    <string name="feature_nowplaying_playlist_name">Playlist Name</string>
+    <string name="feature_nowplaying_playlist_name_placeholder">Enter playlist name</string>
+    <string name="feature_nowplaying_playlist_description_optional">Description (Optional)</string>
+    <string name="feature_nowplaying_playlist_description_placeholder">Enter description</string>
 </resources>

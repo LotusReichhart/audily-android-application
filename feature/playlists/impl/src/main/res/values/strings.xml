@@ -33,4 +33,13 @@
     <string name="feature_playlists_impl_songs_count">%1$d songs</string>
     <string name="feature_playlists_impl_unknown_playlist">Unknown playlist</string>
     <string name="feature_playlists_impl_playlist_empty_description">Your playlist is empty. Add some tracks to set the vibe!</string>
+
+    <!-- Playlist Picker -->
+    <string name="feature_playlists_impl_add_song_to_playlists">The song has been added to the playlist</string>
+    <string name="feature_playlists_impl_picker_title">Select Playlists</string>
+    <string name="feature_playlists_impl_picker_selected">Selected</string>
+    <string name="feature_playlists_impl_picker_find_placeholder">Find a playlist…</string>
+    <string name="feature_playlists_impl_picker_not_found_title">Couldn\'t find that playlist</string>
+    <string name="feature_playlists_impl_picker_empty_title">Nothing to select yet</string>
+    <string name="feature_playlists_impl_picker_all">All</string>
 </resources>

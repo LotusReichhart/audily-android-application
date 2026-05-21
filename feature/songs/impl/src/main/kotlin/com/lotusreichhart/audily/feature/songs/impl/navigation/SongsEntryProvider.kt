@@ -26,7 +26,7 @@ fun EntryProviderScope<NavKey>.songsEntry(
 
     entry<SongsPickerNavKey> { key ->
         SongsPickerScreen(
-            playlistId = key.id,
+            playlistId = key.playlistId,
             onBack = {
                 navigator.goBack()
             }

@@ -93,4 +93,19 @@ class NavigatorTest {
         
         assertEquals(topLevelKey1, subStack1.last())
     }
+
+    class TestPickerNavKey(val id: Long) : SingleInstanceKey
+
+    @Test
+    fun `navigate to SingleInstanceKey removes existing keys of the same type`() {
+        val pickerKey1 = TestPickerNavKey(1)
+        val pickerKey2 = TestPickerNavKey(2)
+        
+        navigator.navigate(pickerKey1)
+        navigator.navigate(pickerKey2)
+        
+        assertEquals(2, subStack1.size) // topLevelKey1 and pickerKey2
+        assertEquals(pickerKey2, subStack1.last())
+        kotlin.test.assertFalse(subStack1.contains(pickerKey1))
+    }
 }

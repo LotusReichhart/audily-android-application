@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.feature.nowplaying.queue
+package com.lotusreichhart.audily.feature.nowplaying.queue.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

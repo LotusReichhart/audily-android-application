@@ -1,5 +1,6 @@
 package com.lotusreichhart.audily.core.navigation
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation3.runtime.NavKey
 
 /**
@@ -7,7 +8,7 @@ import androidx.navigation3.runtime.NavKey
  * Quản lý cả Top-Level destinations (như Home, Library) và Sub-Stack (các màn hình chi tiết).
  */
 class Navigator(val state: NavigationState) {
-    
+
     /**
      * Phương thức điều hướng chính.
      * - Nếu key đã là Top-Level đang hiển thị -> Xóa sạch các màn hình chi tiết (Sub-Stack).
@@ -34,6 +35,7 @@ class Navigator(val state: NavigationState) {
             state.currentTopLevelKey -> {
                 state.topLevelStack.removeLastOrNull()
             }
+
             else -> state.currentSubStack.removeLastOrNull()
         }
     }
@@ -45,6 +47,9 @@ class Navigator(val state: NavigationState) {
     internal fun goToKey(key: NavKey) {
         state.currentSubStack.apply {
             remove(key)
+            if (key is SingleInstanceKey) {
+                removeAll { it::class == key::class }
+            }
             add(key)
         }
     }
@@ -75,4 +80,10 @@ class Navigator(val state: NavigationState) {
             if (size > 1) subList(1, size).clear()
         }
     }
+}
+
+interface SingleInstanceKey : NavKey
+
+val LocalNavigator = staticCompositionLocalOf<Navigator> {
+    error("No Navigator provided")
 }

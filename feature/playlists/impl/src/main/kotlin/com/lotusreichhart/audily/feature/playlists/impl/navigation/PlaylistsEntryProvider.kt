@@ -6,8 +6,10 @@ import com.lotusreichhart.audily.core.navigation.Navigator
 import com.lotusreichhart.audily.feature.favorites.api.navigation.FavoritesNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistDetailNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsNavKey
+import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsPickerNavKey
 import com.lotusreichhart.audily.feature.playlists.impl.PlaylistsScreen
 import com.lotusreichhart.audily.feature.playlists.impl.detail.PlaylistDetailScreen
+import com.lotusreichhart.audily.feature.playlists.impl.picker.PlaylistsPickerScreen
 import com.lotusreichhart.audily.feature.search.api.SearchNavKey
 import com.lotusreichhart.audily.feature.search.api.SearchType
 
@@ -40,7 +42,16 @@ fun EntryProviderScope<NavKey>.playlistsEntry(
                 navigator.goBack()
             },
             onNavigateToAddSongs = { playlistId ->
-                navigator.navigate(SongsPickerNavKey(id = playlistId))
+                navigator.navigate(SongsPickerNavKey(playlistId = playlistId))
+            }
+        )
+    }
+
+    entry<PlaylistsPickerNavKey> { key ->
+        PlaylistsPickerScreen(
+            songId = key.songId,
+            onBack = {
+                navigator.goBack()
             }
         )
     }
