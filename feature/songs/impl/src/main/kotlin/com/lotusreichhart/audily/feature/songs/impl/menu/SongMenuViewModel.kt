@@ -22,9 +22,11 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -93,6 +95,9 @@ class SongMenuViewModel @Inject constructor(
 
     private var _playlistId: Long? = null
     private var _queueIds: List<Long> = emptyList()
+
+    private val _uiEffect = MutableSharedFlow<SongMenuUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
 
     fun init(
         song: Song,
@@ -239,7 +244,21 @@ class SongMenuViewModel @Inject constructor(
                 }
             }
 
-            else -> {}
+            SongMenuAction.AddToPlaylist -> {
+                _uiEffect.emit(SongMenuUiEffect.AddSongToPlaylists(song.id))
+            }
+
+            SongMenuAction.Delete -> {
+
+            }
+
+            SongMenuAction.EditTags -> {
+
+            }
+
+            SongMenuAction.Share -> {
+
+            }
         }
     }
 }
