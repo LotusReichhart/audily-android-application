@@ -51,6 +51,21 @@ abstract class PlaylistDao {
     @Upsert
     abstract suspend fun upsertSongsToPlaylist(crossRefs: List<PlaylistSongCrossRef>)
 
+    @Transaction
+    open suspend fun addSongToPlaylists(playlistIds: List<Long>, songId: Long) {
+        playlistIds.forEach { id ->
+            val maxPos = getMaxPositionInPlaylist(id) ?: -1
+            val time = System.currentTimeMillis()
+            val crossRef = PlaylistSongCrossRef(
+                playlistId = id,
+                songId = songId,
+                addedAt = time,
+                position = maxPos + 1
+            )
+            upsertSongToPlaylist(crossRef)
+        }
+    }
+
     @Query("DELETE FROM playlist_song_cross_ref WHERE playlist_id = :playlistId AND song_id = :songId")
     abstract suspend fun deleteSongFromPlaylist(playlistId: Long, songId: Long)
 
