@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.feature.nowplaying.queue
+package com.lotusreichhart.audily.feature.nowplaying.queue.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +28,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.designsystem.theme.OnSurfaceDark
 import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
 import com.lotusreichhart.audily.core.model.song.Song
+import com.lotusreichhart.audily.feature.nowplaying.queue.QueueUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.resource.NowPlayingIcons
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -12,6 +12,7 @@ fun AudilyScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     containerColor: Color = Color.Transparent,
     content: @Composable (PaddingValues) -> Unit
@@ -20,6 +21,7 @@ fun AudilyScaffold(
         modifier = modifier,
         topBar = topBar,
         bottomBar = bottomBar,
+        floatingActionButton = floatingActionButton,
         snackbarHost = snackbarHost,
         containerColor = containerColor,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),

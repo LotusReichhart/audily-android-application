@@ -6,4 +6,5 @@ sealed interface QueueUiEvent {
     data class OnSongClicked(val index: Int, val songId: Long) : QueueUiEvent
     data class OnSkipToIndex(val index: Int) : QueueUiEvent
     data object OnStopQueue : QueueUiEvent
+    data class OnSaveQueueAsPlaylist(val name: String, val description: String?) : QueueUiEvent
 }
