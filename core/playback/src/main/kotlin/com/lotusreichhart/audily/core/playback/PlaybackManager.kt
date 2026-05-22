@@ -116,6 +116,7 @@ class PlaybackManager @Inject constructor(
             is PlaybackEvent.AddSongsToQueue -> addSongsToQueue(event.songs, event.index)
             is PlaybackEvent.PlayNext -> addNext(event.song)
             is PlaybackEvent.AddSongToLast -> addLast(event.song)
+            is PlaybackEvent.UpdateSongMetadata -> updateSongMetadata(event.song)
         }
     }
 
@@ -286,6 +287,21 @@ class PlaybackManager @Inject constructor(
             if (player.getMediaItemAt(i).mediaId == songId.toString()) {
                 player.removeMediaItem(i)
                 break
+            }
+        }
+    }
+
+    internal fun updateSongMetadata(song: Song) {
+        val player = exoPlayer ?: return
+        val songIdStr = song.id.toString()
+        for (i in 0 until player.mediaItemCount) {
+            val mediaItem = player.getMediaItemAt(i)
+            if (mediaItem.mediaId == songIdStr) {
+                val updatedMediaItem = MediaItemMapper.toMediaItem(song)
+                player.replaceMediaItem(i, updatedMediaItem)
+                if (i == player.currentMediaItemIndex) {
+                    notifyListeners()
+                }
             }
         }
     }

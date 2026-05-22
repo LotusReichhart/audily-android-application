@@ -1,6 +1,7 @@
 package com.lotusreichhart.audily.core.data.di
 
 import com.lotusreichhart.audily.core.data.repository.album.AlbumRepositoryImpl
+import com.lotusreichhart.audily.core.data.repository.edittag.EditTagRepositoryImpl
 import com.lotusreichhart.audily.core.data.repository.favorite.FavoritesRepositoryImpl
 import com.lotusreichhart.audily.core.data.repository.history.HistoryRepositoryImpl
 import com.lotusreichhart.audily.core.data.repository.playback.PlaybackStateListenerImpl
@@ -9,6 +10,7 @@ import com.lotusreichhart.audily.core.data.repository.prefs.UserPreferencesRepos
 import com.lotusreichhart.audily.core.data.repository.song.SongRepositoryImpl
 import com.lotusreichhart.audily.core.data.util.ConnectivityManagerNetworkMonitor
 import com.lotusreichhart.audily.core.domain.repository.album.AlbumRepository
+import com.lotusreichhart.audily.core.domain.repository.edittag.EditTagRepository
 import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
 import com.lotusreichhart.audily.core.domain.repository.history.HistoryRepository
 import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackStateListener
@@ -65,4 +67,9 @@ internal abstract class DataModule {
     internal abstract fun bindsHistoryRepository(
         historyRepository: HistoryRepositoryImpl,
     ): HistoryRepository
+
+    @Binds
+    internal abstract fun bindsEditTagRepository(
+        editTagRepository: EditTagRepositoryImpl,
+    ): EditTagRepository
 }

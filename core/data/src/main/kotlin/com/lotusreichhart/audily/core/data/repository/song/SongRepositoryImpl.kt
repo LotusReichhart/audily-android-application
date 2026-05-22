@@ -75,42 +75,42 @@ internal class SongRepositoryImpl @Inject constructor(
     }
 
     override fun getSong(id: Long): Flow<Song?> {
-        return flow {
-            emit(mediaStoreDataSource.getSong(id)?.toSong())
+        return mediaStoreDataSource.observeMusicUri().map {
+            mediaStoreDataSource.getSong(id)?.toSong()
         }
     }
 
     override fun getSongsByIds(ids: List<Long>): Flow<List<Song>> {
-        return flow {
+        return mediaStoreDataSource.observeMusicUri().map {
             val songs = mediaStoreDataSource.getSongs(ids).map { it.toSong() }
             val songsMap = songs.associateBy { it.id }
-            emit(ids.map { id ->
+            ids.map { id ->
                 songsMap[id] ?: Song(
                     id = id,
                     basic = BasicSongMetadata.EMPTY,
                     isMissing = true
                 )
-            })
+            }
         }
     }
 
     override fun getBasicSong(id: Long): Flow<Song?> {
-        return flow {
-            emit(mediaStoreDataSource.getBasicSong(id)?.toSong())
+        return mediaStoreDataSource.observeMusicUri().map {
+            mediaStoreDataSource.getBasicSong(id)?.toSong()
         }
     }
 
     override fun getBasicSongs(ids: List<Long>): Flow<List<Song>> {
-        return flow {
+        return mediaStoreDataSource.observeMusicUri().map {
             val songs = mediaStoreDataSource.getBasicSongs(ids).map { it.toSong() }
             val songsMap = songs.associateBy { it.id }
-            emit(ids.map { id ->
+            ids.map { id ->
                 songsMap[id] ?: Song(
                     id = id,
                     basic = BasicSongMetadata.EMPTY,
                     isMissing = true
                 )
-            })
+            }
         }
     }
 
