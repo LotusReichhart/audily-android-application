@@ -109,6 +109,26 @@ class MediaStoreTagEditor @Inject constructor(
             songId
         )
 
+        // Check if the file is writable (Scoped Storage permission check)
+        val file = File(filePath)
+        if (!file.canWrite()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                try {
+                    val pendingIntent = MediaStore.createWriteRequest(contentResolver, listOf(songUri))
+                    emit(MediaStoreEditTagStatus.NeedScopedStoragePermission(pendingIntent.intentSender))
+                    return@flow
+                } catch (e: Exception) {
+                    Timber.e(e, "$TAG - Không tạo được write request cho songId: $songId")
+                    emit(MediaStoreEditTagStatus.Failed)
+                    return@flow
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Timber.w("$TAG - Không có quyền ghi file trên Android 10 cho songId: $songId")
+                emit(MediaStoreEditTagStatus.Failed)
+                return@flow
+            }
+        }
+
         // --- Giai đoạn 1: Copy file gốc sang file tạm ---
         val tempFile = File(context.cacheDir, "edittag_${songId}_${System.currentTimeMillis()}.tmp")
 
@@ -260,6 +280,8 @@ class MediaStoreTagEditor @Inject constructor(
             }
         }
     }.flowOn(ioDispatcher)
+
+
 
     /**
      * Lấy đường dẫn file vật lý của bài hát từ MediaStore.

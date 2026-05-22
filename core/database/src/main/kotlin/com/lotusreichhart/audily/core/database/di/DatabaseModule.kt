@@ -14,6 +14,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+import com.lotusreichhart.audily.core.database.dao.LyricsDao
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
@@ -46,4 +48,9 @@ object DatabaseModule {
     fun provideHistoryDao(
         database: AudilyDatabase
     ): HistoryDao = database.historyDao()
+
+    @Provides
+    fun provideLyricsDao(
+        database: AudilyDatabase
+    ): LyricsDao = database.lyricsDao()
 }

@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lotusreichhart.audily.core.domain.usecase.favorite.CheckSongFavoriteStatusUseCase
 import com.lotusreichhart.audily.core.domain.usecase.favorite.ToggleFavoriteUseCase
+import com.lotusreichhart.audily.core.domain.usecase.lyrics.ObserveLyricsUseCase
+import com.lotusreichhart.audily.core.domain.usecase.lyrics.FetchAndSaveLyricsUseCase
+import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.PlaybackControlUseCases
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
 import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdatePlaybackParametersUseCase
@@ -23,6 +26,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
+import timber.log.Timber
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,9 +44,43 @@ class NowPlayingViewModel @Inject constructor(
     private val updateSkipDuration: UpdateSkipDurationUseCase,
     private val checkSongFavoriteStatusUseCase: CheckSongFavoriteStatusUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val observeLyricsUseCase: ObserveLyricsUseCase,
+    private val fetchAndSaveLyricsUseCase: FetchAndSaveLyricsUseCase,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     private val _isLyricsVisible = MutableStateFlow(false)
+    private val _isLyricsLoading = MutableStateFlow(false)
+
+    init {
+        viewModelScope.launch {
+            observeNowPlaying()
+                .map { it.song }
+                .distinctUntilChanged { old, new -> old?.id == new?.id }
+                .collect { song ->
+                    if (song != null) {
+                        val currentLyrics = observeLyricsUseCase(song.id).first()
+                        if (currentLyrics == null) {
+                            if (networkMonitor.isOnline.first()) {
+                                _isLyricsLoading.value = true
+                                try {
+                                    fetchAndSaveLyricsUseCase(
+                                        songId = song.id,
+                                        title = song.basic.title,
+                                        artist = song.basic.artist,
+                                        durationMs = song.basic.duration
+                                    )
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Error fetching lyrics")
+                                } finally {
+                                    _isLyricsLoading.value = false
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<NowPlayingUiState> = observeNowPlaying()
@@ -51,12 +92,27 @@ class NowPlayingViewModel @Inject constructor(
                 flowOf(false)
             }
 
+            val lyricsFlow = if (songId != -1L) {
+                observeLyricsUseCase(songId)
+            } else {
+                flowOf(null)
+            }
+
+            val lyricsStateFlow = combine(
+                _isLyricsVisible,
+                lyricsFlow,
+                _isLyricsLoading
+            ) { isVisible, lyrics, isLoading ->
+                Triple(isVisible, lyrics, isLoading)
+            }
+
             combine(
                 favoriteFlow,
                 observePlaybackPosition(),
                 observeSleepTimer(),
-                _isLyricsVisible
-            ) { isFavorite, position, timer, isLyricsVisible ->
+                lyricsStateFlow
+            ) { isFavorite, position, timer, lyricsState ->
+                val (isLyricsVisible, lyrics, isLyricsLoading) = lyricsState
                 NowPlayingUiState(
                     playbackState = data.playbackState,
                     playbackPositionMs = position,
@@ -68,7 +124,9 @@ class NowPlayingViewModel @Inject constructor(
                     paletteColors = data.colors?.toUiPalette(),
                     hasNext = data.hasNext,
                     hasPrevious = data.hasPrevious,
-                    isLyricsVisible = isLyricsVisible
+                    isLyricsVisible = isLyricsVisible,
+                    lyrics = lyrics,
+                    isLyricsLoading = isLyricsLoading
                 )
             }
         }.stateIn(

@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.network
+package com.lotusreichhart.audily.core.network.util
 
 import android.content.ContentUris
 import android.content.Context

@@ -34,6 +34,8 @@ import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingArtworkP
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingControls
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingExtension
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingInfo
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingLyricsLoadingView
+import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingLyricsView
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingNoLyrics
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingProgress
 import com.lotusreichhart.audily.feature.nowplaying.component.NowPlayingTopBar
@@ -144,7 +146,17 @@ internal fun ExpandedNowPlayingLayout(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            NowPlayingNoLyrics()
+                            if (uiState.isLyricsLoading) {
+                                NowPlayingLyricsLoadingView()
+                            } else if (uiState.lyrics != null) {
+                                NowPlayingLyricsView(
+                                    lyrics = uiState.lyrics,
+                                    currentPositionMs = uiState.playbackPositionMs,
+                                    onLineClick = { position -> onEvent(NowPlayingUiEvent.OnSeekTo(position)) }
+                                )
+                            } else {
+                                NowPlayingNoLyrics()
+                            }
                         }
                     }
                 }
