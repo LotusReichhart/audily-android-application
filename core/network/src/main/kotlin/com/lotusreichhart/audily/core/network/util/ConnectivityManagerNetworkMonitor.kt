@@ -1,4 +1,4 @@
-package com.lotusreichhart.audily.core.data.util
+package com.lotusreichhart.audily.core.network.util
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -10,7 +10,6 @@ import androidx.core.content.getSystemService
 import androidx.tracing.trace
 import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
 import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
-import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
@@ -19,12 +18,14 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
+import javax.inject.Singleton
 
-internal class ConnectivityManagerNetworkMonitor @Inject constructor(
+@Singleton
+class ConnectivityManagerNetworkMonitor @Inject constructor(
     @param:ApplicationContext private val context: Context,
     @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
-) : NetworkMonitor {
-    override val isOnline: Flow<Boolean> = callbackFlow {
+) {
+    val isOnline: Flow<Boolean> = callbackFlow {
         trace("NetworkMonitor.callbackFlow") {
             val connectivityManager = context.getSystemService<ConnectivityManager>()
             if (connectivityManager == null) {
@@ -34,7 +35,6 @@ internal class ConnectivityManagerNetworkMonitor @Inject constructor(
             }
 
             val callback = object : NetworkCallback() {
-
                 private val networks = mutableSetOf<Network>()
 
                 override fun onAvailable(network: Network) {

@@ -8,7 +8,7 @@ import com.lotusreichhart.audily.core.data.repository.playback.PlaybackStateList
 import com.lotusreichhart.audily.core.data.repository.playlist.PlaylistRepositoryImpl
 import com.lotusreichhart.audily.core.data.repository.prefs.UserPreferencesRepositoryImpl
 import com.lotusreichhart.audily.core.data.repository.song.SongRepositoryImpl
-import com.lotusreichhart.audily.core.data.util.ConnectivityManagerNetworkMonitor
+import com.lotusreichhart.audily.core.data.util.NetworkMonitorImpl
 import com.lotusreichhart.audily.core.domain.repository.album.AlbumRepository
 import com.lotusreichhart.audily.core.domain.repository.edittag.EditTagRepository
 import com.lotusreichhart.audily.core.domain.repository.favorite.FavoritesRepository
@@ -29,7 +29,7 @@ import dagger.multibindings.IntoSet
 internal abstract class DataModule {
     @Binds
     internal abstract fun bindsNetworkMonitor(
-        networkMonitor: ConnectivityManagerNetworkMonitor,
+        networkMonitor: NetworkMonitorImpl,
     ): NetworkMonitor
 
     @Binds
@@ -72,4 +72,9 @@ internal abstract class DataModule {
     internal abstract fun bindsEditTagRepository(
         editTagRepository: EditTagRepositoryImpl,
     ): EditTagRepository
-}
+
+    @Binds
+    internal abstract fun bindsLyricsRepository(
+        lyricsRepository: com.lotusreichhart.audily.core.data.repository.lyrics.LyricsRepositoryImpl,
+    ): com.lotusreichhart.audily.core.domain.repository.lyrics.LyricsRepository
+}

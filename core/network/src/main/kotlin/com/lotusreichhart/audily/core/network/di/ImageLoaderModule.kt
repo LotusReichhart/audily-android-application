@@ -2,7 +2,7 @@ package com.lotusreichhart.audily.core.network.di
 
 import android.content.Context
 import coil3.ImageLoader
-import com.lotusreichhart.audily.core.network.AudioCoverFetcher
+import com.lotusreichhart.audily.core.network.util.AudioCoverFetcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
