@@ -6,4 +6,5 @@ internal sealed interface HomeUiEvent {
     data class OnSongClick(val songId: Long, val contextSongs: List<Song>) : HomeUiEvent
     data object OnShuffleAll : HomeUiEvent
     data object OnResume : HomeUiEvent
+    data class OnDeleteFromHistory(val songId: Long) : HomeUiEvent
 }

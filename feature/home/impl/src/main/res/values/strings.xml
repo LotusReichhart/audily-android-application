@@ -17,4 +17,6 @@
     <string name="feature_home_impl_empty_title">Welcome to Audily</string>
     <string name="feature_home_impl_empty_subtitle">It\'s a bit quiet here. Head over to your library to scan and bring this space to life.</string>
     <string name="feature_home_impl_empty_action">Open library</string>
+    <string name="feature_home_impl_delete_history_title">Delete from History</string>
+    <string name="feature_home_impl_delete_history_text">Are you sure you want to remove \"%1$s\" from your listening history?</string>
 </resources>

@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.feature.home.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lotusreichhart.audily.core.domain.usecase.history.DeleteHistoryUseCase
 import com.lotusreichhart.audily.core.domain.usecase.home.GetHomeVibeUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
@@ -27,6 +28,7 @@ internal class HomeViewModel @Inject constructor(
     private val playFromQueueUseCase: PlayFromQueueUseCase,
     private val resumeSongUseCase: ResumeSongUseCase,
     private val getSongIdsUseCase: GetSongIdsUseCase,
+    private val deleteHistoryUseCase: DeleteHistoryUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = combine(
@@ -58,6 +60,10 @@ internal class HomeViewModel @Inject constructor(
 
                 HomeUiEvent.OnResume -> {
                     resumeSongUseCase()
+                }
+
+                is HomeUiEvent.OnDeleteFromHistory -> {
+                    deleteHistoryUseCase(event.songId)
                 }
             }
         }

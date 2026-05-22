@@ -85,9 +85,14 @@ fun SongItem(
             .padding(horizontal = LocalDimensions.current.paddingMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (showDragHandle && !isMissing) {
-            DragHandleIcon(modifier = dragHandleModifier, inNowPlaying = inNowPlaying)
-            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
+        if (showDragHandle) {
+            if (!isMissing) {
+                DragHandleIcon(modifier = dragHandleModifier, inNowPlaying = inNowPlaying)
+                Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
+            } else {
+                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
+            }
         }
 
         Row(
@@ -175,7 +180,7 @@ private fun SongInformation(
     val displayTitle =
         if (isMissing) stringResource(id = R.string.core_designsystem_song_is_missing) else title
     val displayArtist =
-        if (isMissing) stringResource(id = R.string.core_designsystem_unknown_artist) else artist
+        if (isMissing) stringResource(id = R.string.core_designsystem_song_is_missing) else artist
 
     val titleColor = when {
         isMissing -> MaterialTheme.colorScheme.error

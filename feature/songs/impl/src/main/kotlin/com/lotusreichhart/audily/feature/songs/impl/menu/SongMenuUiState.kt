@@ -7,6 +7,7 @@ data class SongMenuUiState(
     val caller: String = "",
     val options: List<SongMenuAction> = emptyList(),
     val isShowingInfoDialog: Boolean = false,
+    val isShowingDeleteDialog: Boolean = false,
     val isFavorite: Boolean = false
 )
 

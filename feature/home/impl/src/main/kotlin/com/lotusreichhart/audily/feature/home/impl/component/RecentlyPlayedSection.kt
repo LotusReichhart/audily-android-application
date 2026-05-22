@@ -27,7 +27,8 @@ import com.lotusreichhart.audily.feature.home.impl.R
 @Composable
 internal fun RecentlyPlayedSection(
     songs: List<Song>,
-    onSongClick: (Long) -> Unit,
+    onSongClick: (Song) -> Unit,
+    onSongLongClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -50,6 +51,7 @@ internal fun RecentlyPlayedSection(
                     modifier = Modifier.width(80.dp),
                     title = song.basic.title,
                     artist = song.basic.artist,
+                    isMissing = song.isMissing,
                     albumArt = {
                         AudilyArtwork(
                             artworkUri = song.basic.artworkUri,
@@ -58,7 +60,8 @@ internal fun RecentlyPlayedSection(
                                 .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusMedium))
                         )
                     },
-                    onClick = { onSongClick(song.id) }
+                    onClick = { onSongClick(song) },
+                    onLongClick = { onSongLongClick(song) }
                 )
             }
         }

@@ -51,4 +51,12 @@
     <string name="feature_songs_impl_picker_empty_title">Nothing to select yet</string>
     <string name="feature_songs_impl_picker_find_placeholder">Find a track…</string>
     <string name="feature_songs_impl_picker_not_found_title">Couldn\'t find that song</string>
+    <string name="feature_songs_impl_menu_delete_confirm_title">Delete Song</string>
+    <string name="feature_songs_impl_menu_delete_confirm_text">Are you sure you want to permanently delete \"%1$s\" from your device?</string>
+    <string name="feature_songs_impl_delete_success">Successfully deleted song</string>
+    <string name="feature_songs_impl_delete_failed">Failed to delete song</string>
+    <string name="feature_songs_impl_ringtone_success">Successfully set as ringtone</string>
+    <string name="feature_songs_impl_ringtone_permission_need">Need Write Settings permission</string>
+    <string name="feature_songs_impl_ringtone_permission_grant">GRANT</string>
+    <string name="feature_songs_impl_ringtone_failed">Failed to set ringtone</string>
 </resources>

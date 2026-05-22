@@ -1,6 +1,7 @@
 package com.lotusreichhart.audily.core.mediastore
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.database.ContentObserver
 import android.net.Uri
 import android.provider.MediaStore
@@ -140,5 +141,13 @@ class MediaStoreDataSource @Inject constructor(
      */
     fun getAlbum(id: Long): MediaStoreAlbum? {
         return contentResolver.queryAlbumById(albumsUri, id)
+    }
+
+    /**
+     * Xóa một bài hát khỏi MediaStore theo ID.
+     */
+    fun deleteSong(id: Long) {
+        val uri = ContentUris.withAppendedId(musicUri, id)
+        contentResolver.delete(uri, null, null)
     }
 }
