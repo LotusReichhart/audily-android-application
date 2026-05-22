@@ -9,17 +9,21 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.control.ResumeSong
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.AddSongToQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayFromQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.queue.PlayNextUseCase
+import com.lotusreichhart.audily.core.domain.usecase.playback.queue.RemoveFromQueueUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveNowPlayingUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.RemoveSongFromPlaylistUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetSongUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.SetRingtoneUseCase
+import com.lotusreichhart.audily.core.domain.usecase.song.DeleteSongUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.RingtoneResult
+import com.lotusreichhart.audily.core.model.song.DeleteSongResult
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalMenuCaller
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
+import com.lotusreichhart.audily.feature.songs.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,12 +50,15 @@ class SongMenuViewModel @Inject constructor(
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val checkSongFavoriteStatusUseCase: CheckSongFavoriteStatusUseCase,
     private val setRingtoneUseCase: SetRingtoneUseCase,
+    private val deleteSongUseCase: DeleteSongUseCase,
+    private val removeFromQueueUseCase: RemoveFromQueueUseCase,
     private val getSongUseCase: GetSongUseCase,
     private val globalUiEventBus: GlobalUiEventBus
 ) : ViewModel() {
 
     private val _params = MutableStateFlow<SongMenuParams?>(null)
     private val _isShowingInfoDialog = MutableStateFlow(false)
+    private val _isShowingDeleteDialog = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<SongMenuUiState?> = _params
@@ -63,8 +70,9 @@ class SongMenuViewModel @Inject constructor(
                     getSongUseCase(params.song.id),
                     observeNowPlayingUseCase(),
                     checkSongFavoriteStatusUseCase(params.song.id),
-                    _isShowingInfoDialog
-                ) { fullSong, playbackState, isFavorite, isShowingInfo ->
+                    _isShowingInfoDialog,
+                    _isShowingDeleteDialog
+                ) { fullSong, playbackState, isFavorite, isShowingInfo, isShowingDelete ->
                     val updatedSong = fullSong ?: params.song
                     val isCurrentSong = playbackState.song?.id == updatedSong.id
                     val isPlaying =
@@ -82,6 +90,7 @@ class SongMenuViewModel @Inject constructor(
                         caller = params.caller,
                         options = options,
                         isShowingInfoDialog = isShowingInfo,
+                        isShowingDeleteDialog = isShowingDelete,
                         isFavorite = isFavorite
                     )
                 }
@@ -110,6 +119,7 @@ class SongMenuViewModel @Inject constructor(
         this._playlistId = playlistId
         this._queueIds = queueIds
         this._isShowingInfoDialog.value = false
+        this._isShowingDeleteDialog.value = false
 
         _params.value = SongMenuParams(song, playlistId, caller, queueIds)
     }
@@ -120,6 +130,30 @@ class SongMenuViewModel @Inject constructor(
                 is SongMenuUiEvent.OnActionClick -> handleAction(event.action)
                 SongMenuUiEvent.OnDismissInfoDialog -> {
                     _isShowingInfoDialog.value = false
+                }
+
+                SongMenuUiEvent.OnDismissDeleteDialog -> {
+                    _isShowingDeleteDialog.value = false
+                }
+
+                SongMenuUiEvent.OnConfirmDelete -> {
+                    _isShowingDeleteDialog.value = false
+                    val songId = _params.value?.song?.id ?: return@launch
+                    when (val result = deleteSongUseCase(songId)) {
+                        is DeleteSongResult.SUCCESS -> {
+                            removeFromQueueUseCase(songId)
+                            globalUiEventBus.emit(GlobalUiEvent.HideSheet)
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.StringResource(R.string.feature_songs_impl_delete_success)))
+                        }
+
+                        is DeleteSongResult.NEED_SCOPED_STORAGE_PERMISSION -> {
+                            globalUiEventBus.emit(GlobalUiEvent.RequestFilePermission(result.intentSender))
+                        }
+
+                        is DeleteSongResult.FAILED -> {
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.StringResource(R.string.feature_songs_impl_delete_failed)))
+                        }
+                    }
                 }
             }
         }
@@ -218,14 +252,14 @@ class SongMenuViewModel @Inject constructor(
                     when (val result = setRingtoneUseCase(song.id)) {
                         is RingtoneResult.SUCCESS -> {
                             globalUiEventBus.emit(GlobalUiEvent.HideSheet)
-                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.DynamicString("Successfully set as ringtone")))
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.StringResource(R.string.feature_songs_impl_ringtone_success)))
                         }
 
                         is RingtoneResult.NO_PERMISSION -> {
                             globalUiEventBus.emit(
                                 GlobalUiEvent.ShowSnackbar(
-                                    message = UiText.DynamicString("Need Write Settings permission"),
-                                    actionLabel = UiText.DynamicString("GRANT"),
+                                    message = UiText.StringResource(R.string.feature_songs_impl_ringtone_permission_need),
+                                    actionLabel = UiText.StringResource(R.string.feature_songs_impl_ringtone_permission_grant),
                                     onAction = {
                                         globalUiEventBus.emit(GlobalUiEvent.OpenWriteSettingsPermission)
                                     }
@@ -238,7 +272,7 @@ class SongMenuViewModel @Inject constructor(
                         }
 
                         is RingtoneResult.FAILED -> {
-                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.DynamicString("Failed to set ringtone")))
+                            globalUiEventBus.emit(GlobalUiEvent.ShowSnackbar(UiText.StringResource(R.string.feature_songs_impl_ringtone_failed)))
                         }
                     }
                 }
@@ -249,7 +283,7 @@ class SongMenuViewModel @Inject constructor(
             }
 
             SongMenuAction.Delete -> {
-
+                _isShowingDeleteDialog.value = true
             }
 
             SongMenuAction.EditTags -> {
@@ -257,7 +291,7 @@ class SongMenuViewModel @Inject constructor(
             }
 
             SongMenuAction.Share -> {
-
+                _uiEffect.emit(SongMenuUiEffect.ShareSong(song))
             }
         }
     }

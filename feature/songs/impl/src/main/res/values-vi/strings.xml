@@ -51,4 +51,12 @@
     <string name="feature_songs_impl_picker_empty_title">Chưa có nhạc để thêm vào</string>
     <string name="feature_songs_impl_picker_find_placeholder">Tìm tên bài hát…</string>
     <string name="feature_songs_impl_picker_not_found_title">Không tìm thấy bài hát nào</string>
+    <string name="feature_songs_impl_menu_delete_confirm_title">Xóa bài hát</string>
+    <string name="feature_songs_impl_menu_delete_confirm_text">Bạn có chắc chắn muốn xóa vĩnh viễn \"%1$s\" khỏi thiết bị?</string>
+    <string name="feature_songs_impl_delete_success">Đã xóa bài hát thành công</string>
+    <string name="feature_songs_impl_delete_failed">Xóa bài hát thất bại</string>
+    <string name="feature_songs_impl_ringtone_success">Cài làm nhạc chuông thành công</string>
+    <string name="feature_songs_impl_ringtone_permission_need">Cần cấp quyền thay đổi cài đặt hệ thống để đặt nhạc chuông</string>
+    <string name="feature_songs_impl_ringtone_permission_grant">CẤP QUYỀN</string>
+    <string name="feature_songs_impl_ringtone_failed">Cài đặt nhạc chuông thất bại</string>
 </resources>

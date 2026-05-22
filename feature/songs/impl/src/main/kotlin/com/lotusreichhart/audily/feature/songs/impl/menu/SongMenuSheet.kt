@@ -19,6 +19,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import android.content.ContentUris
+import android.content.Intent
+import android.provider.MediaStore
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,6 +49,7 @@ internal fun SongMenuSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetController = LocalAudilySheetController.current
     val navigator = LocalNavigator.current
+    val context = LocalContext.current
 
     // Initialize ViewModel with params
     LaunchedEffect(params) {
@@ -73,6 +78,20 @@ internal fun SongMenuSheet(
                     sheetController.hideSheet()
                     navigator.navigate(EditTagNavKey(effect.songId))
                 }
+
+                is SongMenuUiEffect.ShareSong -> {
+                    sheetController.hideSheet()
+                    val uri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        effect.song.id
+                    )
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "audio/*"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share Audio"))
+                }
             }
         }
     }
@@ -88,7 +107,7 @@ internal fun SongMenuSheet(
                 onClick = { viewModel.onEvent(SongMenuUiEvent.OnActionClick(action)) },
                 isDestructive = action is SongMenuAction.Delete ||
                         action is SongMenuAction.RemoveFromPlaylist,
-                autoDismiss = action !is SongMenuAction.SetRingtone
+                autoDismiss = action !is SongMenuAction.Delete
             )
         }
 
@@ -104,6 +123,7 @@ internal fun SongMenuSheet(
                         if (action !is SongMenuAction.ResumePause
                             && action !is SongMenuAction.ToggleFavorite
                             && action !is SongMenuAction.ShowInfo
+                            && action !is SongMenuAction.Delete
                         ) {
                             sheetController.hideSheet()
                         }
@@ -116,6 +136,49 @@ internal fun SongMenuSheet(
             SongInfoDialog(
                 song = state.song,
                 onDismiss = { viewModel.onEvent(SongMenuUiEvent.OnDismissInfoDialog) }
+            )
+        }
+
+        if (state.isShowingDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onEvent(SongMenuUiEvent.OnDismissDeleteDialog) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.feature_songs_impl_menu_delete_confirm_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.feature_songs_impl_menu_delete_confirm_text, state.song.basic.title),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.onEvent(SongMenuUiEvent.OnConfirmDelete)
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(com.lotusreichhart.audily.core.designsystem.R.string.core_designsystem_delete),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { viewModel.onEvent(SongMenuUiEvent.OnDismissDeleteDialog) }
+                    ) {
+                        Text(
+                            text = stringResource(com.lotusreichhart.audily.core.designsystem.R.string.core_designsystem_cancel),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
