@@ -253,7 +253,7 @@ class SongMenuViewModel @Inject constructor(
             }
 
             SongMenuAction.EditTags -> {
-
+                _uiEffect.emit(SongMenuUiEffect.EditTag(song.id))
             }
 
             SongMenuAction.Share -> {

@@ -26,12 +26,12 @@ import com.lotusreichhart.audily.core.designsystem.component.ActionItem
 import com.lotusreichhart.audily.core.designsystem.component.AudilyActionSheet
 import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.resource.AudilyIcons
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.ui.GlobalParams
-import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.LocalAudilySheetController
-import com.lotusreichhart.audily.core.ui.util.UiText
 import com.lotusreichhart.audily.core.navigation.LocalNavigator
+import com.lotusreichhart.audily.feature.edittag.api.navigation.EditTagNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsPickerNavKey
 import com.lotusreichhart.audily.feature.songs.impl.R
 import com.lotusreichhart.audily.feature.songs.impl.resource.SongsIcons
@@ -67,6 +67,11 @@ internal fun SongMenuSheet(
                 is SongMenuUiEffect.AddSongToPlaylists -> {
                     sheetController.hideSheet()
                     navigator.navigate(PlaylistsPickerNavKey(effect.songId))
+                }
+
+                is SongMenuUiEffect.EditTag -> {
+                    sheetController.hideSheet()
+                    navigator.navigate(EditTagNavKey(effect.songId))
                 }
             }
         }
@@ -135,7 +140,7 @@ private fun SongMenuHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(LocalDimensions.current.paddingMedium),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AudilyArtwork(
@@ -144,7 +149,7 @@ private fun SongMenuHeader(
                     .size(56.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingMedium))
             Column {
                 Text(
                     text = song.basic.title,
@@ -169,18 +174,21 @@ private fun SongMenuHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(bottom = LocalDimensions.current.paddingSmall),
+            horizontalArrangement = Arrangement.spacedBy(
+                space = LocalDimensions.current.paddingSmall,
+                alignment = Alignment.CenterHorizontally
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
             quickActions.forEach { action ->
                 QuickActionItem(
                     action = action,
                     onClick = { onActionClick(action) }
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
         }
     }
 }

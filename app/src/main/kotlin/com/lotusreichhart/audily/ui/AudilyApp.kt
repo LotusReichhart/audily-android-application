@@ -78,6 +78,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavigationSuiteScaffold
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyNavItem
 import com.lotusreichhart.audily.core.ui.util.findActivity
+import com.lotusreichhart.audily.feature.edittag.impl.navigation.editTagEntry
 import com.lotusreichhart.audily.feature.playlists.impl.navigation.playlistsEntry
 import com.lotusreichhart.audily.feature.favorites.impl.navigation.favoritesEntry
 
@@ -294,6 +295,7 @@ internal fun AudilyApp(
                 playlistsEntry(navigator = appState.navigator)
                 favoritesEntry(navigator = appState.navigator)
                 searchEntry(navigator = appState.navigator)
+                editTagEntry(navigator = appState.navigator)
                 entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
                 entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
             }
