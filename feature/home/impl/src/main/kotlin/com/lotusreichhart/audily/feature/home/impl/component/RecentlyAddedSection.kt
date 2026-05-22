@@ -49,6 +49,7 @@ internal fun RecentlyAddedSection(
                     modifier = Modifier.width(220.dp),
                     title = song.basic.title,
                     artist = song.basic.artist,
+                    isMissing = song.isMissing,
                     albumArt = {
                         AudilyArtwork(
                             artworkUri = song.basic.artworkUri,
