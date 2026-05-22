@@ -25,6 +25,19 @@ class MediaStoreDataSource @Inject constructor(
     private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
     private val albumsUri: Uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 ) {
+    fun observeMusicUri(): Flow<Unit> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                trySend(Unit)
+            }
+        }
+        contentResolver.registerContentObserver(musicUri, true, observer)
+        trySend(Unit)
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
     /**
      * Lấy luồng thông tin tóm tắt của danh sách bài hát (số lượng, tổng thời lượng).
      */

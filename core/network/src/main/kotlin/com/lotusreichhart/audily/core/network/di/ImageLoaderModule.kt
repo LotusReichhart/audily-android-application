@@ -2,6 +2,7 @@ package com.lotusreichhart.audily.core.network.di
 
 import android.content.Context
 import coil3.ImageLoader
+import com.lotusreichhart.audily.core.network.AudioCoverFetcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +20,9 @@ object ImageLoaderModule {
         @ApplicationContext context: Context
     ): ImageLoader {
         return ImageLoader.Builder(context)
+            .components {
+                add(AudioCoverFetcher.Factory(context))
+            }
             .build()
     }
 }
