@@ -20,11 +20,24 @@ import androidx.core.net.toUri
 /**
  * Tạo URI cho ảnh album từ albumId.
  */
-private fun getArtworkUri(albumId: Long): String {
-    return ContentUris.withAppendedId(
+private fun getArtworkUri(albumId: Long, dateModified: Long? = null): String {
+    val baseUri = ContentUris.withAppendedId(
         "content://media/external/audio/albumart".toUri(),
         albumId
-    ).toString()
+    )
+    return if (dateModified != null && dateModified > 0) {
+        baseUri.buildUpon()
+            .appendQueryParameter("t", dateModified.toString())
+            .build()
+            .toString()
+    } else {
+        baseUri.toString()
+    }
+}
+
+private fun getSongArtworkUri(songId: Long, path: String, dateModified: Long): String {
+    val encodedPath = Uri.encode(path)
+    return "audiocover://$songId?path=$encodedPath&t=$dateModified"
 }
 
 internal fun ContentResolver.querySongById(
@@ -67,18 +80,21 @@ internal fun ContentResolver.querySongById(
             val sizeCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
             val composerCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
 
+            val songId = c.getLong(idCol)
+            val path = c.getString(dataCol) ?: ""
+            val dateModified = c.getLong(dateModCol)
             val albumId = c.getLong(albumIdCol)
             MediaStoreSong(
-                id = c.getLong(idCol),
+                id = songId,
                 basic = BasicMediaStoreMetadata(
                     title = c.getString(titleCol) ?: "Unknown Title",
                     artist = c.getString(artistCol) ?: "Unknown Artist",
                     album = c.getString(albumCol) ?: "Unknown Album",
                     duration = c.getLong(durationCol),
-                    path = c.getString(dataCol) ?: "",
+                    path = path,
                     albumId = albumId,
-                    dateModified = c.getLong(dateModCol),
-                    artworkUri = getArtworkUri(albumId)
+                    dateModified = dateModified,
+                    artworkUri = getSongArtworkUri(songId, path, dateModified)
                 ),
                 extended = ExtendedMediaStoreMetadata(
                     track = c.getInt(trackCol),
@@ -133,19 +149,22 @@ internal fun ContentResolver.querySongsByIds(
             val composerCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
 
             while (c.moveToNext()) {
+                val songId = c.getLong(idCol)
+                val path = c.getString(dataCol) ?: ""
+                val dateModified = c.getLong(dateModCol)
                 val albumId = c.getLong(albumIdCol)
                 results.add(
                     MediaStoreSong(
-                        id = c.getLong(idCol),
+                        id = songId,
                         basic = BasicMediaStoreMetadata(
                             title = c.getString(titleCol) ?: "Unknown Title",
                             artist = c.getString(artistCol) ?: "Unknown Artist",
                             album = c.getString(albumCol) ?: "Unknown Album",
                             duration = c.getLong(durationCol),
-                            path = c.getString(dataCol) ?: "",
+                            path = path,
                             albumId = albumId,
-                            dateModified = c.getLong(dateModCol),
-                            artworkUri = getArtworkUri(albumId)
+                            dateModified = dateModified,
+                            artworkUri = getSongArtworkUri(songId, path, dateModified)
                         ),
                         extended = ExtendedMediaStoreMetadata(
                             track = c.getInt(trackCol),
@@ -174,7 +193,9 @@ internal fun ContentResolver.queryBasicSongById(
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.ALBUM,
         MediaStore.Audio.Media.DURATION,
-        MediaStore.Audio.Media.ALBUM_ID
+        MediaStore.Audio.Media.DATA,
+        MediaStore.Audio.Media.ALBUM_ID,
+        MediaStore.Audio.Media.DATE_MODIFIED
     )
 
     return this.query(
@@ -190,20 +211,25 @@ internal fun ContentResolver.queryBasicSongById(
             val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
             val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val dataCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
 
+            val songId = c.getLong(idCol)
+            val path = c.getString(dataCol) ?: ""
             val albumId = c.getLong(albumIdCol)
+            val dateModified = c.getLong(dateModCol)
             MediaStoreSong(
-                id = c.getLong(idCol),
+                id = songId,
                 basic = BasicMediaStoreMetadata(
                     title = c.getString(titleCol) ?: "Unknown Title",
                     artist = c.getString(artistCol) ?: "Unknown Artist",
                     album = c.getString(albumCol) ?: "Unknown Album",
                     duration = c.getLong(durationCol),
-                    path = "", // Không lấy path cho Basic query
+                    path = path,
                     albumId = albumId,
-                    dateModified = 0L,
-                    artworkUri = getArtworkUri(albumId)
+                    dateModified = dateModified,
+                    artworkUri = getSongArtworkUri(songId, path, dateModified)
                 ),
                 extended = ExtendedMediaStoreMetadata(
                     track = 0,
@@ -228,7 +254,9 @@ internal fun ContentResolver.queryBasicSongsByIds(
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.ALBUM,
         MediaStore.Audio.Media.DURATION,
-        MediaStore.Audio.Media.ALBUM_ID
+        MediaStore.Audio.Media.DATA,
+        MediaStore.Audio.Media.ALBUM_ID,
+        MediaStore.Audio.Media.DATE_MODIFIED
     )
 
     val chunks = ids.chunked(500)
@@ -242,22 +270,27 @@ internal fun ContentResolver.queryBasicSongsByIds(
             val artistCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
             val durationCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val dataCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val albumIdCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val dateModCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
 
             while (c.moveToNext()) {
+                val songId = c.getLong(idCol)
+                val path = c.getString(dataCol) ?: ""
                 val albumId = c.getLong(albumIdCol)
+                val dateModified = c.getLong(dateModCol)
                 results.add(
                     MediaStoreSong(
-                        id = c.getLong(idCol),
+                        id = songId,
                         basic = BasicMediaStoreMetadata(
                             title = c.getString(titleCol) ?: "Unknown Title",
                             artist = c.getString(artistCol) ?: "Unknown Artist",
                             album = c.getString(albumCol) ?: "Unknown Album",
                             duration = c.getLong(durationCol),
-                            path = "", // Không lấy path cho Basic query
+                            path = path,
                             albumId = albumId,
-                            dateModified = 0L,
-                            artworkUri = getArtworkUri(albumId)
+                            dateModified = dateModified,
+                            artworkUri = getSongArtworkUri(songId, path, dateModified)
                         ),
                         extended = ExtendedMediaStoreMetadata(
                             track = 0,

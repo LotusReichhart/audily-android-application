@@ -32,4 +32,5 @@ object AudilyIcons {
     val Timer = R.drawable.core_designsystem_ic_timer
     val VerticalDot = R.drawable.core_designsystem_ic_vertical_dot
     val Info = R.drawable.core_designsystem_ic_info
+    val Camera = R.drawable.core_designsystem_ic_camera
 }

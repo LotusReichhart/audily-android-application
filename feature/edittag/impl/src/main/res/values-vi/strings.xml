@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_edittag_impl_save_success">Đã cập nhật thông tin bài hát thành công</string>
+    <string name="feature_edittag_impl_save_failed">Cập nhật thông tin bài hát thất bại</string>
+    <string name="feature_edittag_impl_label_title">Tiêu đề</string>
+    <string name="feature_edittag_impl_label_artist">Ca sĩ</string>
+    <string name="feature_edittag_impl_label_album">Album</string>
+    <string name="feature_edittag_impl_label_year">Năm</string>
+    <string name="feature_edittag_impl_label_track">Stt</string>
+    <string name="feature_edittag_impl_label_composer">Nhà soạn nhạc</string>
+    <string name="feature_edittag_impl_label_genre">Thể loại</string>
+    <string name="feature_edittag_impl_saving_title">Đang lưu thông tin</string>
+    <string name="feature_edittag_impl_saving_msg">Đang cập nhật thông tin file nhạc, vui lòng đợi…</string>
+    <string name="feature_edittag_impl_artwork_options">Tùy chọn ảnh bìa</string>
+    <string name="feature_edittag_impl_artwork_change">Chọn từ Thư viện</string>
+    <string name="feature_edittag_impl_artwork_remove">Xóa ảnh bìa</string>
+</resources>

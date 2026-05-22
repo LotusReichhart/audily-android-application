@@ -33,4 +33,6 @@ sealed class PlaybackEvent {
     ) : PlaybackEvent()
 
     data class SeekToIndex(val index: Int) : PlaybackEvent()
+
+    data class UpdateSongMetadata(val song: Song) : PlaybackEvent()
 }

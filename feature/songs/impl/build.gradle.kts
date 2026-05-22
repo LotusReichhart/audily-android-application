@@ -14,7 +14,8 @@ dependencies {
     implementation(projects.feature.songs.api)
     implementation(projects.feature.playlists.api)
     implementation(projects.feature.search.api)
-    
+    implementation(projects.feature.edittag.api)
+
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 

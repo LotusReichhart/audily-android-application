@@ -67,6 +67,8 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.playback)
     implementation(projects.core.palette)
+    implementation(projects.core.network)
+    implementation(libs.coil.compose)
 
     implementation(projects.feature.home.api)
     implementation(projects.feature.home.impl)
@@ -81,6 +83,8 @@ dependencies {
     implementation(projects.feature.search.api)
     implementation(projects.feature.search.impl)
     implementation(projects.feature.nowplaying)
+    implementation(projects.feature.edittag.api)
+    implementation(projects.feature.edittag.impl)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -53,7 +53,6 @@ include(":feature:settings:api")
 include(":feature:songs:api")
 include(":feature:songs:impl")
 
-
 include(":feature:albums:api")
 
 include(":feature:playlists:api")
@@ -66,4 +65,8 @@ include(":feature:search:impl")
 
 include(":feature:favorites:api")
 include(":feature:favorites:impl")
+
+include(":feature:edittag:api")
+include(":feature:edittag:impl")
+
 

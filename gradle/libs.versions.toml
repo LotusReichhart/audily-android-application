@@ -50,6 +50,7 @@ protobufPlugin = "0.10.0"
 retrofit = "3.0.0"
 room = "2.8.4"
 robolectric = "4.16.1"
+taglib = "1.0.6"
 timber = "5.0.1"
 turbine = "1.2.1"
 roborazzi = "1.60.0"
@@ -139,6 +140,7 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+taglib = { module = "io.github.kyant0:taglib", version.ref = "taglib" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }

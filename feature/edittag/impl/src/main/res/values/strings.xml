@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_edittag_impl_save_success">Tags updated successfully</string>
+    <string name="feature_edittag_impl_save_failed">Failed to update tags</string>
+    <string name="feature_edittag_impl_label_title">Title</string>
+    <string name="feature_edittag_impl_label_artist">Artist</string>
+    <string name="feature_edittag_impl_label_album">Album</string>
+    <string name="feature_edittag_impl_label_year">Year</string>
+    <string name="feature_edittag_impl_label_track">Track Number</string>
+    <string name="feature_edittag_impl_label_composer">Composer</string>
+    <string name="feature_edittag_impl_label_genre">Genre</string>
+    <string name="feature_edittag_impl_saving_title">Saving Tags</string>
+    <string name="feature_edittag_impl_saving_msg">Updating audio file tags, please wait…</string>
+    <string name="feature_edittag_impl_artwork_options">Artwork Options</string>
+    <string name="feature_edittag_impl_artwork_change">Choose from Gallery</string>
+    <string name="feature_edittag_impl_artwork_remove">Remove Artwork</string>
+</resources>
