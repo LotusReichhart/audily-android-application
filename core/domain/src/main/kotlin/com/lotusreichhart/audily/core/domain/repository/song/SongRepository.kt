@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.RingtoneResult
+import com.lotusreichhart.audily.core.model.song.DeleteSongResult
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import kotlinx.coroutines.flow.Flow
@@ -51,4 +52,9 @@ interface SongRepository {
      * Cài đặt bài hát làm nhạc chuông hệ thống.
      */
     suspend fun setAsRingtone(id: Long): RingtoneResult
+
+    /**
+     * Xóa bài hát khỏi thiết bị.
+     */
+    suspend fun deleteSong(id: Long): DeleteSongResult
 }

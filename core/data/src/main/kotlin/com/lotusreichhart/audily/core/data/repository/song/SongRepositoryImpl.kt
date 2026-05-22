@@ -21,6 +21,7 @@ import com.lotusreichhart.audily.core.mediastore.MediaStoreIdPagingSource
 import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.song.BasicSongMetadata
 import com.lotusreichhart.audily.core.model.song.RingtoneResult
+import com.lotusreichhart.audily.core.model.song.DeleteSongResult
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
@@ -149,6 +150,21 @@ internal class SongRepositoryImpl @Inject constructor(
             }
             Timber.e(e, "SongRepositoryImpl - Failed to set ringtone for id: $id")
             RingtoneResult.FAILED
+        }
+    }
+
+    override suspend fun deleteSong(id: Long): DeleteSongResult {
+        return try {
+            mediaStoreDataSource.deleteSong(id)
+            Timber.d("SongRepositoryImpl - Successfully deleted song for id: $id")
+            DeleteSongResult.SUCCESS
+        } catch (e: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e is RecoverableSecurityException) {
+                DeleteSongResult.NEED_SCOPED_STORAGE_PERMISSION(e.userAction.actionIntent.intentSender)
+            } else {
+                Timber.e(e, "SongRepositoryImpl - Failed to delete song for id: $id")
+                DeleteSongResult.FAILED
+            }
         }
     }
 }
