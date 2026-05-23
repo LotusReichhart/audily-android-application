@@ -481,3 +481,21 @@ internal fun ContentResolver.queryAlbumById(
         } else null
     }
 }
+
+internal fun ContentResolver.querySongIdsByAlbumId(
+    uri: Uri,
+    albumId: Long
+): List<Long> {
+    val ids = mutableListOf<Long>()
+    val projection = arrayOf(MediaStore.Audio.Media._ID)
+    val selection = "${MediaStore.Audio.Media.ALBUM_ID} = ? AND ${MediaStore.Audio.Media.IS_MUSIC} != 0"
+    val selectionArgs = arrayOf(albumId.toString())
+    val sortOrder = "${MediaStore.Audio.Media.TRACK} ASC, ${MediaStore.Audio.Media.TITLE} ASC"
+    this.query(uri, projection, selection, selectionArgs, sortOrder)?.use { c ->
+        val idCol = c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+        while (c.moveToNext()) {
+            ids.add(c.getLong(idCol))
+        }
+    }
+    return ids
+}

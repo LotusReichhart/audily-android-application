@@ -150,4 +150,24 @@ class MediaStoreDataSource @Inject constructor(
         val uri = ContentUris.withAppendedId(musicUri, id)
         contentResolver.delete(uri, null, null)
     }
+
+    fun getSongIdsByAlbumId(albumId: Long): Flow<List<Long>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.querySongIdsByAlbumId(musicUri, albumId))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(musicUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.querySongIdsByAlbumId(musicUri, albumId))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
 }

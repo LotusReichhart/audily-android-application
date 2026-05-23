@@ -167,4 +167,8 @@ internal class SongRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getSongIdsByAlbum(albumId: Long): Flow<List<Long>> {
+        return mediaStoreDataSource.getSongIdsByAlbumId(albumId)
+    }
 }
