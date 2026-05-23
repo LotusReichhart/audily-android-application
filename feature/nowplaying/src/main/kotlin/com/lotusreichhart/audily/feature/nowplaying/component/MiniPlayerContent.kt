@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.feature.nowplaying.component
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,7 +78,9 @@ internal fun MiniPlayerContent(
                         .size(48.dp)
                         .clip(RoundedCornerShape(LocalDimensions.current.cornerRadiusSmall))
                 )
-                Spacer(modifier = Modifier.width(LocalDimensions.current.paddingSmall))
+
+                Spacer(Modifier.width(6.dp))
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         modifier = Modifier.basicMarquee(
@@ -99,7 +102,9 @@ internal fun MiniPlayerContent(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.width(LocalDimensions.current.paddingExtraSmall))
+
+                Spacer(Modifier.width(6.dp))
+
                 AudilyIconButton(
                     onClick = onQueueClick,
                     painter = painterResource(id = AudilyIcons.QueueMusic),
@@ -114,6 +119,8 @@ internal fun MiniPlayerContent(
                     modifier = Modifier.alpha(if (hasNext) 1f else 0.5f),
                     tint = OnSurfaceDark
                 )
+
+                Spacer(Modifier.width(10.dp))
 
                 // Progress Circle Play/Pause Button
                 Box(contentAlignment = Alignment.Center) {

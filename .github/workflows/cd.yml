@@ -9,6 +9,8 @@ jobs:
   deploy:
     name: Build & Deploy Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout source code
@@ -39,14 +41,14 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew bundleRelease
+        run: ./gradlew bundleProdRelease
 
       - name: Upload to Google Play (Internal Track)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonRaw: ${{ secrets.PLAY_CONSOLE_JSON }}
           packageName: com.lotusreichhart.audily
-          releaseFiles: app/build/outputs/bundle/release/*.aab
+          releaseFiles: app/build/outputs/bundle/prodRelease/*.aab
           track: internal
           status: completed
 
@@ -55,7 +57,7 @@ jobs:
         if: success()
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/bundle/release/*.aab
+          files: app/build/outputs/bundle/prodRelease/*.aab
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           draft: false

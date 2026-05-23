@@ -113,6 +113,7 @@ internal fun LandscapeNowPlayingLayout(
                 } else {
                     Box(
                         modifier = Modifier
+                            .padding(bottom = LocalDimensions.current.paddingLarge)
                             .fillMaxSize()
                             .graphicsLayer {
                                 this.rotationY = 180f
@@ -125,7 +126,13 @@ internal fun LandscapeNowPlayingLayout(
                             NowPlayingLyricsView(
                                 lyrics = uiState.lyrics,
                                 currentPositionMs = uiState.playbackPositionMs,
-                                onLineClick = { position -> onEvent(NowPlayingUiEvent.OnSeekTo(position)) }
+                                onLineClick = { position ->
+                                    onEvent(
+                                        NowPlayingUiEvent.OnSeekTo(
+                                            position
+                                        )
+                                    )
+                                }
                             )
                         } else {
                             NowPlayingNoLyrics()

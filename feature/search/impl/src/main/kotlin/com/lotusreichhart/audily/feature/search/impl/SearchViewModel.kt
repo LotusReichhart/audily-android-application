@@ -139,14 +139,6 @@ internal class SearchViewModel @Inject constructor(
                     )
                 }
             }
-
-            is SearchUiEvent.OnAlbumClick -> {
-                // TODO: Navigate to album detail
-            }
-
-            is SearchUiEvent.OnPlaylistClick -> {
-                // TODO: Navigate to playlist detail
-            }
         }
     }
 }
