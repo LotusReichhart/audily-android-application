@@ -20,8 +20,8 @@ android {
     namespace = "com.lotusreichhart.audily"
     defaultConfig {
         applicationId = "com.lotusreichhart.audily"
-        versionCode = 1
-        versionName = "0.0.1"
+        versionCode = 2
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -85,6 +85,8 @@ dependencies {
     implementation(projects.feature.nowplaying)
     implementation(projects.feature.edittag.api)
     implementation(projects.feature.edittag.impl)
+    implementation(projects.feature.albums.api)
+    implementation(projects.feature.albums.impl)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)

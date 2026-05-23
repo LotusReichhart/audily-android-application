@@ -12,6 +12,7 @@ import com.lotusreichhart.audily.feature.home.api.navigation.HomeNavKey
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsNavKey
 import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
 import com.lotusreichhart.audily.feature.songs.api.navigation.SongsNavKey
+import com.lotusreichhart.audily.feature.albums.api.navigation.AlbumsNavKey
 
 /**
  * Định nghĩa thông tin hiển thị cho các mục điều hướng chính trên thanh Bottom Bar / Rail.
@@ -60,7 +61,6 @@ val NAV_BAR_ITEMS = mapOf(
 val TOP_LEVEL_NAV_ITEMS = NAV_BAR_ITEMS.keys + setOf(
     SongsNavKey,
     PlaylistsNavKey,
-    FavoritesNavKey
-    // PlaylistsNavKey, // Bổ sung sau
-    // AlbumsNavKey,    // Bổ sung sau
+    FavoritesNavKey,
+    AlbumsNavKey
 )

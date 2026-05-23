@@ -1,4 +1,7 @@
 @file:Suppress("UnstableApiUsage")
+
+include(":feature:albums:impl")
+
 pluginManagement {
     includeBuild("build-logic")
     repositories {
