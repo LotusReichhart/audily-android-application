@@ -12,8 +12,4 @@ sealed interface SearchUiEvent {
     data class OnSearchTypeChange(val type: SearchType) : SearchUiEvent
     /** Nhấn vào một bài hát trong kết quả */
     data class OnSongClick(val songId: Long) : SearchUiEvent
-    /** Nhấn vào một album trong kết quả */
-    data class OnAlbumClick(val albumId: Long) : SearchUiEvent
-    /** Nhấn vào một playlist trong kết quả */
-    data class OnPlaylistClick(val playlistId: Long) : SearchUiEvent
 }

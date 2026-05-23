@@ -59,7 +59,7 @@ internal fun NowPlayingLyricsView(
                     Text(
                         text = lyrics.plainLyrics.content,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceDark.copy(alpha = 0.8f),
+                        color = OnSurfaceDark,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -120,7 +120,7 @@ internal fun NowPlayingLyricsView(
                             } else if (index < activeIndex) {
                                 OnSurfaceDark.copy(alpha = 0.5f)
                             } else {
-                                OnSurfaceDark.copy(alpha = 0.8f)
+                                OnSurfaceDark
                             }
                             val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
 

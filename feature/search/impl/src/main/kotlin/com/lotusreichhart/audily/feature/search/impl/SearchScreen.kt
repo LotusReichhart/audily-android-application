@@ -57,7 +57,9 @@ import com.lotusreichhart.audily.feature.albums.api.R as albumsR
 internal fun SearchScreen(
     type: SearchType,
     onBack: () -> Unit,
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
+    onAlbumItemClick: (albumId: Long) -> Unit,
+    onPlaylistItemClick: (playlistId: Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val songs = uiState.songs.collectAsLazyPagingItems()
@@ -84,18 +86,22 @@ internal fun SearchScreen(
                     isShowDragHandle = false
                 )
             )
-        }
+        },
+        onAlbumItemClick = onAlbumItemClick,
+        onPlaylistItemClick = onPlaylistItemClick
     )
 }
 
 @Composable
 internal fun SearchScreen(
+    modifier: Modifier = Modifier,
     uiState: SearchUiState,
     songs: LazyPagingItems<Song>,
     onBack: () -> Unit,
     onEvent: (SearchUiEvent) -> Unit,
     onMenuClick: (Song) -> Unit,
-    modifier: Modifier = Modifier
+    onAlbumItemClick: (albumId: Long) -> Unit,
+    onPlaylistItemClick: (playlistId: Long) -> Unit
 ) {
     val dimensions = LocalDimensions.current
     val focusRequester = remember { FocusRequester() }
@@ -170,7 +176,7 @@ internal fun SearchScreen(
                                         SearchAlbumItem(
                                             album = album,
                                             onClick = {
-                                                onEvent(SearchUiEvent.OnAlbumClick(it.id))
+                                                onAlbumItemClick(it.id)
                                                 focusManager.clearFocus()
                                             },
                                             isVertical = true
@@ -202,7 +208,7 @@ internal fun SearchScreen(
                                         SearchPlaylistItem(
                                             playlist = playlist,
                                             onClick = {
-                                                onEvent(SearchUiEvent.OnPlaylistClick(it.id))
+                                                onPlaylistItemClick(it.id)
                                                 focusManager.clearFocus()
                                             },
                                             isVertical = true
@@ -294,7 +300,7 @@ internal fun SearchScreen(
                                     SearchAlbumItem(
                                         album = album,
                                         onClick = {
-                                            onEvent(SearchUiEvent.OnAlbumClick(it.id))
+                                            onAlbumItemClick(it.id)
                                             focusManager.clearFocus()
                                         },
                                         isVertical = false
@@ -307,7 +313,7 @@ internal fun SearchScreen(
                                     SearchPlaylistItem(
                                         playlist = playlist,
                                         onClick = {
-                                            onEvent(SearchUiEvent.OnPlaylistClick(it.id))
+                                            onPlaylistItemClick(it.id)
                                             focusManager.clearFocus()
                                         },
                                         isVertical = false

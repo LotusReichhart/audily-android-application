@@ -2,7 +2,6 @@ package com.lotusreichhart.audily.core.designsystem.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -28,18 +28,10 @@ fun AudilyArtwork(
     isAspectRatio: Boolean = true,
     contentDescription: String? = null
 ) {
-    val isDark = isSystemInDarkTheme()
-
-    val backgroundColor = if (isDark) {
-        MaterialTheme.colorScheme.surfaceContainerLowest
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-
     Box(
         modifier = if (isAspectRatio) modifier
             .aspectRatio(1f)
-            .background(backgroundColor) else modifier.background(backgroundColor),
+            .background(Color.Black) else modifier.background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         if (artworkUri != null) {

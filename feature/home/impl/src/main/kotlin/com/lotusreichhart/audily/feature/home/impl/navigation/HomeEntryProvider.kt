@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lotusreichhart.audily.core.navigation.Navigator
+import com.lotusreichhart.audily.feature.albums.api.navigation.AlbumsNavKey
 import com.lotusreichhart.audily.feature.home.api.navigation.HomeNavKey
 import com.lotusreichhart.audily.feature.home.impl.HomeScreen
 import com.lotusreichhart.audily.feature.playlists.api.navigation.PlaylistsNavKey
@@ -21,7 +22,7 @@ fun EntryProviderScope<NavKey>.homeEntry(
             modifier = Modifier.fillMaxSize(),
             onNavigateToSongs = { navigator.navigate(SongsNavKey) },
             onNavigateToPlaylists = { navigator.navigate(PlaylistsNavKey) },
-            onNavigateToAlbums = { /* Sẽ xử lý điều hướng sau */ },
+            onNavigateToAlbums = { navigator.navigate(AlbumsNavKey) },
             onSearchClick = {
                 navigator.navigate(SearchNavKey(type = SearchType.ALL))
             },

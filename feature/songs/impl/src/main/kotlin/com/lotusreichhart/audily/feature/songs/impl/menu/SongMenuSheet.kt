@@ -81,13 +81,17 @@ internal fun SongMenuSheet(
 
                 is SongMenuUiEffect.ShareSong -> {
                     sheetController.hideSheet()
-                    val uri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        effect.song.id
-                    )
+                    val shareUri = android.net.Uri.Builder()
+                        .scheme("content")
+                        .authority("com.lotusreichhart.audily.share")
+                        .appendPath(effect.song.id.toString())
+                        .appendQueryParameter("title", effect.song.basic.title)
+                        .build()
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "audio/*"
-                        putExtra(Intent.EXTRA_STREAM, uri)
+                        putExtra(Intent.EXTRA_STREAM, shareUri)
+                        putExtra(Intent.EXTRA_TITLE, effect.song.basic.title)
+                        clipData = android.content.ClipData.newRawUri(null, shareUri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "Share Audio"))

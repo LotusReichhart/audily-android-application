@@ -57,4 +57,9 @@ interface SongRepository {
      * Xóa bài hát khỏi thiết bị.
      */
     suspend fun deleteSong(id: Long): DeleteSongResult
+
+    /**
+     * Luồng các ID bài hát thuộc một Album.
+     */
+    fun getSongIdsByAlbum(albumId: Long): Flow<List<Long>>
 }

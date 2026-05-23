@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_albums_impl_empty">No albums found on your device</string>
+    <string name="feature_albums_impl_sort_title">Sort Albums</string>
+    <string name="feature_albums_impl_sort_default">Default</string>
+    <string name="feature_albums_impl_sort_accept">Accept</string>
+    <string name="feature_albums_impl_grid_size_title">Grid Columns</string>
+    <string name="feature_albums_impl_sort_by_name">Name</string>
+    <string name="feature_albums_impl_sort_by_artist">Artist</string>
+    <string name="feature_albums_impl_sort_by_songs_count">Number of Songs</string>
+    <string name="feature_albums_impl_grid_cols">%1$d Columns</string>
+    <string name="feature_albums_impl_grid_col_single">1 Column (List)</string>
+    <string name="feature_albums_impl_songs_count">%1$d songs</string>
+    <string name="feature_albums_impl_detail_play">Play</string>
+    <string name="feature_albums_impl_detail_shuffle">Shuffle</string>
+    <string name="feature_albums_impl_detail_songs">Songs</string>
+    <string name="feature_albums_impl_detail_save_as_playlist">Save as playlist</string>
+    <string name="feature_albums_impl_detail_create_playlist">Create Playlist</string>
+    <string name="feature_albums_impl_detail_playlist_name">Playlist Name</string>
+    <string name="feature_albums_impl_detail_playlist_name_placeholder">Enter playlist name</string>
+    <string name="feature_albums_impl_detail_playlist_description_optional">Description (Optional)</string>
+    <string name="feature_albums_impl_detail_playlist_description_placeholder">Enter description</string>
+    <string name="feature_albums_impl_detail_playlist_created_success">Playlist created successfully</string>
+    <string name="feature_albums_impl_detail_playlist_created_failed">Failed to create playlist</string>
+</resources>

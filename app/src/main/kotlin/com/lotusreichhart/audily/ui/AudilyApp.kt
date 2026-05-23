@@ -81,6 +81,7 @@ import com.lotusreichhart.audily.core.ui.util.findActivity
 import com.lotusreichhart.audily.feature.edittag.impl.navigation.editTagEntry
 import com.lotusreichhart.audily.feature.playlists.impl.navigation.playlistsEntry
 import com.lotusreichhart.audily.feature.favorites.impl.navigation.favoritesEntry
+import com.lotusreichhart.audily.feature.albums.impl.navigation.albumsEntry
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -293,6 +294,7 @@ internal fun AudilyApp(
                 )
                 songsEntry(navigator = appState.navigator)
                 playlistsEntry(navigator = appState.navigator)
+                albumsEntry(navigator = appState.navigator)
                 favoritesEntry(navigator = appState.navigator)
                 searchEntry(navigator = appState.navigator)
                 editTagEntry(navigator = appState.navigator)
