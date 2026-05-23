@@ -1,0 +1,173 @@
+package com.lotusreichhart.audily.core.mediastore
+
+import android.content.ContentResolver
+import android.content.ContentUris
+import android.database.ContentObserver
+import android.net.Uri
+import android.provider.MediaStore
+import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
+import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbum
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreAlbumSortMetadata
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSong
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSortMetadata
+import com.lotusreichhart.audily.core.mediastore.model.MediaStoreSongsSummary
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+class MediaStoreDataSource @Inject constructor(
+    @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val contentResolver: ContentResolver,
+    private val musicUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    private val albumsUri: Uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+) {
+    fun observeMusicUri(): Flow<Unit> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                trySend(Unit)
+            }
+        }
+        contentResolver.registerContentObserver(musicUri, true, observer)
+        trySend(Unit)
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy luồng thông tin tóm tắt của danh sách bài hát (số lượng, tổng thời lượng).
+     */
+    fun getSongsSummary(
+        searchQuery: String? = null
+    ): Flow<MediaStoreSongsSummary> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.querySongsSummary(musicUri, searchQuery))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(musicUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.querySongsSummary(musicUri, searchQuery))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy luồng Metadata nhẹ phục vụ cho việc sorting tiếng Việt trong bộ nhớ.
+     */
+    fun getSongsSortMetadata(
+        searchQuery: String? = null
+    ): Flow<List<MediaStoreSortMetadata>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(musicUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy đầy đủ thông tin của một bài hát (MediaStore query).
+     */
+    fun getSong(id: Long): MediaStoreSong? {
+        return contentResolver.querySongById(musicUri, id)
+    }
+
+    /**
+     * Lấy đầy đủ thông tin của danh sách bài hát (MediaStore batch query).
+     */
+    fun getSongs(ids: List<Long>): List<MediaStoreSong> {
+        return contentResolver.querySongsByIds(musicUri, ids)
+    }
+
+    fun getBasicSong(id: Long): MediaStoreSong? {
+        return contentResolver.queryBasicSongById(musicUri, id)
+    }
+
+    fun getBasicSongs(ids: List<Long>): List<MediaStoreSong> {
+        return contentResolver.queryBasicSongsByIds(musicUri, ids)
+    }
+
+    /**
+     * Lấy luồng Metadata nhẹ phục vụ cho việc sorting Album.
+     */
+    fun getAlbums(
+        searchQuery: String? = null
+    ): Flow<List<MediaStoreAlbumSortMetadata>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.queryAlbums(albumsUri, searchQuery))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(albumsUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.queryAlbums(albumsUri, searchQuery))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Lấy đầy đủ thông tin của một Album.
+     */
+    fun getAlbum(id: Long): MediaStoreAlbum? {
+        return contentResolver.queryAlbumById(albumsUri, id)
+    }
+
+    /**
+     * Xóa một bài hát khỏi MediaStore theo ID.
+     */
+    fun deleteSong(id: Long) {
+        val uri = ContentUris.withAppendedId(musicUri, id)
+        contentResolver.delete(uri, null, null)
+    }
+
+    fun getSongIdsByAlbumId(albumId: Long): Flow<List<Long>> = callbackFlow {
+        val observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                launch(ioDispatcher) {
+                    trySend(contentResolver.querySongIdsByAlbumId(musicUri, albumId))
+                }
+            }
+        }
+
+        contentResolver.registerContentObserver(musicUri, true, observer)
+
+        launch(ioDispatcher) {
+            trySend(contentResolver.querySongIdsByAlbumId(musicUri, albumId))
+        }
+
+        awaitClose {
+            contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(ioDispatcher)
+}

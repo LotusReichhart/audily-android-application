@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_albums_impl_empty">Không tìm thấy album nào trên thiết bị</string>
+    <string name="feature_albums_impl_sort_title">Sắp xếp Album</string>
+    <string name="feature_albums_impl_sort_default">Mặc định</string>
+    <string name="feature_albums_impl_sort_accept">Xác nhận</string>
+    <string name="feature_albums_impl_grid_size_title">Số cột hiển thị</string>
+    <string name="feature_albums_impl_sort_by_name">Tên</string>
+    <string name="feature_albums_impl_sort_by_artist">Ca sĩ</string>
+    <string name="feature_albums_impl_sort_by_songs_count">Số lượng bài hát</string>
+    <string name="feature_albums_impl_grid_cols">%1$d cột</string>
+    <string name="feature_albums_impl_grid_col_single">1 cột (Danh sách)</string>
+    <string name="feature_albums_impl_songs_count">%1$d bài hát</string>
+    <string name="feature_albums_impl_detail_play">Phát</string>
+    <string name="feature_albums_impl_detail_shuffle">Trộn bài</string>
+    <string name="feature_albums_impl_detail_songs">Bài hát</string>
+    <string name="feature_albums_impl_detail_save_as_playlist">Lưu thành danh sách phát</string>
+    <string name="feature_albums_impl_detail_create_playlist">Tạo danh sách phát</string>
+    <string name="feature_albums_impl_detail_playlist_name">Tên danh sách phát</string>
+    <string name="feature_albums_impl_detail_playlist_name_placeholder">Nhập tên danh sách phát</string>
+    <string name="feature_albums_impl_detail_playlist_description_optional">Mô tả (Không bắt buộc)</string>
+    <string name="feature_albums_impl_detail_playlist_description_placeholder">Nhập mô tả</string>
+    <string name="feature_albums_impl_detail_playlist_created_success">Tạo danh sách phát thành công</string>
+    <string name="feature_albums_impl_detail_playlist_created_failed">Tạo danh sách phát thất bại</string>
+</resources>

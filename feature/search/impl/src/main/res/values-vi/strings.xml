@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_search_impl_all_placeholder">Tìm bài hát, album…</string>
+    <string name="feature_search_impl_songs_placeholder">Tìm tên bài hát…</string>
+    <string name="feature_search_impl_playlists_placeholder">Tìm danh sách phát…</string>
+    <string name="feature_search_impl_albums_placeholder">Tìm tên album…</string>
+
+    <!-- Tìm kiếm: Trạng thái chờ (Mời gọi tìm kiếm) -->
+    <string name="feature_search_impl_all_query_empty">Bạn đang tìm gì thế?</string>
+    <string name="feature_search_impl_songs_query_empty">Nhập tên bài hát bạn muốn tìm…</string>
+    <string name="feature_search_impl_playlists_query_empty">Nhập tên danh sách phát…</string>
+    <string name="feature_search_impl_albums_query_empty">Nhập tên album…</string>
+
+    <!-- Tìm kiếm: Không có kết quả -->
+    <string name="feature_search_impl_all_result_empty">Không tìm thấy kết quả</string>
+    <string name="feature_search_impl_songs_result_empty">Không có bài hát nào phù hợp</string>
+    <string name="feature_search_impl_playlists_result_empty">Không tìm thấy danh sách phát</string>
+    <string name="feature_search_impl_albums_result_empty">Không tìm thấy album nào</string>
+</resources>

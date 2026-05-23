@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_playlists_impl_favorite_title">Giai điệu yêu thích</string>
+
+    <string name="feature_playlists_impl_empty">Bạn chưa có danh sách phát nào. Bắt đầu tạo playlist đầu tiên thôi!</string>
+    <string name="feature_playlists_impl_add_new_playlist">Thêm danh sách phát</string>
+    <string name="feature_playlists_impl_add_new_playlist_description">Nhấn để bắt đầu</string>
+
+    <string name="feature_playlists_impl_playlist_sort">Sắp xếp</string>
+    <string name="feature_playlists_impl_playlist_sort_default">Mặc định</string>
+    <string name="feature_playlists_impl_playlist_sort_accept">Xác nhận</string>
+
+    <string name="feature_playlists_impl_sort_order_name">Tên</string>
+    <string name="feature_playlists_impl_sort_order_created_date">Ngày tạo</string>
+    <string name="feature_playlists_impl_sort_order_number_of_songs">Số lượng bài hát</string>
+
+    <string name="feature_playlists_impl_create_playlist">Tạo danh sách phát</string>
+    <string name="feature_playlists_impl_playlist_name">Tên</string>
+    <string name="feature_playlists_impl_playlist_name_placeholder">VD: Nhạc đi dạo, Chạy bộ buổi sáng…</string>
+    <string name="feature_playlists_impl_playlist_name_empty_error">Tên không được để trống</string>
+    <string name="feature_playlists_impl_playlist_description_optional">Mô tả (Tùy chọn)</string>
+    <string name="feature_playlists_impl_playlist_description_placeholder">Vài dòng cảm nghĩ về playlist này…</string>
+    <string name="feature_playlists_impl_playlist_created_success">Tạo danh sách phát thành công</string>
+    <string name="feature_playlists_impl_playlist_created_failed">Tạo danh sách phát thất bại</string>
+
+    <!-- Playlist Detail -->
+    <string name="feature_playlists_impl_edit_playlist">Chỉnh sửa danh sách phát</string>
+    <string name="feature_playlists_impl_delete_playlist">Xóa danh sách phát</string>
+    <string name="feature_playlists_impl_delete_playlist_confirm">Xóa danh sách phát này? Thao tác này không thể hoàn tác.</string>
+    <string name="feature_playlists_impl_remove_from_playlist">Xóa khỏi danh sách phát</string>
+    <string name="feature_playlists_impl_add_songs">Thêm bài hát</string>
+    <string name="feature_playlists_impl_playlist_play">Phát</string>
+    <string name="feature_playlists_impl_songs_count">%1$d bài hát</string>
+    <string name="feature_playlists_impl_unknown_playlist">Danh sách phát không rõ</string>
+    <string name="feature_playlists_impl_playlist_empty_description">Chưa có bài hát nào ở đây. Hãy thêm vài giai điệu để bắt đầu nhé!</string>
+
+    <!-- Playlist Picker -->
+    <string name="feature_playlists_impl_add_song_to_playlists">Bài hát đã được thêm vào danh sách phát</string>
+    <string name="feature_playlists_impl_picker_title">Chọn danh sách phát</string>
+    <string name="feature_playlists_impl_picker_selected">Đã chọn</string>
+    <string name="feature_playlists_impl_picker_find_placeholder">Tìm danh sách phát…</string>
+    <string name="feature_playlists_impl_picker_not_found_title">Không tìm thấy danh sách phát nào</string>
+    <string name="feature_playlists_impl_picker_empty_title">Chưa có danh sách phát nào để thêm vào</string>
+    <string name="feature_playlists_impl_picker_all">Tất cả</string>
+</resources>

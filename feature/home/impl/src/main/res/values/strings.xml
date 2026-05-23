@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_impl_tab_your_vibe">Your Vibe</string>
+
+    <string name="feature_home_impl_greeting_morning">Have a great day</string>
+    <string name="feature_home_impl_greeting_afternoon">Pleasant afternoon</string>
+    <string name="feature_home_impl_greeting_evening">Enjoy your evening</string>
+    <string name="feature_home_impl_greeting_night">Good night</string>
+
+    <string name="feature_home_impl_section_recently_played">Recently played</string>
+    <string name="feature_home_impl_section_top_played">Heavy rotation</string>
+    <string name="feature_home_impl_section_recently_added">Recently added</string>
+    <string name="feature_home_impl_section_discovery">Quick picks</string>
+    <string name="feature_home_impl_action_shuffle_all">Shuffle all</string>
+    <string name="feature_home_impl_action_resume">Resume</string>
+
+    <string name="feature_home_impl_empty_title">Welcome to Audily</string>
+    <string name="feature_home_impl_empty_subtitle">It\'s a bit quiet here. Head over to your library to scan and bring this space to life.</string>
+    <string name="feature_home_impl_empty_action">Open library</string>
+    <string name="feature_home_impl_delete_history_title">Delete from History</string>
+    <string name="feature_home_impl_delete_history_text">Are you sure you want to remove \"%1$s\" from your listening history?</string>
+</resources>

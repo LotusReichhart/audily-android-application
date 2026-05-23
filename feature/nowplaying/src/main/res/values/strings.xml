@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_nowplaying_title">Now Playing</string>
+    <string name="feature_nowplaying_no_lyrics">No lyrics</string>
+
+    <string name="feature_nowplaying_menu_timber">Sleep Timer</string>
+    <string name="feature_nowplaying_menu_speed_pitch">Speed &amp; Pitch</string>
+    <string name="feature_nowplaying_menu_skip_duration">Skip duration</string>
+    <string name="feature_nowplaying_menu_ringtone">Ringtone</string>
+
+    <string name="feature_nowplaying_queue_title">Up Next</string>
+    <string name="feature_nowplaying_queue_save_as_playlist">Save as playlist</string>
+    <string name="feature_nowplaying_queue_stop">Stop</string>
+    <string name="feature_nowplaying_queue_play_now">Play now</string>
+    <string name="feature_nowplaying_queue_remove_from_queue">Remove from queue</string>
+
+    <string name="feature_nowplaying_sheet_minutes">Minutes</string>
+    <string name="feature_nowplaying_sheet_sleep_off">Off</string>
+    <string name="feature_nowplaying_sheet_sleep_reset">Reset</string>
+    <string name="feature_nowplaying_sheet_sleep_save">Save</string>
+    <string name="feature_nowplaying_sheet_remaining">Remaining</string>
+    <string name="feature_nowplaying_sheet_dismiss">Dismiss</string>
+    <string name="feature_nowplaying_sheet_stop">Stop</string>
+
+    <string name="feature_nowplaying_sheet_speed">Speed</string>
+    <string name="feature_nowplaying_sheet_pitch">Pitch</string>
+    <string name="feature_nowplaying_sheet_reset_to_default">Reset to Default</string>
+    <string name="feature_nowplaying_sheet_speed_save">Save</string>
+
+    <string name="feature_nowplaying_sheet_seconds">Seconds</string>
+    <string name="feature_nowplaying_sheet_duration_save">Save</string>
+    <string name="feature_nowplaying_playlist_created_success">Playlist created successfully</string>
+    <string name="feature_nowplaying_playlist_created_failed">Failed to create playlist</string>
+    <string name="feature_nowplaying_create_playlist">Create Playlist</string>
+    <string name="feature_nowplaying_playlist_name">Playlist Name</string>
+    <string name="feature_nowplaying_playlist_name_placeholder">Enter playlist name</string>
+    <string name="feature_nowplaying_playlist_description_optional">Description (Optional)</string>
+    <string name="feature_nowplaying_playlist_description_placeholder">Enter description</string>
+</resources>

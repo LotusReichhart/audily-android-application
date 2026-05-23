@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_songs_impl_menu_play">Play</string>
+    <string name="feature_songs_impl_menu_play_once">Play Once</string>
+    <string name="feature_songs_impl_menu_resume">Resume</string>
+    <string name="feature_songs_impl_menu_pause">Pause</string>
+    <string name="feature_songs_impl_menu_play_next">Play Next</string>
+    <string name="feature_songs_impl_menu_add_to_queue">Add to Queue</string>
+    <string name="feature_songs_impl_menu_add_to_playlist">Add to Playlist</string>
+    <string name="feature_songs_impl_menu_remove_from_playlist">Remove from Playlist</string>
+    <string name="feature_songs_impl_menu_add_to_favorite">Add to Favorite</string>
+    <string name="feature_songs_impl_menu_remove_from_favorite">Remove from Favorite</string>
+    <string name="feature_songs_impl_menu_info">Info</string>
+    <string name="feature_songs_impl_menu_edit_tag">Edit Tag</string>
+    <string name="feature_songs_impl_menu_ringtone">Set as Ringtone</string>
+    <string name="feature_songs_impl_menu_share">Share</string>
+    <string name="feature_songs_impl_menu_delete">Delete</string>
+
+    <string name="feature_songs_impl_info_title">Title</string>
+    <string name="feature_songs_impl_info_artist">Artist</string>
+    <string name="feature_songs_impl_info_album">Album</string>
+    <string name="feature_songs_impl_info_duration">Duration</string>
+    <string name="feature_songs_impl_info_path">File Path</string>
+    <string name="feature_songs_impl_info_size">File Size</string>
+    <string name="feature_songs_impl_info_year">Year</string>
+    <string name="feature_songs_impl_info_close">Close</string>
+
+    <string name="feature_songs_impl_empty_title">No melodies here yet</string>
+    <string name="feature_songs_impl_empty_description">Start your musical journey by scanning your device or adding new tracks.</string>
+    <string name="feature_songs_impl_empty_action_scan">Scan for music</string>
+
+    <string name="feature_songs_impl_songs_sort">Sort Songs</string>
+    <string name="feature_songs_impl_songs_sort_default">Default</string>
+    <string name="feature_songs_impl_songs_sort_accept">Accept</string>
+
+    <!-- Sort Order Labels -->
+    <string name="feature_songs_impl_sort_order_title">Title</string>
+    <string name="feature_songs_impl_sort_order_artist">Artist</string>
+    <string name="feature_songs_impl_sort_order_album">Album</string>
+    <string name="feature_songs_impl_sort_order_duration">Duration</string>
+    <string name="feature_songs_impl_sort_order_date_added">Date Added</string>
+    <string name="feature_songs_impl_sort_order_number_of_songs">Number of Songs</string>
+    <string name="feature_songs_impl_sort_order_created_date">Date Created</string>
+
+    <string name="feature_songs_impl_not_found_title">Still no tracks found</string>
+    <string name="feature_songs_impl_not_found_description">We scanned your device but couldn\'t find any audio files. Make sure your music is downloaded directly to your phone.</string>
+    <string name="feature_songs_impl_action_refresh">Scan again</string>
+
+    <string name="feature_songs_impl_picker_title">Select Songs</string>
+    <string name="feature_songs_impl_picker_selected">Selected</string>
+    <string name="feature_songs_impl_picker_empty_title">Nothing to select yet</string>
+    <string name="feature_songs_impl_picker_find_placeholder">Find a track…</string>
+    <string name="feature_songs_impl_picker_not_found_title">Couldn\'t find that song</string>
+    <string name="feature_songs_impl_menu_delete_confirm_title">Delete Song</string>
+    <string name="feature_songs_impl_menu_delete_confirm_text">Are you sure you want to permanently delete \"%1$s\" from your device?</string>
+    <string name="feature_songs_impl_delete_success">Successfully deleted song</string>
+    <string name="feature_songs_impl_delete_failed">Failed to delete song</string>
+    <string name="feature_songs_impl_ringtone_success">Successfully set as ringtone</string>
+    <string name="feature_songs_impl_ringtone_permission_need">Need Write Settings permission</string>
+    <string name="feature_songs_impl_ringtone_permission_grant">GRANT</string>
+    <string name="feature_songs_impl_ringtone_failed">Failed to set ringtone</string>
+</resources>

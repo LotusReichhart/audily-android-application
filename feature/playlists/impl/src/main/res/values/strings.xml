@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_playlists_impl_favorite_title">Favorite Vibes</string>
+
+    <string name="feature_playlists_impl_empty">You haven\'t created any playlists yet. Let\'s make your first one!</string>
+    <string name="feature_playlists_impl_add_new_playlist">Add a playlist</string>
+    <string name="feature_playlists_impl_add_new_playlist_description">Tap to get started</string>
+
+    <string name="feature_playlists_impl_playlist_sort">Sort Playlists</string>
+    <string name="feature_playlists_impl_playlist_sort_default">Default</string>
+    <string name="feature_playlists_impl_playlist_sort_accept">Accept</string>
+
+    <string name="feature_playlists_impl_sort_order_name">Name</string>
+    <string name="feature_playlists_impl_sort_order_created_date">Creation Date</string>
+    <string name="feature_playlists_impl_sort_order_number_of_songs">Number of Songs</string>
+
+    <string name="feature_playlists_impl_create_playlist">New Playlist</string>
+    <string name="feature_playlists_impl_playlist_name">Name</string>
+    <string name="feature_playlists_impl_playlist_name_placeholder">e.g., Summer Chill, Late Night Workout…</string>
+    <string name="feature_playlists_impl_playlist_name_empty_error">Playlist name cannot be empty</string>
+    <string name="feature_playlists_impl_playlist_description_optional">Description (optional)</string>
+    <string name="feature_playlists_impl_playlist_description_placeholder">What\'s the vibe of this playlist?</string>
+    <string name="feature_playlists_impl_playlist_created_success">Playlist created successfully</string>
+    <string name="feature_playlists_impl_playlist_created_failed">Failed to create playlist</string>
+
+    <!-- Playlist Detail -->
+    <string name="feature_playlists_impl_edit_playlist">Edit playlist</string>
+    <string name="feature_playlists_impl_delete_playlist">Delete playlist</string>
+    <string name="feature_playlists_impl_delete_playlist_confirm">Delete this playlist? This action cannot be undone.</string>
+    <string name="feature_playlists_impl_remove_from_playlist">Remove from playlist</string>
+    <string name="feature_playlists_impl_add_songs">Add songs</string>
+    <string name="feature_playlists_impl_playlist_play">Play</string>
+    <string name="feature_playlists_impl_songs_count">%1$d songs</string>
+    <string name="feature_playlists_impl_unknown_playlist">Unknown playlist</string>
+    <string name="feature_playlists_impl_playlist_empty_description">Your playlist is empty. Add some tracks to set the vibe!</string>
+
+    <!-- Playlist Picker -->
+    <string name="feature_playlists_impl_add_song_to_playlists">The song has been added to the playlist</string>
+    <string name="feature_playlists_impl_picker_title">Select Playlists</string>
+    <string name="feature_playlists_impl_picker_selected">Selected</string>
+    <string name="feature_playlists_impl_picker_find_placeholder">Find a playlist…</string>
+    <string name="feature_playlists_impl_picker_not_found_title">Couldn\'t find that playlist</string>
+    <string name="feature_playlists_impl_picker_empty_title">Nothing to select yet</string>
+    <string name="feature_playlists_impl_picker_all">All</string>
+</resources>

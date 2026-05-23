@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Audily" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Audily.Splash" parent="Theme.SplashScreen" tools:ignore="ResourceName">
+        <!-- Background of the splash screen -->
+        <item name="windowSplashScreenBackground">#0F0D13</item> <!-- Dark background typical for Audily -->
+
+        <!-- Icon to be shown in the center -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+
+        <!-- Theme to transition to after splash screen is finished -->
+        <item name="postSplashScreenTheme">@style/Theme.Audily</item>
+    </style>
 </resources>

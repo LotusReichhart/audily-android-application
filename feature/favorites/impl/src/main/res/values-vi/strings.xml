@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_favorites_impl_menu_play_all">Phát tất cả</string>
+    <string name="feature_favorites_impl_menu_clear_all">Xóa tất cả</string>
+    <string name="feature_favorites_impl_clear_title">Xóa danh sách yêu thích</string>
+    <string name="feature_favorites_impl_clear_confirm">Bạn có chắc chắn muốn xóa toàn bộ bài hát khỏi danh sách yêu thích không? Thao tác này không thể hoàn tác.</string>
+</resources>

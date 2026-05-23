@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.lotusreichhart.audily.core.datastore";
+option java_multiple_files = true;
+
+// Thiết lập trình phát nhạc (bao gồm trạng thái phiên cuối cùng).
+// Thiết lập trình phát nhạc.
+message PlaybackSettingsProto {
+    int32 skip_duration = 1; // Thời gian nhảy bài (ms), mặc định 10000
+    bool pause_on_unplug = 2; // Tự động tạm dừng khi rút tai nghe
+    float playback_speed = 3; // Tốc độ phát nhạc
+    float playback_pitch = 11; // Cao độ phát nhạc
+    bool volume_normalization = 4; // Chuẩn hóa âm lượng
+    bool is_shuffle_enabled = 9; // Trạng thái phát ngẫu nhiên
+    RepeatModeProto repeat_mode = 10; // Chế độ lặp lại
+}
+
+enum RepeatModeProto {
+    REPEAT_MODE_OFF = 0;
+    REPEAT_MODE_ONE = 1;
+    REPEAT_MODE_ALL = 2;
+}

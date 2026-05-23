@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common Labels -->
+    <string name="core_designsystem_songs">bài hát</string>
+    <string name="core_designsystem_song_is_missing">Tệp đã bị xóa hoặc di chuyển</string>
+    <string name="core_designsystem_unknown_artist">Nghệ sĩ vô danh</string>
+    <string name="core_designsystem_unknown_album">Album không rõ</string>
+    <string name="core_designsystem_unknown_title">Không có tiêu đề</string>
+    <string name="core_designsystem_cancel">Hủy bỏ</string>
+    <string name="core_designsystem_delete">Xóa</string>
+    <string name="core_designsystem_done">Xong</string>
+    <string name="core_designsystem_save">Lưu</string>
+
+    <!-- Sort Type Labels -->
+    <string name="core_designsystem_sort_order">Thứ tự</string>
+    <string name="core_designsystem_sort_according_to">Theo</string>
+    <string name="core_designsystem_sort_type_ascending">Tăng dần</string>
+    <string name="core_designsystem_sort_type_descending">Giảm dần</string>
+</resources>

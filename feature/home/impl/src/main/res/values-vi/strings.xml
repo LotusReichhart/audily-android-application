@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_impl_tab_your_vibe">Gu của bạn</string>
+
+    <string name="feature_home_impl_greeting_morning">Ngày mới tốt lành</string>
+    <string name="feature_home_impl_greeting_afternoon">Chào buổi chiều</string>
+    <string name="feature_home_impl_greeting_evening">Buổi tối vui vẻ</string>
+    <string name="feature_home_impl_greeting_night">Chúc ngủ ngon</string>
+
+    <string name="feature_home_impl_section_recently_played">Nghe gần đây</string>
+    <string name="feature_home_impl_section_top_played">Nghe nhiều nhất</string>
+    <string name="feature_home_impl_section_recently_added">Thêm gần đây</string>
+    <string name="feature_home_impl_section_discovery">Gợi ý</string>
+    <string name="feature_home_impl_action_shuffle_all">Ngẫu nhiên</string>
+    <string name="feature_home_impl_action_resume">Tiếp tục</string>
+
+    <string name="feature_home_impl_empty_title">Chào mừng đến với Audily</string>
+    <string name="feature_home_impl_empty_subtitle">Hành trình âm nhạc của bạn bắt đầu từ đây. Hãy chuyển sang tab Bài hát để tìm và phát những giai điệu yêu thích.</string>
+    <string name="feature_home_impl_empty_action">Tìm nhạc ngay</string>
+    <string name="feature_home_impl_delete_history_title">Xóa khỏi lịch sử</string>
+    <string name="feature_home_impl_delete_history_text">Bạn có chắc chắn muốn xóa \"%1$s\" khỏi lịch sử nghe nhạc?</string>
+</resources>

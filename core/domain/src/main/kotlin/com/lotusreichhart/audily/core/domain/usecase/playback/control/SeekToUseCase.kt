@@ -1,0 +1,12 @@
+package com.lotusreichhart.audily.core.domain.usecase.playback.control
+
+import com.lotusreichhart.audily.core.domain.repository.playback.PlaybackRepository
+import com.lotusreichhart.audily.core.model.playback.PlaybackEvent
+import javax.inject.Inject
+
+class SeekToUseCase @Inject constructor(
+    private val playbackRepository: PlaybackRepository
+) {
+    suspend operator fun invoke(position: Long) =
+        playbackRepository.handleEvent(PlaybackEvent.SeekTo(position))
+}

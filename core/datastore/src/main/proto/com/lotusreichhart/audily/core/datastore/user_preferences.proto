@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.lotusreichhart.audily.core.datastore";
+option java_multiple_files = true;
+
+import "com/lotusreichhart/audily/core/datastore/library_settings.proto";
+import "com/lotusreichhart/audily/core/datastore/ui_settings.proto";
+import "com/lotusreichhart/audily/core/datastore/playback_settings.proto";
+
+// Root message: Tổng hợp toàn bộ tùy chọn người dùng.
+message UserPreferencesProto {
+    LibrarySettingsProto library_settings = 1;
+    UiSettingsProto ui_settings = 2;
+    PlaybackSettingsProto playback_settings = 3;
+}

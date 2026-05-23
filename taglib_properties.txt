@@ -1,0 +1,79 @@
+====================
+CLASS: com.kyant.taglib.Metadata
+====================
+Fields:
+  propertyMap: java.util.HashMap
+  pictures: [Lcom.kyant.taglib.Picture;
+
+Methods:
+  equals(java.lang.Object): boolean
+  toString(): java.lang.String
+  hashCode(): int
+  copy(java.util.HashMap, [Lcom.kyant.taglib.Picture;): com.kyant.taglib.Metadata
+  component1(): java.util.HashMap
+  component2(): [Lcom.kyant.taglib.Picture;
+  getPropertyMap(): java.util.HashMap
+  copy$default(com.kyant.taglib.Metadata, java.util.HashMap, [Lcom.kyant.taglib.Picture;, int, java.lang.Object): com.kyant.taglib.Metadata
+  getPictures(): [Lcom.kyant.taglib.Picture;
+
+
+====================
+CLASS: com.kyant.taglib.PropertyMapKt
+====================
+Fields:
+
+Methods:
+
+
+Failed to load com.kyant.taglib.TagLib: java.lang.UnsatisfiedLinkError: no taglib in java.library.path: C:\Program Files\Java\jdk-21.0.10\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\Users\Lotus\AppData\Local\nvm;C:\nvm4w\nodejs;C:\ProgramData\chocolatey\bin;C:\Program Files\Cloudflare\Cloudflare WARP\;C:\Users\Lotus\AppData\Local\Programs\Python\Python314\Scripts\;C:\Users\Lotus\AppData\Local\Programs\Python\Python314\;C:\Users\Lotus\AppData\Local\Programs\Python\Launcher\;C:\Users\Lotus\AppData\Local\Microsoft\WindowsApps;C:\Users\Lotus\AppData\Local\nvm;C:\nvm4w\nodejs;C:\Users\Lotus\AppData\Local\GitHubDesktop\bin;C:\Users\Lotus\.pyenv\pyenv-win\bin;C:\Users\Lotus\.pyenv\pyenv-win\shims;C:\Program Files\JetBrains\WebStorm 2025.3.2\bin;C:\Program Files\JetBrains\PyCharm 2025.3.2.1\bin;C:\Program Files\Java\jdk-21.0.10\bin;C:\Users\Lotus\AppData\Local\Android\Sdk\platform-tools;C:\Users\Lotus\AppData\Local\Android\Sdk\tools;C:\Users\Lotus\AppData\Local\Microsoft\WinGet\Packages\Genymobile.scrcpy_Microsoft.Winget.Source_8wekyb3d8bbwe\scrcpy-win64-v3.3.4;C:\Users\Lotus\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\Lotus\AppData\Local\PowerToys\DSCModules\;C:\Users\Lotus\AppData\Local\Programs\Antigravity\bin;;.;D:\LotusReichhart\Development\Audily\core\mediastore\src\testDevDebug\jniLibs;D:\LotusReichhart\Development\Audily\core\mediastore\src\testDebug\jniLibs;D:\LotusReichhart\Development\Audily\core\mediastore\src\testDev\jniLibs;D:\LotusReichhart\Development\Audily\core\mediastore\src\test\jniLibs
+
+====================
+CLASS: com.kyant.taglib.Picture
+====================
+Fields:
+  data: [B
+  description: java.lang.String
+  pictureType: java.lang.String
+  mimeType: java.lang.String
+
+Methods:
+  getDescription(): java.lang.String
+  equals(java.lang.Object): boolean
+  toString(): java.lang.String
+  hashCode(): int
+  copy([B, java.lang.String, java.lang.String, java.lang.String): com.kyant.taglib.Picture
+  getData(): [B
+  component1(): [B
+  component2(): java.lang.String
+  component3(): java.lang.String
+  component4(): java.lang.String
+  getPictureType(): java.lang.String
+  copy$default(com.kyant.taglib.Picture, [B, java.lang.String, java.lang.String, java.lang.String, int, java.lang.Object): com.kyant.taglib.Picture
+  getMimeType(): java.lang.String
+
+
+====================
+CLASS: com.kyant.taglib.AudioProperties
+====================
+Fields:
+  length: int
+  bitrate: int
+  sampleRate: int
+  channels: int
+
+Methods:
+  equals(java.lang.Object): boolean
+  toString(): java.lang.String
+  hashCode(): int
+  getLength(): int
+  copy(int, int, int, int): com.kyant.taglib.AudioProperties
+  component1(): int
+  component2(): int
+  component3(): int
+  component4(): int
+  getChannels(): int
+  getSampleRate(): int
+  copy$default(com.kyant.taglib.AudioProperties, int, int, int, int, int, java.lang.Object): com.kyant.taglib.AudioProperties
+  getBitrate(): int
+
+
