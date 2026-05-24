@@ -14,6 +14,13 @@ message UiSettingsProto {
     bool dynamic_color = 7;
     bool use_glassmorphism = 8;
     bool has_use_glassmorphism = 9;
+    AppLanguageProto app_language = 10;
+}
+
+enum AppLanguageProto {
+    APP_LANGUAGE_FOLLOW_SYSTEM = 0;
+    APP_LANGUAGE_ENG_LIST = 1;
+    APP_LANGUAGE_VIETNAMESE = 2;
 }
 
 enum AppThemeProto {

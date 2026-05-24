@@ -15,6 +15,7 @@ import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
+import com.lotusreichhart.audily.core.model.prefs.AppLanguage
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -72,6 +73,10 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updateUseGlassmorphism(enabled: Boolean) {
         audilyDataStore.ui.updateUseGlassmorphism(enabled)
+    }
+
+    override suspend fun updateAppLanguage(language: AppLanguage) {
+        audilyDataStore.ui.updateAppLanguage(language.toProto())
     }
 
     // === Library Settings ===

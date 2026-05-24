@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import com.lotusreichhart.audily.core.datastore.AppThemeProto
 import com.lotusreichhart.audily.core.datastore.NowPlayingThemeProto
 import com.lotusreichhart.audily.core.datastore.UserPreferencesProto
+import com.lotusreichhart.audily.core.datastore.AppLanguageProto
 import javax.inject.Inject
 
 /**
@@ -86,6 +87,17 @@ class UiPreferences @Inject constructor(
                     prefs.uiSettings.toBuilder()
                         .setHasUseGlassmorphism(true)
                         .setUseGlassmorphism(enabled)
+                )
+                .build()
+        }
+    }
+
+    suspend fun updateAppLanguage(language: AppLanguageProto) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setUiSettings(
+                    prefs.uiSettings.toBuilder()
+                        .setAppLanguage(language)
                 )
                 .build()
         }

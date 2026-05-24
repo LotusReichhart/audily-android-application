@@ -25,6 +25,7 @@ interface UserPreferencesRepository {
     suspend fun updateShowMiniPlayerExtraControls(show: Boolean)
     suspend fun updateDynamicColor(enabled: Boolean)
     suspend fun updateUseGlassmorphism(enabled: Boolean)
+    suspend fun updateAppLanguage(language: com.lotusreichhart.audily.core.model.prefs.AppLanguage)
 
     // === Library Settings ===
     suspend fun updateExcludedFolders(folders: List<String>)
