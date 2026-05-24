@@ -221,11 +221,11 @@ internal fun AudioPlaybackScreen(
             // Auto-Play Settings Section Header
             item {
                 Text(
-                    text = stringResource(R.string.feature_settings_impl_audio_autoplay_section),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    modifier = Modifier.padding(top = 8.dp),
+                    text = stringResource(R.string.feature_settings_impl_audio_autoplay_section).uppercase(),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 

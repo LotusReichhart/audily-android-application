@@ -59,4 +59,10 @@
     <string name="feature_settings_impl_library_clear_dialog_msg">Are you sure you want to clear your playback history, playing queue, and search history? This cannot be undone.</string>
     <string name="feature_settings_impl_library_clear_dialog_confirm">Clear</string>
     <string name="feature_settings_impl_library_clear_dialog_cancel">Cancel</string>
+
+    <!-- Language settings -->
+    <string name="feature_settings_impl_language_setting">Language settings</string>
+    <string name="feature_settings_impl_language_system">System Default</string>
+    <string name="feature_settings_impl_language_english">English</string>
+    <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
 </resources>

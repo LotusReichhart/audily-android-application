@@ -94,8 +94,8 @@ internal fun PersonalizationScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.feature_settings_impl_personalization_theme),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.feature_settings_impl_personalization_theme).uppercase(),
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -162,8 +162,8 @@ internal fun PersonalizationScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.feature_settings_impl_personalization_accent_color),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.feature_settings_impl_personalization_accent_color).uppercase(),
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )

@@ -38,25 +38,31 @@
     <!-- Audio & Playback settings -->
     <string name="feature_settings_impl_audio_equalizer_title">Bộ chỉnh âm &amp; Hiệu ứng</string>
     <string name="feature_settings_impl_audio_equalizer_desc">Tùy chỉnh âm thanh của bạn</string>
-    <string name="feature_settings_impl_audio_autoplay_section">CÀI ĐẶT TỰ ĐỘNG PHÁT</string>
+    <string name="feature_settings_impl_audio_autoplay_section">Cài đặt tự động phát</string>
     <string name="feature_settings_impl_audio_autoplay_headphone">Tự động phát khi cắm tai nghe</string>
     <string name="feature_settings_impl_audio_autoplay_bluetooth">Tự động phát khi kết nối Bluetooth</string>
     <string name="feature_settings_impl_audio_ducking">Audio Ducking (Giảm âm lượng khi có thông báo)</string>
     <string name="feature_settings_impl_audio_equalizer_unsupported">Thiết bị không hỗ trợ Bộ chỉnh âm (Equalizer)</string>
 
     <!-- Library & Storage settings -->
-    <string name="feature_settings_impl_library_folders_section">THƯ MỤC TRUY CẬP</string>
+    <string name="feature_settings_impl_library_folders_section">Thư mục truy cập</string>
     <string name="feature_settings_impl_library_folders_desc">Thư mục bị loại trừ khỏi quá trình quét nhạc</string>
     <string name="feature_settings_impl_library_no_excluded_folders">Không có thư mục bị chặn</string>
     <string name="feature_settings_impl_library_add_folder">Thêm thư mục chặn</string>
-    <string name="feature_settings_impl_library_actions_section">HÀNH ĐỘNG</string>
+    <string name="feature_settings_impl_library_actions_section">Hành động</string>
     <string name="feature_settings_impl_library_rescan_btn">Quét lại bộ lưu trữ ngay</string>
     <string name="feature_settings_impl_library_scanning_msg">Đang quét lại bộ lưu trữ…</string>
     <string name="feature_settings_impl_library_scan_complete_msg">Đã quét xong!</string>
-    <string name="feature_settings_impl_library_data_section">QUẢN LÝ DỮ LIỆU</string>
+    <string name="feature_settings_impl_library_data_section">Quản lý dữ liệu</string>
     <string name="feature_settings_impl_library_clear_history_btn">Xóa lịch sử nghe nhạc &amp; tìm kiếm</string>
     <string name="feature_settings_impl_library_clear_dialog_title">Xóa lịch sử</string>
     <string name="feature_settings_impl_library_clear_dialog_msg">Bạn có chắc chắn muốn xóa toàn bộ lịch sử nghe nhạc, hàng đợi và lịch sử tìm kiếm? Hành động này không thể hoàn tác.</string>
     <string name="feature_settings_impl_library_clear_dialog_confirm">Xóa</string>
     <string name="feature_settings_impl_library_clear_dialog_cancel">Hủy</string>
+
+    <!-- Language settings -->
+    <string name="feature_settings_impl_language_setting">Cài đặt ngôn ngữ</string>
+    <string name="feature_settings_impl_language_system">Mặc định hệ thống</string>
+    <string name="feature_settings_impl_language_english">English</string>
+    <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
 </resources>

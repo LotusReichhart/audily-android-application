@@ -107,8 +107,8 @@ internal fun LibraryStorageScreen(
                 ) {
                     Column {
                         Text(
-                            text = stringResource(R.string.feature_settings_impl_library_folders_section),
-                            style = MaterialTheme.typography.titleMedium,
+                            text = stringResource(R.string.feature_settings_impl_library_folders_section).uppercase(),
+                            style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -230,8 +230,8 @@ internal fun LibraryStorageScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.feature_settings_impl_library_actions_section),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.feature_settings_impl_library_actions_section).uppercase(),
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -295,8 +295,8 @@ internal fun LibraryStorageScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.feature_settings_impl_library_data_section),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.feature_settings_impl_library_data_section).uppercase(),
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
