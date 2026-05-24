@@ -21,10 +21,23 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
+import android.content.Context
+import android.media.MediaScannerConnection
+import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
+import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.suspendCancellableCoroutine
+import java.io.File
+import kotlin.coroutines.resume
 
 internal class UserPreferencesRepositoryImpl @Inject constructor(
     private val audilyDataStore: AudilyDataStore,
-    private val playbackDao: PlaybackDao
+    private val playbackDao: PlaybackDao,
+    @param:ApplicationContext private val context: Context,
+    @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : UserPreferencesRepository {
 
     override fun getUserPreferences(): Flow<UserPreferences> {
@@ -173,6 +186,10 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         playbackDao.clearSession()
     }
 
+    override suspend fun clearPlayingQueue() {
+        playbackDao.clearQueue()
+    }
+
     override fun getPlaybackSession(): Flow<PlaybackSession?> {
         return combine(
             playbackDao.getSession(),
@@ -187,5 +204,57 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun rescanMediaStore() = withContext(ioDispatcher) {
+        val prefs = getUserPreferences().first()
+        val excluded = prefs.librarySettings.excludedFolders.map { File(it).canonicalPath }
+
+        val dirs = listOf(
+            File("/storage/emulated/0/Music"),
+            File("/storage/emulated/0/Download"),
+            File("/storage/emulated/0/Audiobooks"),
+            File("/storage/emulated/0/Podcasts"),
+            File("/storage/emulated/0/Ringtones"),
+            File("/storage/emulated/0/Alarms"),
+            File("/storage/emulated/0/Notifications")
+        )
+
+        val filesToScan = mutableListOf<String>()
+
+        for (dir in dirs) {
+            if (!dir.exists() || !dir.isDirectory) continue
+
+            dir.walkTopDown()
+                .onEnter { file ->
+                    try {
+                        val path = file.canonicalPath
+                        !excluded.any { path == it || path.startsWith("$it/") }
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+                .forEach { file ->
+                    if (file.isFile && isAudioFile(file)) {
+                        filesToScan.add(file.absolutePath)
+                    }
+                }
+        }
+
+        if (filesToScan.isNotEmpty()) {
+            suspendCancellableCoroutine<Unit> { cont ->
+                MediaScannerConnection.scanFile(
+                    context,
+                    filesToScan.toTypedArray(),
+                    null
+                ) { _, _ -> }
+                cont.resume(Unit)
+            }
+        }
+    }
+
+    private fun isAudioFile(file: File): Boolean {
+        val extensions = listOf("mp3", "m4a", "flac", "wav", "ogg", "aac", "mid", "wma")
+        return extensions.contains(file.extension.lowercase())
     }
 }

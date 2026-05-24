@@ -45,5 +45,9 @@ class HistoryRepositoryImpl @Inject constructor(
     override suspend fun deleteHistory(songId: Long) {
         historyDao.deleteHistory(songId)
     }
+
+    override suspend fun clearHistory() {
+        historyDao.clearHistory()
+    }
 }
 

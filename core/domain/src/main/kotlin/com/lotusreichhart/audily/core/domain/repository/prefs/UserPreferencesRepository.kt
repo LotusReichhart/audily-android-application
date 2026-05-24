@@ -62,9 +62,15 @@ interface UserPreferencesRepository {
     )
 
     suspend fun clearPlaybackSession()
+    suspend fun clearPlayingQueue()
 
     /**
      * Lấy phiên phát nhạc đã lưu từ Database.
      */
     fun getPlaybackSession(): Flow<com.lotusreichhart.audily.core.model.playback.PlaybackSession?>
+
+    /**
+     * Quét lại toàn bộ bộ nhớ để cập nhật MediaStore.
+     */
+    suspend fun rescanMediaStore()
 }
