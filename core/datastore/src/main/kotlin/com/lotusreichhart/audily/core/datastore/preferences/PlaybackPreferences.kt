@@ -81,4 +81,38 @@ class PlaybackPreferences @Inject constructor(
                 .build()
         }
     }
+
+    suspend fun updateAutoplayOnHeadphoneConnect(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setPlaybackSettings(
+                    prefs.playbackSettings.toBuilder()
+                        .setAutoplayOnHeadphoneConnect(enabled)
+                )
+                .build()
+        }
+    }
+
+    suspend fun updateAutoplayOnBluetoothConnect(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setPlaybackSettings(
+                    prefs.playbackSettings.toBuilder()
+                        .setAutoplayOnBluetoothConnect(enabled)
+                )
+                .build()
+        }
+    }
+
+    suspend fun updateAudioDucking(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setPlaybackSettings(
+                    prefs.playbackSettings.toBuilder()
+                        .setAudioDucking(enabled)
+                        .setHasAudioDucking(true)
+                )
+                .build()
+        }
+    }
 }

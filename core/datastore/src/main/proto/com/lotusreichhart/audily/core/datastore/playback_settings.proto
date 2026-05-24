@@ -13,6 +13,10 @@ message PlaybackSettingsProto {
     bool volume_normalization = 4; // Chuẩn hóa âm lượng
     bool is_shuffle_enabled = 9; // Trạng thái phát ngẫu nhiên
     RepeatModeProto repeat_mode = 10; // Chế độ lặp lại
+    bool autoplay_on_headphone_connect = 12;
+    bool autoplay_on_bluetooth_connect = 13;
+    bool audio_ducking = 14;
+    bool has_audio_ducking = 15;
 }
 
 enum RepeatModeProto {

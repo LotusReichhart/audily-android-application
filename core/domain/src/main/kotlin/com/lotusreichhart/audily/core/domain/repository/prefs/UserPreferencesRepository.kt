@@ -49,6 +49,9 @@ interface UserPreferencesRepository {
     suspend fun updateVolumeNormalization(enabled: Boolean)
     suspend fun updateShuffleEnabled(enabled: Boolean)
     suspend fun updateRepeatMode(mode: RepeatMode)
+    suspend fun updateAutoplayOnHeadphoneConnect(enabled: Boolean)
+    suspend fun updateAutoplayOnBluetoothConnect(enabled: Boolean)
+    suspend fun updateAudioDucking(enabled: Boolean)
 
     // === Session Persistence (Database) ===
     suspend fun savePlaybackSession(

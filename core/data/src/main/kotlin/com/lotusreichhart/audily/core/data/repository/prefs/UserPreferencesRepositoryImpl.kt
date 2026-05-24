@@ -129,6 +129,18 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         audilyDataStore.playback.updateRepeatMode(mode.toProto())
     }
 
+    override suspend fun updateAutoplayOnHeadphoneConnect(enabled: Boolean) {
+        audilyDataStore.playback.updateAutoplayOnHeadphoneConnect(enabled)
+    }
+
+    override suspend fun updateAutoplayOnBluetoothConnect(enabled: Boolean) {
+        audilyDataStore.playback.updateAutoplayOnBluetoothConnect(enabled)
+    }
+
+    override suspend fun updateAudioDucking(enabled: Boolean) {
+        audilyDataStore.playback.updateAudioDucking(enabled)
+    }
+
     // === Session Persistence (Database) ===
 
     override suspend fun savePlaybackSession(
