@@ -52,7 +52,7 @@ fun Modifier.nowPlayingBackground(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(15000, easing = LinearEasing),
+            animation = tween(15_000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "GradientOffset"

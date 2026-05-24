@@ -35,7 +35,7 @@ internal class PersonalizationViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PersonalizationUiState()
         )
 

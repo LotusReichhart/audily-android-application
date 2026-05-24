@@ -46,6 +46,7 @@ import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.feature.settings.impl.R
 import com.lotusreichhart.audily.feature.settings.impl.personalization.component.ColorPickerBottomSheet
 import com.lotusreichhart.audily.feature.settings.impl.personalization.component.PersonalizationTopBar
+import com.lotusreichhart.audily.feature.settings.impl.resource.SettingsIcons
 
 @Composable
 internal fun PersonalizationScreen(
@@ -276,7 +277,7 @@ internal fun PersonalizationScreen(
                                 )
                             } else {
                                 Icon(
-                                    painter = painterResource(id = AudilyIcons.Edit),
+                                    painter = painterResource(id = SettingsIcons.Pick),
                                     contentDescription = "Custom Color Picker",
                                     tint = Color.White.copy(alpha = 0.8f),
                                     modifier = Modifier.size(16.dp)

@@ -34,4 +34,13 @@
     <string name="feature_settings_impl_personalization_glassmorphism_desc">Sử dụng màu sắc của bìa bài hát để làm mờ nền của trình phát</string>
     <string name="feature_settings_impl_personalization_dynamic_color">Màu sắc động (Material You)</string>
     <string name="feature_settings_impl_personalization_dynamic_color_desc">Tự động thay đổi tông màu theo hình nền điện thoại (Android 12+)</string>
+    
+    <!-- Audio & Playback settings -->
+    <string name="feature_settings_impl_audio_equalizer_title">Bộ chỉnh âm &amp; Hiệu ứng</string>
+    <string name="feature_settings_impl_audio_equalizer_desc">Tùy chỉnh âm thanh của bạn</string>
+    <string name="feature_settings_impl_audio_autoplay_section">CÀI ĐẶT TỰ ĐỘNG PHÁT</string>
+    <string name="feature_settings_impl_audio_autoplay_headphone">Tự động phát khi cắm tai nghe</string>
+    <string name="feature_settings_impl_audio_autoplay_bluetooth">Tự động phát khi kết nối Bluetooth</string>
+    <string name="feature_settings_impl_audio_ducking">Audio Ducking (Giảm âm lượng khi có thông báo)</string>
+    <string name="feature_settings_impl_audio_equalizer_unsupported">Thiết bị không hỗ trợ Bộ chỉnh âm (Equalizer)</string>
 </resources>

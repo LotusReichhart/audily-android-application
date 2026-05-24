@@ -34,4 +34,13 @@
     <string name="feature_settings_impl_personalization_glassmorphism_desc">Applies dynamic blur using song artwork colors to players</string>
     <string name="feature_settings_impl_personalization_dynamic_color">Dynamic Color (Material You)</string>
     <string name="feature_settings_impl_personalization_dynamic_color_desc">Generate accent colors from phone wallpaper (Android 12+)</string>
+    
+    <!-- Audio & Playback settings -->
+    <string name="feature_settings_impl_audio_equalizer_title">Equalizer &amp; Audio Effects</string>
+    <string name="feature_settings_impl_audio_equalizer_desc">Customize your sound</string>
+    <string name="feature_settings_impl_audio_autoplay_section">AUTO-PLAY SETTINGS</string>
+    <string name="feature_settings_impl_audio_autoplay_headphone">Auto-play on headphone connect</string>
+    <string name="feature_settings_impl_audio_autoplay_bluetooth">Auto-play on Bluetooth connect</string>
+    <string name="feature_settings_impl_audio_ducking">Audio Ducking (Reduce volume on notifications)</string>
+    <string name="feature_settings_impl_audio_equalizer_unsupported">Equalizer is not supported on this device</string>
 </resources>
