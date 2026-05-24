@@ -71,7 +71,7 @@ internal fun AlbumDetailTopBar(
         Color.Transparent
     } else {
         lerp(
-            start = contentColor.copy(alpha = 0.4f),
+            start = Color.Black.copy(alpha = 0.2f),
             stop = Color.Transparent,
             fraction = collapseFraction
         )

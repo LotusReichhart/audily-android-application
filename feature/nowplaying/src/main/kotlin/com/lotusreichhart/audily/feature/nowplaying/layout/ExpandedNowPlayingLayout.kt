@@ -59,7 +59,7 @@ internal fun ExpandedNowPlayingLayout(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .nowPlayingBackground(uiState.paletteColors),
+            .nowPlayingBackground(uiState.paletteColors, uiState.useGlassmorphism),
         containerColor = Color.Transparent,
         topBar = {
             NowPlayingTopBar(

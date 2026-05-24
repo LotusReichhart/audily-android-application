@@ -23,7 +23,13 @@ import com.lotusreichhart.audily.core.designsystem.theme.SurfaceDark
  * Modifier vẽ nền gradient động dựa trên Palette màu của bài hát.
  */
 @Composable
-fun Modifier.nowPlayingBackground(paletteColors: UiPalette?): Modifier {
+fun Modifier.nowPlayingBackground(
+    paletteColors: UiPalette?,
+    useGlassmorphism: Boolean
+): Modifier {
+    if (!useGlassmorphism) {
+        return this.background(SurfaceDark)
+    }
     val defaultColor = SurfaceDark
     val adaptiveColor = paletteColors?.dominant ?: defaultColor
     val vibrantColor = paletteColors?.vibrant ?: adaptiveColor

@@ -10,5 +10,6 @@ data class QueueUiState(
     val queueSummary: SongsSummary = SongsSummary(),
     val playbackState: PlaybackState = PlaybackState.INITIAL,
     val paletteColors: UiPalette? = null,
-    val currentIndex: Int = -1
+    val currentIndex: Int = -1,
+    val useGlassmorphism: Boolean = true
 )

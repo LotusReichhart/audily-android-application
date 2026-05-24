@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import com.lotusreichhart.audily.core.domain.usecase.playlist.CreatePlaylistUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playlist.AddSongsToPlaylistUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
 import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
@@ -26,6 +27,8 @@ import com.lotusreichhart.audily.feature.nowplaying.R
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,6 +37,7 @@ import javax.inject.Inject
 internal class QueueViewModel @Inject constructor(
     observeNowPlayingUseCase: ObserveNowPlayingUseCase,
     getRemainingQueueSummaryUseCase: GetRemainingQueueSummaryUseCase,
+    private val getUserPreferences: GetUserPreferencesUseCase,
     private val moveQueueItemUseCase: MoveQueueItemUseCase,
     private val removeFromQueueUseCase: RemoveFromQueueUseCase,
     private val skipToIndexUseCase: SkipToIndexUseCase,
@@ -51,16 +55,22 @@ internal class QueueViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
+        val useGlassmorphismFlow = getUserPreferences()
+            .map { it.uiSettings.useGlassmorphism }
+            .distinctUntilChanged()
+
         combine(
             observeNowPlayingUseCase(),
-            getRemainingQueueSummaryUseCase()
-        ) { nowPlaying, summary ->
+            getRemainingQueueSummaryUseCase(),
+            useGlassmorphismFlow
+        ) { nowPlaying, summary, useGlassmorphism ->
             QueueUiState(
                 queue = nowPlaying.queue,
                 queueSummary = summary,
                 playbackState = nowPlaying.playbackState,
                 paletteColors = nowPlaying.colors?.toUiPalette(),
-                currentIndex = nowPlaying.currentIndex
+                currentIndex = nowPlaying.currentIndex,
+                useGlassmorphism = useGlassmorphism
             )
         }
             .onEach { newState ->
