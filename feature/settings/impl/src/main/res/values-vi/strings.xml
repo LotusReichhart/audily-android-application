@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_settings_impl_personalization_title">Cá nhân hóa</string>
+    <string name="feature_settings_impl_personalization_description">Giao diện &amp; Màu sắc</string>
+
+    <string name="feature_settings_impl_audio_title">Âm thanh &amp; Phát nhạc</string>
+    <string name="feature_settings_impl_audio_description">Bộ chỉnh âm, tự động phát</string>
+
+    <string name="feature_settings_impl_library_title">Thư viện &amp; Lưu trữ</string>
+    <string name="feature_settings_impl_library_description">Quét nhạc, lịch sử</string>
+
+    <string name="feature_settings_impl_language_title">Ngôn ngữ</string>
+    <string name="feature_settings_impl_language_description">Ngôn ngữ hiển thị của ứng dụng</string>
+
+    <string name="feature_settings_impl_network_title">Lời bài hát &amp; Mạng</string>
+    <string name="feature_settings_impl_network_description">Tiết kiệm dữ liệu</string>
+
+    <string name="feature_settings_impl_question_title">Trợ giúp &amp; Hỏi đáp</string>
+    <string name="feature_settings_impl_question_description">Các câu hỏi thường gặp</string>
+
+    <string name="feature_settings_impl_about_title">Giới thiệu</string>
+    <string name="feature_settings_impl_about_description">Phiên bản, pháp lý</string>
+
+    <string name="feature_settings_impl_personalization_theme">Giao diện</string>
+    <string name="feature_settings_impl_personalization_theme_system">Hệ thống</string>
+    <string name="feature_settings_impl_personalization_theme_light">Sáng</string>
+    <string name="feature_settings_impl_personalization_theme_dark">Tối</string>
+    <string name="feature_settings_impl_personalization_accent_color">Màu nhấn (Accent)</string>
+    <string name="feature_settings_impl_personalization_accent_default">Mặc định</string>
+    <string name="feature_settings_impl_personalization_accent_custom">Tùy chỉnh</string>
+    <string name="feature_settings_impl_personalization_custom_picker_title">Tùy chỉnh màu sắc</string>
+    <string name="feature_settings_impl_personalization_custom_picker_select">Chọn màu</string>
+    <string name="feature_settings_impl_personalization_glassmorphism">Bật UI Glassmorphism &amp; Blur</string>
+    <string name="feature_settings_impl_personalization_glassmorphism_desc">Sử dụng màu sắc của bìa bài hát để làm mờ nền của trình phát</string>
+    <string name="feature_settings_impl_personalization_dynamic_color">Màu sắc động (Material You)</string>
+    <string name="feature_settings_impl_personalization_dynamic_color_desc">Tự động thay đổi tông màu theo hình nền điện thoại (Android 12+)</string>
+</resources>

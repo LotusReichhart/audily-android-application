@@ -20,6 +20,8 @@ import com.lotusreichhart.audily.core.ui.permission.PermissionScreen
 import com.lotusreichhart.audily.ui.AudilyApp
 import com.lotusreichhart.audily.ui.rememberAudilyAppState
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.RestorePlaybackSessionUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
+import androidx.compose.runtime.collectAsState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.lifecycle.lifecycleScope
@@ -38,14 +40,37 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var globalUiEventBus: GlobalUiEventBus
 
+    @Inject
+    lateinit var getUserPreferencesUseCase: GetUserPreferencesUseCase
+
     private var shouldExpandPlayer by mutableStateOf(false)
+    private var isPreferencesLoaded by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isPreferencesLoaded }
         super.onCreate(savedInstanceState)
         handleIntent(intent)
         enableEdgeToEdge()
         setContent {
+            val userPrefs by getUserPreferencesUseCase().collectAsState(initial = null)
+            val uiSettings = userPrefs?.uiSettings
+
+            LaunchedEffect(userPrefs) {
+                if (userPrefs != null) {
+                    isPreferencesLoaded = true
+                }
+            }
+
+            val appTheme = uiSettings?.appTheme ?: com.lotusreichhart.audily.core.model.prefs.AppTheme.FOLLOW_SYSTEM
+            val darkTheme = when (appTheme) {
+                com.lotusreichhart.audily.core.model.prefs.AppTheme.LIGHT -> false
+                com.lotusreichhart.audily.core.model.prefs.AppTheme.DARK -> true
+                else -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            val dynamicColor = uiSettings?.dynamicColor ?: false
+            val accentColor = uiSettings?.accentColor
+
             val appState = rememberAudilyAppState(
                 networkMonitor = networkMonitor,
             )
@@ -58,7 +83,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            AudilyTheme {
+            AudilyTheme(
+                darkTheme = darkTheme,
+                dynamicColor = dynamicColor,
+                accentColor = accentColor
+            ) {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(

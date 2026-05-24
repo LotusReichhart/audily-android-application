@@ -1,7 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
-include(":feature:albums:impl")
-
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -52,11 +49,13 @@ include(":feature:home:impl")
 include(":feature:focus:api")
 
 include(":feature:settings:api")
+include(":feature:settings:impl")
 
 include(":feature:songs:api")
 include(":feature:songs:impl")
 
 include(":feature:albums:api")
+include(":feature:albums:impl")
 
 include(":feature:playlists:api")
 include(":feature:playlists:impl")

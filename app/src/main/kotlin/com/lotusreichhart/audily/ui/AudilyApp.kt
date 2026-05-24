@@ -82,6 +82,7 @@ import com.lotusreichhart.audily.feature.edittag.impl.navigation.editTagEntry
 import com.lotusreichhart.audily.feature.playlists.impl.navigation.playlistsEntry
 import com.lotusreichhart.audily.feature.favorites.impl.navigation.favoritesEntry
 import com.lotusreichhart.audily.feature.albums.impl.navigation.albumsEntry
+import com.lotusreichhart.audily.feature.settings.impl.navigation.settingsEntry
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -299,7 +300,7 @@ internal fun AudilyApp(
                 searchEntry(navigator = appState.navigator)
                 editTagEntry(navigator = appState.navigator)
                 entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
-                entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
+                settingsEntry(navigator = appState.navigator)
             }
         }
 

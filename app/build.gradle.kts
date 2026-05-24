@@ -74,6 +74,7 @@ dependencies {
     implementation(projects.feature.home.impl)
     implementation(projects.feature.focus.api)
     implementation(projects.feature.settings.api)
+    implementation(projects.feature.settings.impl)
     implementation(projects.feature.songs.api)
     implementation(projects.feature.songs.impl)
     implementation(projects.feature.playlists.api)
