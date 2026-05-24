@@ -8,5 +8,7 @@ data class UiSettings(
     val nowPlayingTheme: NowPlayingTheme = NowPlayingTheme.DEFAULT,
     val useAmoledBlack: Boolean = false,
     val accentColor: Int? = null,
-    val showMiniPlayerExtraControls: Boolean = true
+    val showMiniPlayerExtraControls: Boolean = true,
+    val dynamicColor: Boolean = false,
+    val useGlassmorphism: Boolean = true
 )

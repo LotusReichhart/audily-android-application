@@ -13,7 +13,9 @@ internal fun UiSettingsProto.toDomain(): UiSettings {
         nowPlayingTheme = nowPlayingTheme.toDomain(),
         useAmoledBlack = useAmoledBlack,
         accentColor = if (hasAccentColor) accentColor else null,
-        showMiniPlayerExtraControls = showMiniPlayerExtraControls
+        showMiniPlayerExtraControls = showMiniPlayerExtraControls,
+        dynamicColor = dynamicColor,
+        useGlassmorphism = if (hasUseGlassmorphism) useGlassmorphism else true
     )
 }
 

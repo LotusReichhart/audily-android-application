@@ -67,4 +67,27 @@ class UiPreferences @Inject constructor(
                 .build()
         }
     }
+
+    suspend fun updateDynamicColor(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setUiSettings(
+                    prefs.uiSettings.toBuilder()
+                        .setDynamicColor(enabled)
+                )
+                .build()
+        }
+    }
+
+    suspend fun updateUseGlassmorphism(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toBuilder()
+                .setUiSettings(
+                    prefs.uiSettings.toBuilder()
+                        .setHasUseGlassmorphism(true)
+                        .setUseGlassmorphism(enabled)
+                )
+                .build()
+        }
+    }
 }

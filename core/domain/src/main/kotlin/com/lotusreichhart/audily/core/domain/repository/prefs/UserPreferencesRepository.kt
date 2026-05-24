@@ -23,6 +23,8 @@ interface UserPreferencesRepository {
     suspend fun updateUseAmoledBlack(enabled: Boolean)
     suspend fun updateAccentColor(color: Int?)
     suspend fun updateShowMiniPlayerExtraControls(show: Boolean)
+    suspend fun updateDynamicColor(enabled: Boolean)
+    suspend fun updateUseGlassmorphism(enabled: Boolean)
 
     // === Library Settings ===
     suspend fun updateExcludedFolders(folders: List<String>)

@@ -53,6 +53,14 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         audilyDataStore.ui.updateShowMiniPlayerExtraControls(show)
     }
 
+    override suspend fun updateDynamicColor(enabled: Boolean) {
+        audilyDataStore.ui.updateDynamicColor(enabled)
+    }
+
+    override suspend fun updateUseGlassmorphism(enabled: Boolean) {
+        audilyDataStore.ui.updateUseGlassmorphism(enabled)
+    }
+
     // === Library Settings ===
 
     override suspend fun updateExcludedFolders(folders: List<String>) {

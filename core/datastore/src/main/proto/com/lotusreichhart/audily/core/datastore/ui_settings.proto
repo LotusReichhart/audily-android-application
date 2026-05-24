@@ -11,6 +11,9 @@ message UiSettingsProto {
     int32 accent_color = 4;
     bool has_accent_color = 5; // Hỗ trợ nullable: true nếu accent_color được đặt
     bool show_mini_player_extra_controls = 6;
+    bool dynamic_color = 7;
+    bool use_glassmorphism = 8;
+    bool has_use_glassmorphism = 9;
 }
 
 enum AppThemeProto {

@@ -56,6 +56,7 @@ fun AudilyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color có sẵn trên Android 12+ (Tùy chọn: lấy màu theo hình nền điện thoại)
     dynamicColor: Boolean = false,
+    accentColor: Int? = null,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -66,6 +67,18 @@ fun AudilyTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }.let { baseScheme ->
+        val isDynamicActive = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        if (accentColor != null && !isDynamicActive) {
+            val customColor = androidx.compose.ui.graphics.Color(accentColor)
+            baseScheme.copy(
+                primary = customColor,
+                primaryContainer = customColor.copy(alpha = 0.2f),
+                onPrimaryContainer = customColor
+            )
+        } else {
+            baseScheme
+        }
     }
 
     val view = LocalView.current
