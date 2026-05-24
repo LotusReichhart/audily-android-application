@@ -25,18 +25,23 @@ import androidx.compose.runtime.collectAsState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.lifecycle.lifecycleScope
+import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import com.lotusreichhart.audily.core.model.prefs.AppLanguage
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
 
     @Inject
     lateinit var restorePlaybackSessionUseCase: RestorePlaybackSessionUseCase
-    
+
     @Inject
     lateinit var globalUiEventBus: GlobalUiEventBus
 
@@ -59,13 +64,27 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(userPrefs) {
                 if (userPrefs != null) {
                     isPreferencesLoaded = true
+                    val appLanguage = userPrefs?.uiSettings?.appLanguage ?: AppLanguage.FOLLOW_SYSTEM
+                    val currentLocales = AppCompatDelegate.getApplicationLocales()
+                    val targetLocales = when (appLanguage) {
+                        AppLanguage.FOLLOW_SYSTEM -> LocaleListCompat.getEmptyLocaleList()
+                        AppLanguage.ENG_LIST -> LocaleListCompat.forLanguageTags("en")
+                        AppLanguage.VIETNAMESE -> LocaleListCompat.forLanguageTags("vi")
+                    }
+                    // So sánh tag ngôn ngữ thay vì so sánh đối tượng LocaleListCompat trực tiếp
+                    val currentTag = currentLocales.toLanguageTags()
+                    val targetTag = targetLocales.toLanguageTags()
+                    Timber.d("Language sync: currentTag='$currentTag', targetTag='$targetTag'")
+                    if (currentTag != targetTag) {
+                        AppCompatDelegate.setApplicationLocales(targetLocales)
+                    }
                 }
             }
 
-            val appTheme = uiSettings?.appTheme ?: com.lotusreichhart.audily.core.model.prefs.AppTheme.FOLLOW_SYSTEM
+            val appTheme = uiSettings?.appTheme ?: AppTheme.FOLLOW_SYSTEM
             val darkTheme = when (appTheme) {
-                com.lotusreichhart.audily.core.model.prefs.AppTheme.LIGHT -> false
-                com.lotusreichhart.audily.core.model.prefs.AppTheme.DARK -> true
+                AppTheme.LIGHT -> false
+                AppTheme.DARK -> true
                 else -> androidx.compose.foundation.isSystemInDarkTheme()
             }
             val dynamicColor = uiSettings?.dynamicColor ?: false
