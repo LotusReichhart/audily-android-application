@@ -43,4 +43,20 @@
     <string name="feature_settings_impl_audio_autoplay_bluetooth">Auto-play on Bluetooth connect</string>
     <string name="feature_settings_impl_audio_ducking">Audio Ducking (Reduce volume on notifications)</string>
     <string name="feature_settings_impl_audio_equalizer_unsupported">Equalizer is not supported on this device</string>
+
+    <!-- Library & Storage settings -->
+    <string name="feature_settings_impl_library_folders_section">MEDIA FOLDERS</string>
+    <string name="feature_settings_impl_library_folders_desc">Excluded folders from scanning</string>
+    <string name="feature_settings_impl_library_no_excluded_folders">No excluded folders</string>
+    <string name="feature_settings_impl_library_add_folder">Add Excluded Folder</string>
+    <string name="feature_settings_impl_library_actions_section">LIBRARY ACTIONS</string>
+    <string name="feature_settings_impl_library_rescan_btn">Rescan MediaStore Now</string>
+    <string name="feature_settings_impl_library_scanning_msg">Scanning storage…</string>
+    <string name="feature_settings_impl_library_scan_complete_msg">Scan complete!</string>
+    <string name="feature_settings_impl_library_data_section">DATA MANAGEMENT</string>
+    <string name="feature_settings_impl_library_clear_history_btn">Clear Playback &amp; Search History</string>
+    <string name="feature_settings_impl_library_clear_dialog_title">Clear History</string>
+    <string name="feature_settings_impl_library_clear_dialog_msg">Are you sure you want to clear your playback history, playing queue, and search history? This cannot be undone.</string>
+    <string name="feature_settings_impl_library_clear_dialog_confirm">Clear</string>
+    <string name="feature_settings_impl_library_clear_dialog_cancel">Cancel</string>
 </resources>

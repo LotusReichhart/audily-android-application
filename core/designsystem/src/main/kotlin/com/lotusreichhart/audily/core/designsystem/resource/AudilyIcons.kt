@@ -35,4 +35,5 @@ object AudilyIcons {
     val Grid = R.drawable.core_designsystem_ic_grid
     val Info = R.drawable.core_designsystem_ic_info
     val Camera = R.drawable.core_designsystem_ic_camera
+    val Refresh = R.drawable.core_designsystem_ic_refresh
 }

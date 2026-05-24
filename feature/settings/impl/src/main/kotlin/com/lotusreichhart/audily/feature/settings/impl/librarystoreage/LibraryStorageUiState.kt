@@ -1,3 +1,6 @@
 package com.lotusreichhart.audily.feature.settings.impl.librarystoreage
 
-internal class LibraryStorageUiState
+internal data class LibraryStorageUiState(
+    val excludedFolders: List<String> = emptyList(),
+    val isScanning: Boolean = false
+)
