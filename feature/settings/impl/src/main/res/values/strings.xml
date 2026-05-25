@@ -74,4 +74,24 @@
     <string name="feature_settings_impl_data_saver_section">Data saver</string>
     <string name="feature_settings_impl_data_saver_album_art_wifi_only">Download high-res album art on Wi-Fi only</string>
     <string name="feature_settings_impl_data_saver_fetch_artist_images">Fetch missing artist images</string>
+
+    <!-- Help & FAQ settings -->
+    <string name="feature_settings_impl_help_faq_title">Frequently Asked Questions</string>
+    <string name="feature_settings_impl_help_q1">How do I rescan the music library?</string>
+    <string name="feature_settings_impl_help_a1">Go to Settings > Library &amp; Storage and tap "Rescan MediaStore Now" to update your local music list.</string>
+    <string name="feature_settings_impl_help_q2">Why are lyrics not displaying?</string>
+    <string name="feature_settings_impl_help_a2">Ensure you have an active internet connection. Audily will fetch missing lyrics from Lrclib.net. If a song is unrecognized, edit its tags first.</string>
+    <string name="feature_settings_impl_help_q3">How do I enable AMOLED black theme?</string>
+    <string name="feature_settings_impl_help_a3">Go to Settings > Personalization. Under Theme options, turn on "Enable AMOLED Black" for deeper blacks on supported screens.</string>
+    <string name="feature_settings_impl_help_q4">Can I exclude specific folders from scanning?</string>
+    <string name="feature_settings_impl_help_a4">Yes! Go to Settings > Library &amp; Storage. Under "Media Folders", tap "Add Excluded Folder" and select the folder you wish to ignore.</string>
+
+    <!-- About settings -->
+    <string name="feature_settings_impl_about_version">Version %1$s</string>
+    <string name="feature_settings_impl_about_privacy_policy">Privacy Policy</string>
+    <string name="feature_settings_impl_about_terms_of_service">Terms of Service</string>
+    <string name="feature_settings_impl_about_open_source_licenses">Open Source Licenses</string>
+    <string name="feature_settings_impl_about_send_feedback">Send Feedback</string>
+    <string name="feature_settings_impl_about_licenses_title">Open Source Licenses</string>
+    <string name="feature_settings_impl_about_licenses_close">Close</string>
 </resources>

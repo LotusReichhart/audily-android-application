@@ -74,4 +74,24 @@
     <string name="feature_settings_impl_data_saver_section">Tiết kiệm dữ liệu</string>
     <string name="feature_settings_impl_data_saver_album_art_wifi_only">Chỉ tải ảnh bìa chất lượng cao qua Wi-Fi</string>
     <string name="feature_settings_impl_data_saver_fetch_artist_images">Tự động tải ảnh nghệ sĩ còn thiếu</string>
+
+    <!-- Help & FAQ settings -->
+    <string name="feature_settings_impl_help_faq_title">Các câu hỏi thường gặp</string>
+    <string name="feature_settings_impl_help_q1">Làm thế nào để quét lại thư viện nhạc?</string>
+    <string name="feature_settings_impl_help_a1">Bạn vào Cài đặt > Thư viện &amp; Lưu trữ, chọn "Quét lại bộ lưu trữ ngay" để cập nhật các bài hát mới trên thiết bị.</string>
+    <string name="feature_settings_impl_help_q2">Tại sau lời bài hát không hiển thị?</string>
+    <string name="feature_settings_impl_help_a2">Hãy đảm bảo thiết bị có kết nối Internet để Audily tải lời bài hát từ Lrclib.net. Nếu bài hát không có lời, hãy kiểm tra lại thông tin tag (Tên bài hát, ca sĩ).</string>
+    <string name="feature_settings_impl_help_q3">Làm thế nào để bật giao diện AMOLED tối?</string>
+    <string name="feature_settings_impl_help_a3">Bạn vào Cài đặt > Cá nhân hóa, bật tùy chọn "Sử dụng AMOLED đen" để có màu nền tối tuyệt đối trên màn hình OLED/AMOLED.</string>
+    <string name="feature_settings_impl_help_q4">Tôi có thể loại trừ một số thư mục không quét không?</string>
+    <string name="feature_settings_impl_help_a4">Có! Bạn vào Cài đặt > Thư viện &amp; Lưu trữ. Tại mục "Thư mục truy cập", chọn "Thêm thư mục chặn" và chọn thư mục bạn muốn bỏ qua.</string>
+
+    <!-- About settings -->
+    <string name="feature_settings_impl_about_version">Phiên bản %1$s</string>
+    <string name="feature_settings_impl_about_privacy_policy">Chính sách bảo mật</string>
+    <string name="feature_settings_impl_about_terms_of_service">Điều khoản dịch vụ</string>
+    <string name="feature_settings_impl_about_open_source_licenses">Giấy phép nguồn mở</string>
+    <string name="feature_settings_impl_about_send_feedback">Gửi ý kiến phản hồi</string>
+    <string name="feature_settings_impl_about_licenses_title">Giấy phép nguồn mở</string>
+    <string name="feature_settings_impl_about_licenses_close">Đóng</string>
 </resources>
