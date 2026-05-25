@@ -7,6 +7,7 @@ import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
+import com.lotusreichhart.audily.core.model.prefs.LyricsProvider
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 
@@ -53,6 +54,12 @@ interface UserPreferencesRepository {
     suspend fun updateAutoplayOnHeadphoneConnect(enabled: Boolean)
     suspend fun updateAutoplayOnBluetoothConnect(enabled: Boolean)
     suspend fun updateAudioDucking(enabled: Boolean)
+
+    // === Lyrics & Network Settings ===
+    suspend fun updatePreferEmbeddedOfflineLyrics(prefer: Boolean)
+    suspend fun updateDefaultLyricsSource(source: LyricsProvider)
+    suspend fun updateDownloadHighResAlbumArtWifiOnly(wifiOnly: Boolean)
+    suspend fun updateFetchMissingArtistImages(fetch: Boolean)
 
     // === Session Persistence (Database) ===
     suspend fun savePlaybackSession(

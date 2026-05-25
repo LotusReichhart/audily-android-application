@@ -16,6 +16,7 @@ import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
 import com.lotusreichhart.audily.core.model.prefs.AppLanguage
+import com.lotusreichhart.audily.core.model.prefs.LyricsProvider
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -157,6 +158,24 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updateAudioDucking(enabled: Boolean) {
         audilyDataStore.playback.updateAudioDucking(enabled)
+    }
+
+    // === Lyrics & Network Settings ===
+
+    override suspend fun updatePreferEmbeddedOfflineLyrics(prefer: Boolean) {
+        audilyDataStore.lyricsNetwork.updatePreferEmbeddedOfflineLyrics(prefer)
+    }
+
+    override suspend fun updateDefaultLyricsSource(source: LyricsProvider) {
+        audilyDataStore.lyricsNetwork.updateDefaultLyricsSource(source.toProto())
+    }
+
+    override suspend fun updateDownloadHighResAlbumArtWifiOnly(wifiOnly: Boolean) {
+        audilyDataStore.lyricsNetwork.updateDownloadHighResAlbumArtWifiOnly(wifiOnly)
+    }
+
+    override suspend fun updateFetchMissingArtistImages(fetch: Boolean) {
+        audilyDataStore.lyricsNetwork.updateFetchMissingArtistImages(fetch)
     }
 
     // === Session Persistence (Database) ===
