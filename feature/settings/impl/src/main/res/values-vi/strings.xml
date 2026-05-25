@@ -65,4 +65,13 @@
     <string name="feature_settings_impl_language_system">Mặc định hệ thống</string>
     <string name="feature_settings_impl_language_english">English</string>
     <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
+
+    <!-- Lyrics & Network settings -->
+    <string name="feature_settings_impl_lyrics_network_title">Lời bài hát &amp; Mạng</string>
+    <string name="feature_settings_impl_lyrics_section">Lời bài hát</string>
+    <string name="feature_settings_impl_lyrics_prefer_embedded">Ưu tiên lời bài hát ngoại tuyến</string>
+    <string name="feature_settings_impl_lyrics_default_source">Nguồn lời bài hát mặc định</string>
+    <string name="feature_settings_impl_data_saver_section">Tiết kiệm dữ liệu</string>
+    <string name="feature_settings_impl_data_saver_album_art_wifi_only">Chỉ tải ảnh bìa chất lượng cao qua Wi-Fi</string>
+    <string name="feature_settings_impl_data_saver_fetch_artist_images">Tự động tải ảnh nghệ sĩ còn thiếu</string>
 </resources>

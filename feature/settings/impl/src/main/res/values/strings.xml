@@ -65,4 +65,13 @@
     <string name="feature_settings_impl_language_system">System Default</string>
     <string name="feature_settings_impl_language_english">English</string>
     <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
+
+    <!-- Lyrics & Network settings -->
+    <string name="feature_settings_impl_lyrics_network_title">Lyrics &amp; Network</string>
+    <string name="feature_settings_impl_lyrics_section">Lyrics</string>
+    <string name="feature_settings_impl_lyrics_prefer_embedded">Prefer embedded offline lyrics</string>
+    <string name="feature_settings_impl_lyrics_default_source">Default Lyrics Source</string>
+    <string name="feature_settings_impl_data_saver_section">Data saver</string>
+    <string name="feature_settings_impl_data_saver_album_art_wifi_only">Download high-res album art on Wi-Fi only</string>
+    <string name="feature_settings_impl_data_saver_fetch_artist_images">Fetch missing artist images</string>
 </resources>
