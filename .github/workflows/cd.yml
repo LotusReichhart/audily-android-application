@@ -46,10 +46,10 @@ jobs:
       - name: Upload to Google Play (Internal Track)
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonRaw: ${{ secrets.PLAY_CONSOLE_JSON }}
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_JSON }}
           packageName: com.lotusreichhart.audily
           releaseFiles: app/build/outputs/bundle/prodRelease/*.aab
-          track: internal
+          tracks: internal
           status: completed
 
       - name: Create GitHub Release

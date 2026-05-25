@@ -62,7 +62,6 @@ import com.lotusreichhart.audily.feature.focus.api.navigation.FocusNavKey
 import com.lotusreichhart.audily.feature.home.impl.navigation.homeEntry
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingViewModel
 import com.lotusreichhart.audily.feature.search.impl.navigation.searchEntry
-import com.lotusreichhart.audily.feature.settings.api.navigation.SettingsNavKey
 import com.lotusreichhart.audily.feature.songs.impl.navigation.songsEntry
 import com.lotusreichhart.audily.navigation.NAV_BAR_ITEMS
 import com.lotusreichhart.audily.core.navigation.toEntries
@@ -82,6 +81,7 @@ import com.lotusreichhart.audily.feature.edittag.impl.navigation.editTagEntry
 import com.lotusreichhart.audily.feature.playlists.impl.navigation.playlistsEntry
 import com.lotusreichhart.audily.feature.favorites.impl.navigation.favoritesEntry
 import com.lotusreichhart.audily.feature.albums.impl.navigation.albumsEntry
+import com.lotusreichhart.audily.feature.settings.impl.navigation.settingsEntry
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -90,7 +90,6 @@ fun AudilyApp(
     appState: AudilyAppState,
     globalUiEventBus: GlobalUiEventBus
 ) {
-    val isOffline by appState.isOffline.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val audilyWindowSize = rememberAudilyWindowSize()
@@ -298,8 +297,8 @@ internal fun AudilyApp(
                 favoritesEntry(navigator = appState.navigator)
                 searchEntry(navigator = appState.navigator)
                 editTagEntry(navigator = appState.navigator)
-                entry<FocusNavKey> { SamplePlaceholder("Focus Screen") }
-                entry<SettingsNavKey> { SamplePlaceholder("Settings Screen") }
+                entry<FocusNavKey> { SamplePlaceholder("Coming Soon") }
+                settingsEntry(navigator = appState.navigator)
             }
         }
 
@@ -420,11 +419,13 @@ internal fun AudilyApp(
 }
 
 @Composable
-private fun SamplePlaceholder(name: String) {
+private fun SamplePlaceholder(
+    name: String
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "$name Placeholder", style = MaterialTheme.typography.headlineMedium)
+        Text(text = name, style = MaterialTheme.typography.headlineMedium)
     }
 }

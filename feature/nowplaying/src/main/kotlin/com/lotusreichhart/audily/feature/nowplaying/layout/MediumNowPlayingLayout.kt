@@ -33,7 +33,6 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyArtwork
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
 import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
-import com.lotusreichhart.audily.core.designsystem.theme.SurfaceVariantDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiState
@@ -68,7 +67,7 @@ internal fun MediumNowPlayingLayout(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .nowPlayingBackground(uiState.paletteColors),
+            .nowPlayingBackground(uiState.paletteColors, uiState.useGlassmorphism),
         containerColor = Color.Transparent,
         topBar = {
             NowPlayingTopBar(
@@ -135,7 +134,7 @@ internal fun MediumNowPlayingLayout(
                                             .fillMaxWidth()
                                             .padding(horizontal = LocalDimensions.current.paddingMedium)
                                             .clip(RoundedCornerShape(12.dp))
-                                            .background(SurfaceVariantDark.copy(alpha = 0.7f))
+                                            .background(Color.Black.copy(alpha = 0.5f))
                                             .padding(LocalDimensions.current.paddingSmall),
                                         horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingSmall),
                                         verticalAlignment = Alignment.CenterVertically,

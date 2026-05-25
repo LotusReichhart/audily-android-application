@@ -19,5 +19,6 @@ data class NowPlayingUiState(
     val hasPrevious: Boolean = true,
     val isLyricsVisible: Boolean = false,
     val lyrics: Lyrics? = null,
-    val isLyricsLoading: Boolean = false
+    val isLyricsLoading: Boolean = false,
+    val useGlassmorphism: Boolean = true
 )

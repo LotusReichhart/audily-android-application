@@ -6,6 +6,10 @@ plugins {
 
 android {
     namespace = "com.lotusreichhart.audily.core.datastore"
+
+    defaultConfig {
+        consumerProguardFiles("proguard-rules.pro")
+    }
 }
 
 dependencies{

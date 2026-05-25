@@ -310,7 +310,8 @@ internal fun ContentResolver.queryBasicSongsByIds(
 
 internal fun ContentResolver.querySongsSortMetadata(
     uri: Uri,
-    searchQuery: String? = null
+    searchQuery: String? = null,
+    excludedFolders: List<String> = emptyList()
 ): List<MediaStoreSortMetadata> {
     val metadataList = mutableListOf<MediaStoreSortMetadata>()
     val projection = arrayOf(
@@ -329,6 +330,12 @@ internal fun ContentResolver.querySongsSortMetadata(
         selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
         selectionArgs.add("%$searchQuery%")
         selectionArgs.add("%$searchQuery%")
+    }
+
+    for (folder in excludedFolders) {
+        val normalized = if (folder.endsWith("/")) folder else "$folder/"
+        selection.append(" AND ${MediaStore.Audio.Media.DATA} NOT LIKE ?")
+        selectionArgs.add("$normalized%")
     }
 
     this.query(
@@ -363,7 +370,8 @@ internal fun ContentResolver.querySongsSortMetadata(
 
 internal fun ContentResolver.querySongsSummary(
     uri: Uri,
-    searchQuery: String? = null
+    searchQuery: String? = null,
+    excludedFolders: List<String> = emptyList()
 ): MediaStoreSongsSummary {
     val projection = arrayOf(
         MediaStore.Audio.Media._ID,
@@ -377,6 +385,12 @@ internal fun ContentResolver.querySongsSummary(
         selection.append(" AND (${MediaStore.Audio.Media.TITLE} LIKE ? OR ${MediaStore.Audio.Media.ARTIST} LIKE ?)")
         selectionArgs.add("%$searchQuery%")
         selectionArgs.add("%$searchQuery%")
+    }
+
+    for (folder in excludedFolders) {
+        val normalized = if (folder.endsWith("/")) folder else "$folder/"
+        selection.append(" AND ${MediaStore.Audio.Media.DATA} NOT LIKE ?")
+        selectionArgs.add("$normalized%")
     }
 
     var count = 0

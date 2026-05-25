@@ -3,9 +3,11 @@ package com.lotusreichhart.audily.core.data.mapper.prefs
 import com.lotusreichhart.audily.core.datastore.AppThemeProto
 import com.lotusreichhart.audily.core.datastore.NowPlayingThemeProto
 import com.lotusreichhart.audily.core.datastore.UiSettingsProto
+import com.lotusreichhart.audily.core.datastore.AppLanguageProto
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UiSettings
+import com.lotusreichhart.audily.core.model.prefs.AppLanguage
 
 internal fun UiSettingsProto.toDomain(): UiSettings {
     return UiSettings(
@@ -13,7 +15,10 @@ internal fun UiSettingsProto.toDomain(): UiSettings {
         nowPlayingTheme = nowPlayingTheme.toDomain(),
         useAmoledBlack = useAmoledBlack,
         accentColor = if (hasAccentColor) accentColor else null,
-        showMiniPlayerExtraControls = showMiniPlayerExtraControls
+        showMiniPlayerExtraControls = showMiniPlayerExtraControls,
+        dynamicColor = dynamicColor,
+        useGlassmorphism = if (hasUseGlassmorphism) useGlassmorphism else true,
+        appLanguage = appLanguage.toDomain()
     )
 }
 
@@ -43,4 +48,16 @@ internal fun NowPlayingTheme.toProto(): NowPlayingThemeProto = when (this) {
     NowPlayingTheme.BLUR -> NowPlayingThemeProto.NOW_PLAYING_THEME_BLUR
     NowPlayingTheme.MINIMAL -> NowPlayingThemeProto.NOW_PLAYING_THEME_MINIMAL
     NowPlayingTheme.FULL_SCREEN_ART -> NowPlayingThemeProto.NOW_PLAYING_THEME_FULL_SCREEN_ART
+}
+
+internal fun AppLanguageProto.toDomain(): AppLanguage = when (this) {
+    AppLanguageProto.APP_LANGUAGE_ENG_LIST -> AppLanguage.ENG_LIST
+    AppLanguageProto.APP_LANGUAGE_VIETNAMESE -> AppLanguage.VIETNAMESE
+    else -> AppLanguage.FOLLOW_SYSTEM
+}
+
+internal fun AppLanguage.toProto(): AppLanguageProto = when (this) {
+    AppLanguage.ENG_LIST -> AppLanguageProto.APP_LANGUAGE_ENG_LIST
+    AppLanguage.VIETNAMESE -> AppLanguageProto.APP_LANGUAGE_VIETNAMESE
+    AppLanguage.FOLLOW_SYSTEM -> AppLanguageProto.APP_LANGUAGE_FOLLOW_SYSTEM
 }

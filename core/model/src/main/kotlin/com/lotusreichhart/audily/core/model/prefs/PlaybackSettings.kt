@@ -12,5 +12,8 @@ data class PlaybackSettings(
     val playbackPitch: Float = 1.0f,
     val volumeNormalization: Boolean = false,
     val isShuffleEnabled: Boolean = false,
-    val repeatMode: RepeatMode = RepeatMode.OFF
+    val repeatMode: RepeatMode = RepeatMode.OFF,
+    val autoplayOnHeadphoneConnect: Boolean = false,
+    val autoplayOnBluetoothConnect: Boolean = false,
+    val audioDucking: Boolean = true
 )

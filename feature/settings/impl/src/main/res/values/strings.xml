@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_settings_impl_personalization_title">Personalization</string>
+    <string name="feature_settings_impl_personalization_description">Theme &amp; Colors</string>
+
+    <string name="feature_settings_impl_audio_title">Audio &amp; Playback</string>
+    <string name="feature_settings_impl_audio_description">Equalizer, auto-play</string>
+
+    <string name="feature_settings_impl_library_title">Library &amp; Storage</string>
+    <string name="feature_settings_impl_library_description">Scanning, history</string>
+
+    <string name="feature_settings_impl_language_title">Language</string>
+    <string name="feature_settings_impl_language_description">Application language</string>
+
+    <string name="feature_settings_impl_network_title">Lyrics &amp; Network</string>
+    <string name="feature_settings_impl_network_description">Data usage</string>
+
+    <string name="feature_settings_impl_question_title">Help &amp; FAQ</string>
+    <string name="feature_settings_impl_question_description">Frequently asked questions</string>
+
+    <string name="feature_settings_impl_about_title">About</string>
+    <string name="feature_settings_impl_about_description">Version, legal</string>
+
+    <string name="feature_settings_impl_personalization_theme">Theme</string>
+    <string name="feature_settings_impl_personalization_theme_system">System</string>
+    <string name="feature_settings_impl_personalization_theme_light">Light</string>
+    <string name="feature_settings_impl_personalization_theme_dark">Dark</string>
+    <string name="feature_settings_impl_personalization_accent_color">Accent Color</string>
+    <string name="feature_settings_impl_personalization_accent_default">Default</string>
+    <string name="feature_settings_impl_personalization_accent_custom">Custom</string>
+    <string name="feature_settings_impl_personalization_custom_picker_title">Custom Color</string>
+    <string name="feature_settings_impl_personalization_custom_picker_select">Select</string>
+    <string name="feature_settings_impl_personalization_glassmorphism">Enable UI Glassmorphism &amp; Blur</string>
+    <string name="feature_settings_impl_personalization_glassmorphism_desc">Applies dynamic blur using song artwork colors to players</string>
+    <string name="feature_settings_impl_personalization_dynamic_color">Dynamic Color (Material You)</string>
+    <string name="feature_settings_impl_personalization_dynamic_color_desc">Generate accent colors from phone wallpaper (Android 12+)</string>
+    
+    <!-- Audio & Playback settings -->
+    <string name="feature_settings_impl_audio_equalizer_title">Equalizer &amp; Audio Effects</string>
+    <string name="feature_settings_impl_audio_equalizer_desc">Customize your sound</string>
+    <string name="feature_settings_impl_audio_autoplay_section">AUTO-PLAY SETTINGS</string>
+    <string name="feature_settings_impl_audio_autoplay_headphone">Auto-play on headphone connect</string>
+    <string name="feature_settings_impl_audio_autoplay_bluetooth">Auto-play on Bluetooth connect</string>
+    <string name="feature_settings_impl_audio_ducking">Audio Ducking (Reduce volume on notifications)</string>
+    <string name="feature_settings_impl_audio_equalizer_unsupported">Equalizer is not supported on this device</string>
+
+    <!-- Library & Storage settings -->
+    <string name="feature_settings_impl_library_folders_section">MEDIA FOLDERS</string>
+    <string name="feature_settings_impl_library_folders_desc">Excluded folders from scanning</string>
+    <string name="feature_settings_impl_library_no_excluded_folders">No excluded folders</string>
+    <string name="feature_settings_impl_library_add_folder">Add Excluded Folder</string>
+    <string name="feature_settings_impl_library_actions_section">LIBRARY ACTIONS</string>
+    <string name="feature_settings_impl_library_rescan_btn">Rescan MediaStore Now</string>
+    <string name="feature_settings_impl_library_scanning_msg">Scanning storage…</string>
+    <string name="feature_settings_impl_library_scan_complete_msg">Scan complete!</string>
+    <string name="feature_settings_impl_library_data_section">DATA MANAGEMENT</string>
+    <string name="feature_settings_impl_library_clear_history_btn">Clear Playback &amp; Search History</string>
+    <string name="feature_settings_impl_library_clear_dialog_title">Clear History</string>
+    <string name="feature_settings_impl_library_clear_dialog_msg">Are you sure you want to clear your playback history, playing queue, and search history? This cannot be undone.</string>
+    <string name="feature_settings_impl_library_clear_dialog_confirm">Clear</string>
+    <string name="feature_settings_impl_library_clear_dialog_cancel">Cancel</string>
+
+    <!-- Language settings -->
+    <string name="feature_settings_impl_language_setting">Language settings</string>
+    <string name="feature_settings_impl_language_system">System Default</string>
+    <string name="feature_settings_impl_language_english">English</string>
+    <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
+
+    <!-- Lyrics & Network settings -->
+    <string name="feature_settings_impl_lyrics_network_title">Lyrics &amp; Network</string>
+    <string name="feature_settings_impl_lyrics_section">Lyrics</string>
+    <string name="feature_settings_impl_lyrics_prefer_embedded">Prefer embedded offline lyrics</string>
+    <string name="feature_settings_impl_lyrics_default_source">Default Lyrics Source</string>
+    <string name="feature_settings_impl_data_saver_section">Data saver</string>
+    <string name="feature_settings_impl_data_saver_album_art_wifi_only">Download high-res album art on Wi-Fi only</string>
+    <string name="feature_settings_impl_data_saver_fetch_artist_images">Fetch missing artist images</string>
+
+    <!-- Help & FAQ settings -->
+    <string name="feature_settings_impl_help_faq_title">Frequently Asked Questions</string>
+    <string name="feature_settings_impl_help_q1">How do I rescan the music library?</string>
+    <string name="feature_settings_impl_help_a1">Go to Settings > Library &amp; Storage and tap "Rescan MediaStore Now" to update your local music list.</string>
+    <string name="feature_settings_impl_help_q2">Why are lyrics not displaying?</string>
+    <string name="feature_settings_impl_help_a2">Ensure you have an active internet connection. Audily will fetch missing lyrics from Lrclib.net. If a song is unrecognized, edit its tags first.</string>
+    <string name="feature_settings_impl_help_q3">How do I enable AMOLED black theme?</string>
+    <string name="feature_settings_impl_help_a3">Go to Settings > Personalization. Under Theme options, turn on "Enable AMOLED Black" for deeper blacks on supported screens.</string>
+    <string name="feature_settings_impl_help_q4">Can I exclude specific folders from scanning?</string>
+    <string name="feature_settings_impl_help_a4">Yes! Go to Settings > Library &amp; Storage. Under "Media Folders", tap "Add Excluded Folder" and select the folder you wish to ignore.</string>
+
+    <!-- About settings -->
+    <string name="feature_settings_impl_about_version">Version %1$s</string>
+    <string name="feature_settings_impl_about_privacy_policy">Privacy Policy</string>
+    <string name="feature_settings_impl_about_terms_of_service">Terms of Service</string>
+    <string name="feature_settings_impl_about_open_source_licenses">Open Source Licenses</string>
+    <string name="feature_settings_impl_about_send_feedback">Send Feedback</string>
+    <string name="feature_settings_impl_about_licenses_title">Open Source Licenses</string>
+    <string name="feature_settings_impl_about_licenses_close">Close</string>
+</resources>

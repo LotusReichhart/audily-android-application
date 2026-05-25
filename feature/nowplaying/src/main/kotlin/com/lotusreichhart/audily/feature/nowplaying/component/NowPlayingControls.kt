@@ -61,7 +61,7 @@ internal fun NowPlayingControls(
             contentDescription = "Shuffle",
             containerSize = 28.dp,
             iconSize = 24.dp,
-            modifier = Modifier.alpha(if (isShuffleOn) 1f else 0.7f),
+            modifier = Modifier.alpha(if (isShuffleOn) 1f else 0.5f),
             tint = OnSurfaceDark
         )
         // Previous
@@ -71,7 +71,7 @@ internal fun NowPlayingControls(
             contentDescription = "Previous",
             containerSize = 28.dp,
             iconSize = 24.dp,
-            modifier = Modifier.alpha(if (hasPrevious) 1f else 0.7f),
+            modifier = Modifier.alpha(if (hasPrevious) 1f else 0.5f),
             tint = OnSurfaceDark
         )
         // Fast Rewind
@@ -110,7 +110,7 @@ internal fun NowPlayingControls(
             contentDescription = "Next",
             containerSize = 28.dp,
             iconSize = 24.dp,
-            modifier = Modifier.alpha(if (hasNext) 1f else 0.7f),
+            modifier = Modifier.alpha(if (hasNext) 1f else 0.5f),
             tint = OnSurfaceDark
         )
         // Repeat
@@ -132,7 +132,7 @@ internal fun NowPlayingControls(
             modifier = Modifier
                 .alpha(
                     when (repeatMode) {
-                        RepeatMode.OFF -> 0.7f
+                        RepeatMode.OFF -> 0.5f
                         RepeatMode.ONE -> 1f
                         RepeatMode.ALL -> 1f
                     }

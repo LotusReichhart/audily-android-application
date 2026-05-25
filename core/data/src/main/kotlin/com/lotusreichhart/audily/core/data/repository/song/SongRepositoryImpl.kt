@@ -27,19 +27,27 @@ import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
+import com.lotusreichhart.audily.core.domain.repository.prefs.UserPreferencesRepository
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
+import timber.log.Timber
 
 internal class SongRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val mediaStoreDataSource: MediaStoreDataSource,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : SongRepository {
 
+    private val excludedFoldersFlow: Flow<List<String>> = userPreferencesRepository.getUserPreferences()
+        .map { it.librarySettings.excludedFolders }
+        .distinctUntilChanged()
+
     override fun getSongsSummary(searchQuery: String?): Flow<SongsSummary> {
-        return mediaStoreDataSource.getSongsSummary(searchQuery).map { it.toSongsSummary() }
+        return excludedFoldersFlow.flatMapLatest { excludedFolders ->
+            mediaStoreDataSource.getSongsSummary(searchQuery, excludedFolders)
+        }.map { it.toSongsSummary() }
     }
 
     override fun getSongIds(
@@ -47,7 +55,9 @@ internal class SongRepositoryImpl @Inject constructor(
         sortOrder: SongSortOrder,
         sortType: SortOrderType
     ): Flow<List<Long>> {
-        return mediaStoreDataSource.getSongsSortMetadata(searchQuery).map { metadataList ->
+        return excludedFoldersFlow.flatMapLatest { excludedFolders ->
+            mediaStoreDataSource.getSongsSortMetadata(searchQuery, excludedFolders)
+        }.map { metadataList ->
             SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
         }
     }
@@ -57,22 +67,23 @@ internal class SongRepositoryImpl @Inject constructor(
         sortOrder: SongSortOrder,
         sortType: SortOrderType
     ): Flow<PagingData<Song>> {
-        return mediaStoreDataSource.getSongsSortMetadata(searchQuery)
-            .flatMapLatest { metadataList ->
-                val sortedIds = SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
+        return excludedFoldersFlow.flatMapLatest { excludedFolders ->
+            mediaStoreDataSource.getSongsSortMetadata(searchQuery, excludedFolders)
+        }.flatMapLatest { metadataList ->
+            val sortedIds = SongSorter.sort(metadataList, sortOrder, sortType).map { it.id }
 
-                Pager(
-                    config = AudilyPagingConfig.defaultConfig(),
-                    pagingSourceFactory = {
-                        MediaStoreIdPagingSource(
-                            dataSources = mediaStoreDataSource,
-                            sortedIds = sortedIds
-                        )
-                    }
-                ).flow.map { pagingData ->
-                    pagingData.map { it.toSong() }
+            Pager(
+                config = AudilyPagingConfig.defaultConfig(),
+                pagingSourceFactory = {
+                    MediaStoreIdPagingSource(
+                        dataSources = mediaStoreDataSource,
+                        sortedIds = sortedIds
+                    )
                 }
+            ).flow.map { pagingData ->
+                pagingData.map { it.toSong() }
             }
+        }
     }
 
     override fun getSong(id: Long): Flow<Song?> {

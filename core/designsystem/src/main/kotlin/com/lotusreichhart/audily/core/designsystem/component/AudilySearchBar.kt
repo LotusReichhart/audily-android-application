@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -54,7 +53,7 @@ fun AudilySearchBar(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxSize(),
             textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = Color.Black.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             singleLine = true,

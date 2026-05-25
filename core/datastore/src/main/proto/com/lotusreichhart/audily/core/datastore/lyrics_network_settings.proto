@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "com.lotusreichhart.audily.core.datastore";
+option java_multiple_files = true;
+
+// Thiết lập lời bài hát và mạng.
+message LyricsNetworkSettingsProto {
+    bool prefer_embedded_offline_lyrics = 1;
+    LyricsProviderProto default_lyrics_source = 2;
+    bool download_high_res_album_art_wifi_only = 3;
+    bool fetch_missing_artist_images = 4;
+}
+
+enum LyricsProviderProto {
+    LYRICS_PROVIDER_LRCLIB = 0;
+}

@@ -15,16 +15,31 @@ import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
 import com.lotusreichhart.audily.core.model.prefs.AppTheme
 import com.lotusreichhart.audily.core.model.prefs.NowPlayingTheme
 import com.lotusreichhart.audily.core.model.prefs.UserPreferences
+import com.lotusreichhart.audily.core.model.prefs.AppLanguage
+import com.lotusreichhart.audily.core.model.prefs.LyricsProvider
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
+import android.content.Context
+import android.media.MediaScannerConnection
+import com.lotusreichhart.audily.core.common.coroutines.AudilyDispatchers
+import com.lotusreichhart.audily.core.common.coroutines.Dispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.suspendCancellableCoroutine
+import java.io.File
+import kotlin.coroutines.resume
 
 internal class UserPreferencesRepositoryImpl @Inject constructor(
     private val audilyDataStore: AudilyDataStore,
-    private val playbackDao: PlaybackDao
+    private val playbackDao: PlaybackDao,
+    @param:ApplicationContext private val context: Context,
+    @param:Dispatcher(AudilyDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : UserPreferencesRepository {
 
     override fun getUserPreferences(): Flow<UserPreferences> {
@@ -51,6 +66,18 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun updateShowMiniPlayerExtraControls(show: Boolean) {
         audilyDataStore.ui.updateShowMiniPlayerExtraControls(show)
+    }
+
+    override suspend fun updateDynamicColor(enabled: Boolean) {
+        audilyDataStore.ui.updateDynamicColor(enabled)
+    }
+
+    override suspend fun updateUseGlassmorphism(enabled: Boolean) {
+        audilyDataStore.ui.updateUseGlassmorphism(enabled)
+    }
+
+    override suspend fun updateAppLanguage(language: AppLanguage) {
+        audilyDataStore.ui.updateAppLanguage(language.toProto())
     }
 
     // === Library Settings ===
@@ -121,6 +148,36 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         audilyDataStore.playback.updateRepeatMode(mode.toProto())
     }
 
+    override suspend fun updateAutoplayOnHeadphoneConnect(enabled: Boolean) {
+        audilyDataStore.playback.updateAutoplayOnHeadphoneConnect(enabled)
+    }
+
+    override suspend fun updateAutoplayOnBluetoothConnect(enabled: Boolean) {
+        audilyDataStore.playback.updateAutoplayOnBluetoothConnect(enabled)
+    }
+
+    override suspend fun updateAudioDucking(enabled: Boolean) {
+        audilyDataStore.playback.updateAudioDucking(enabled)
+    }
+
+    // === Lyrics & Network Settings ===
+
+    override suspend fun updatePreferEmbeddedOfflineLyrics(prefer: Boolean) {
+        audilyDataStore.lyricsNetwork.updatePreferEmbeddedOfflineLyrics(prefer)
+    }
+
+    override suspend fun updateDefaultLyricsSource(source: LyricsProvider) {
+        audilyDataStore.lyricsNetwork.updateDefaultLyricsSource(source.toProto())
+    }
+
+    override suspend fun updateDownloadHighResAlbumArtWifiOnly(wifiOnly: Boolean) {
+        audilyDataStore.lyricsNetwork.updateDownloadHighResAlbumArtWifiOnly(wifiOnly)
+    }
+
+    override suspend fun updateFetchMissingArtistImages(fetch: Boolean) {
+        audilyDataStore.lyricsNetwork.updateFetchMissingArtistImages(fetch)
+    }
+
     // === Session Persistence (Database) ===
 
     override suspend fun savePlaybackSession(
@@ -153,6 +210,10 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
         playbackDao.clearSession()
     }
 
+    override suspend fun clearPlayingQueue() {
+        playbackDao.clearQueue()
+    }
+
     override fun getPlaybackSession(): Flow<PlaybackSession?> {
         return combine(
             playbackDao.getSession(),
@@ -167,5 +228,57 @@ internal class UserPreferencesRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun rescanMediaStore() = withContext(ioDispatcher) {
+        val prefs = getUserPreferences().first()
+        val excluded = prefs.librarySettings.excludedFolders.map { File(it).canonicalPath }
+
+        val dirs = listOf(
+            File("/storage/emulated/0/Music"),
+            File("/storage/emulated/0/Download"),
+            File("/storage/emulated/0/Audiobooks"),
+            File("/storage/emulated/0/Podcasts"),
+            File("/storage/emulated/0/Ringtones"),
+            File("/storage/emulated/0/Alarms"),
+            File("/storage/emulated/0/Notifications")
+        )
+
+        val filesToScan = mutableListOf<String>()
+
+        for (dir in dirs) {
+            if (!dir.exists() || !dir.isDirectory) continue
+
+            dir.walkTopDown()
+                .onEnter { file ->
+                    try {
+                        val path = file.canonicalPath
+                        !excluded.any { path == it || path.startsWith("$it/") }
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+                .forEach { file ->
+                    if (file.isFile && isAudioFile(file)) {
+                        filesToScan.add(file.absolutePath)
+                    }
+                }
+        }
+
+        if (filesToScan.isNotEmpty()) {
+            suspendCancellableCoroutine<Unit> { cont ->
+                MediaScannerConnection.scanFile(
+                    context,
+                    filesToScan.toTypedArray(),
+                    null
+                ) { _, _ -> }
+                cont.resume(Unit)
+            }
+        }
+    }
+
+    private fun isAudioFile(file: File): Boolean {
+        val extensions = listOf("mp3", "m4a", "flac", "wav", "ogg", "aac", "mid", "wma")
+        return extensions.contains(file.extension.lowercase())
     }
 }

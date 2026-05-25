@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.lotusreichhart.audily.core.designsystem.component.AudilyScaffold
 import com.lotusreichhart.audily.core.designsystem.R as coreR
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
-import com.lotusreichhart.audily.core.designsystem.theme.SurfaceVariantDark
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiEvent
 import com.lotusreichhart.audily.feature.nowplaying.NowPlayingUiState
@@ -154,7 +153,7 @@ internal fun LandscapeNowPlayingLayout(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(SurfaceVariantDark.copy(alpha = 0.7f))
+                        .background(Color.Black.copy(alpha = 0.5f))
                         .padding(LocalDimensions.current.paddingMedium),
                     title = uiState.currentSong?.basic?.title
                         ?: stringResource(coreR.string.core_designsystem_unknown_title),
