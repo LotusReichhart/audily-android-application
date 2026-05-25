@@ -14,6 +14,7 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObservePlayb
 import com.lotusreichhart.audily.core.domain.usecase.playback.timer.ObserveSleepTimerUseCase
 import com.lotusreichhart.audily.core.domain.usecase.playback.timer.SetSleepTimerUseCase
 import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateSkipDurationUseCase
+import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
@@ -47,6 +48,7 @@ class NowPlayingViewModel @Inject constructor(
     private val observeLyricsUseCase: ObserveLyricsUseCase,
     private val fetchAndSaveLyricsUseCase: FetchAndSaveLyricsUseCase,
     private val networkMonitor: NetworkMonitor,
+    private val getUserPreferences: GetUserPreferencesUseCase,
 ) : ViewModel() {
 
     private val _isLyricsVisible = MutableStateFlow(false)
@@ -106,12 +108,17 @@ class NowPlayingViewModel @Inject constructor(
                 Triple(isVisible, lyrics, isLoading)
             }
 
+            val useGlassmorphismFlow = getUserPreferences()
+                .map { it.uiSettings.useGlassmorphism }
+                .distinctUntilChanged()
+
             combine(
                 favoriteFlow,
                 observePlaybackPosition(),
                 observeSleepTimer(),
-                lyricsStateFlow
-            ) { isFavorite, position, timer, lyricsState ->
+                lyricsStateFlow,
+                useGlassmorphismFlow
+            ) { isFavorite, position, timer, lyricsState, useGlassmorphism ->
                 val (isLyricsVisible, lyrics, isLyricsLoading) = lyricsState
                 NowPlayingUiState(
                     playbackState = data.playbackState,
@@ -126,12 +133,13 @@ class NowPlayingViewModel @Inject constructor(
                     hasPrevious = data.hasPrevious,
                     isLyricsVisible = isLyricsVisible,
                     lyrics = lyrics,
-                    isLyricsLoading = isLyricsLoading
+                    isLyricsLoading = isLyricsLoading,
+                    useGlassmorphism = useGlassmorphism
                 )
             }
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = NowPlayingUiState()
         )
 

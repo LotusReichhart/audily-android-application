@@ -27,4 +27,9 @@ interface HistoryRepository {
      * Xóa lịch sử của một bài hát cụ thể.
      */
     suspend fun deleteHistory(songId: Long)
+
+    /**
+     * Xóa toàn bộ lịch sử nghe nhạc.
+     */
+    suspend fun clearHistory()
 }

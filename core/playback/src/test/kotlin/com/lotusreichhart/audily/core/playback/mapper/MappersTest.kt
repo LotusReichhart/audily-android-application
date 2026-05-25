@@ -21,7 +21,7 @@ class MappersTest {
                 artist = "Artist Name",
                 album = "Album Name",
                 albumId = 1L,
-                duration = 5000L,
+                duration = 5_000L,
                 path = "file:///path/to/song.mp3"
             )
         )

@@ -173,7 +173,7 @@ internal fun NowPlayingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .nowPlayingBackground(uiState.paletteColors)
+            .nowPlayingBackground(uiState.paletteColors, uiState.useGlassmorphism)
     ) {
         SharedTransitionLayout {
             AudilyAdaptiveLayout(

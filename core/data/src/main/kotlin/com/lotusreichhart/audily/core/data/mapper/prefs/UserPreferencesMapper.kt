@@ -7,6 +7,7 @@ internal fun UserPreferencesProto.toDomain(): UserPreferences {
     return UserPreferences(
         librarySettings = librarySettings.toDomain(),
         uiSettings = uiSettings.toDomain(),
-        playbackSettings = playbackSettings.toDomain()
+        playbackSettings = playbackSettings.toDomain(),
+        lyricsNetworkSettings = lyricsNetworkSettings.toDomain()
     )
 }

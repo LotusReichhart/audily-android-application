@@ -43,12 +43,13 @@ class MediaStoreDataSource @Inject constructor(
      * Lấy luồng thông tin tóm tắt của danh sách bài hát (số lượng, tổng thời lượng).
      */
     fun getSongsSummary(
-        searchQuery: String? = null
+        searchQuery: String? = null,
+        excludedFolders: List<String> = emptyList()
     ): Flow<MediaStoreSongsSummary> = callbackFlow {
         val observer = object : ContentObserver(null) {
             override fun onChange(selfChange: Boolean) {
                 launch(ioDispatcher) {
-                    trySend(contentResolver.querySongsSummary(musicUri, searchQuery))
+                    trySend(contentResolver.querySongsSummary(musicUri, searchQuery, excludedFolders))
                 }
             }
         }
@@ -56,7 +57,7 @@ class MediaStoreDataSource @Inject constructor(
         contentResolver.registerContentObserver(musicUri, true, observer)
 
         launch(ioDispatcher) {
-            trySend(contentResolver.querySongsSummary(musicUri, searchQuery))
+            trySend(contentResolver.querySongsSummary(musicUri, searchQuery, excludedFolders))
         }
 
         awaitClose {
@@ -68,12 +69,13 @@ class MediaStoreDataSource @Inject constructor(
      * Lấy luồng Metadata nhẹ phục vụ cho việc sorting tiếng Việt trong bộ nhớ.
      */
     fun getSongsSortMetadata(
-        searchQuery: String? = null
+        searchQuery: String? = null,
+        excludedFolders: List<String> = emptyList()
     ): Flow<List<MediaStoreSortMetadata>> = callbackFlow {
         val observer = object : ContentObserver(null) {
             override fun onChange(selfChange: Boolean) {
                 launch(ioDispatcher) {
-                    trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery))
+                    trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery, excludedFolders))
                 }
             }
         }
@@ -81,7 +83,7 @@ class MediaStoreDataSource @Inject constructor(
         contentResolver.registerContentObserver(musicUri, true, observer)
 
         launch(ioDispatcher) {
-            trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery))
+            trySend(contentResolver.querySongsSortMetadata(musicUri, searchQuery, excludedFolders))
         }
 
         awaitClose {

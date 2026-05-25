@@ -287,7 +287,7 @@ internal fun QueueScreen(
                 .padding(paddingValues)
             else Modifier
                 .padding(paddingValues)
-                .nowPlayingBackground(uiState.paletteColors)
+                .nowPlayingBackground(uiState.paletteColors, uiState.useGlassmorphism)
         ) {
             LazyColumn(
                 state = lazyListState,

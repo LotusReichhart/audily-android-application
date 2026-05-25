@@ -1,8 +1,13 @@
 package com.lotusreichhart.audily.core.playback
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
+import kotlinx.coroutines.flow.first
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
@@ -82,6 +87,63 @@ class PlaybackManager @Inject constructor(
     // Cờ báo hiệu cần khôi phục dữ liệu (dành cho trường hợp Player bị kill nhưng Manager vẫn sống)
     private var needsRestoration = false
 
+    private var isAudioDeviceCallbackRegistered = false
+
+    private val audioDeviceCallback =
+        object : AudioDeviceCallback() {
+            private var isFirstCallback = true
+
+            @SuppressLint("SwitchIntDef")
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
+                if (isFirstCallback) {
+                    isFirstCallback = false
+                    return
+                }
+                if (addedDevices.isNullOrEmpty()) return
+
+                var hasHeadphoneConnect = false
+                var hasBluetoothConnect = false
+
+                for (device in addedDevices) {
+                    when (device.type) {
+                        AudioDeviceInfo.TYPE_WIRED_HEADSET,
+                        AudioDeviceInfo.TYPE_WIRED_HEADPHONES,
+                        AudioDeviceInfo.TYPE_USB_HEADSET -> {
+                            hasHeadphoneConnect = true
+                        }
+                        AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
+                        AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> {
+                            hasBluetoothConnect = true
+                        }
+                        26, 27 -> {
+                            hasBluetoothConnect = true
+                        }
+                    }
+                }
+
+                if (hasHeadphoneConnect || hasBluetoothConnect) {
+                    scope.launch {
+                        try {
+                            val prefs = getUserPreferencesUseCase().first()
+                            val settings = prefs.playbackSettings
+                            val shouldPlay = (hasHeadphoneConnect && settings.autoplayOnHeadphoneConnect) ||
+                                    (hasBluetoothConnect && settings.autoplayOnBluetoothConnect)
+
+                            if (shouldPlay) {
+                                val player = exoPlayer
+                                if (player != null && !player.isPlaying && player.mediaItemCount > 0) {
+                                    play()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error processing AudioDeviceCallback play event")
+                        }
+                    }
+                }
+            }
+        }
+
     internal val player: Player
         get() = getOrCreatePlayer()
 
@@ -122,6 +184,7 @@ class PlaybackManager @Inject constructor(
 
     internal fun release() {
         stopHistoryTracking()
+        unregisterAudioDeviceCallback()
         preferencesJob?.cancel()
         preferencesJob = null
         sleepTimerJob?.cancel()
@@ -435,6 +498,8 @@ class PlaybackManager @Inject constructor(
 
                 // Khởi chạy lắng nghe Preferences
                 observePreferences()
+
+                registerAudioDeviceCallback()
             }
     }
 
@@ -617,4 +682,28 @@ class PlaybackManager @Inject constructor(
         historyTrackingJob = null
     }
     // endregion
+
+    private fun registerAudioDeviceCallback() {
+        try {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            audioManager?.registerAudioDeviceCallback(audioDeviceCallback, null)
+            isAudioDeviceCallbackRegistered = true
+            Timber.d("AudioDeviceCallback registered")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to register AudioDeviceCallback")
+        }
+    }
+
+    private fun unregisterAudioDeviceCallback() {
+        if (isAudioDeviceCallbackRegistered) {
+            try {
+                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+                audioManager?.unregisterAudioDeviceCallback(audioDeviceCallback)
+                isAudioDeviceCallbackRegistered = false
+                Timber.d("AudioDeviceCallback unregistered")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to unregister AudioDeviceCallback")
+            }
+        }
+    }
 }

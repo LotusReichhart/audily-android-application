@@ -13,7 +13,10 @@ internal fun PlaybackSettingsProto.toDomain(): PlaybackSettings {
         playbackPitch = if (playbackPitch > 0f) playbackPitch else 1.0f,
         volumeNormalization = volumeNormalization,
         isShuffleEnabled = isShuffleEnabled,
-        repeatMode = repeatMode.toDomain()
+        repeatMode = repeatMode.toDomain(),
+        autoplayOnHeadphoneConnect = autoplayOnHeadphoneConnect,
+        autoplayOnBluetoothConnect = autoplayOnBluetoothConnect,
+        audioDucking = if (hasAudioDucking) audioDucking else true
     )
 }
 

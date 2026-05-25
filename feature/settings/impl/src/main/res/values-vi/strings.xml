@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_settings_impl_personalization_title">Cá nhân hóa</string>
+    <string name="feature_settings_impl_personalization_description">Giao diện &amp; Màu sắc</string>
+
+    <string name="feature_settings_impl_audio_title">Âm thanh &amp; Phát nhạc</string>
+    <string name="feature_settings_impl_audio_description">Bộ chỉnh âm, tự động phát</string>
+
+    <string name="feature_settings_impl_library_title">Thư viện &amp; Lưu trữ</string>
+    <string name="feature_settings_impl_library_description">Quét nhạc, lịch sử</string>
+
+    <string name="feature_settings_impl_language_title">Ngôn ngữ</string>
+    <string name="feature_settings_impl_language_description">Ngôn ngữ hiển thị của ứng dụng</string>
+
+    <string name="feature_settings_impl_network_title">Lời bài hát &amp; Mạng</string>
+    <string name="feature_settings_impl_network_description">Tiết kiệm dữ liệu</string>
+
+    <string name="feature_settings_impl_question_title">Trợ giúp &amp; Hỏi đáp</string>
+    <string name="feature_settings_impl_question_description">Các câu hỏi thường gặp</string>
+
+    <string name="feature_settings_impl_about_title">Giới thiệu</string>
+    <string name="feature_settings_impl_about_description">Phiên bản, pháp lý</string>
+
+    <string name="feature_settings_impl_personalization_theme">Giao diện</string>
+    <string name="feature_settings_impl_personalization_theme_system">Hệ thống</string>
+    <string name="feature_settings_impl_personalization_theme_light">Sáng</string>
+    <string name="feature_settings_impl_personalization_theme_dark">Tối</string>
+    <string name="feature_settings_impl_personalization_accent_color">Màu nhấn (Accent)</string>
+    <string name="feature_settings_impl_personalization_accent_default">Mặc định</string>
+    <string name="feature_settings_impl_personalization_accent_custom">Tùy chỉnh</string>
+    <string name="feature_settings_impl_personalization_custom_picker_title">Tùy chỉnh màu sắc</string>
+    <string name="feature_settings_impl_personalization_custom_picker_select">Chọn màu</string>
+    <string name="feature_settings_impl_personalization_glassmorphism">Bật UI Glassmorphism &amp; Blur</string>
+    <string name="feature_settings_impl_personalization_glassmorphism_desc">Sử dụng màu sắc của bìa bài hát để làm mờ nền của trình phát</string>
+    <string name="feature_settings_impl_personalization_dynamic_color">Màu sắc động (Material You)</string>
+    <string name="feature_settings_impl_personalization_dynamic_color_desc">Tự động thay đổi tông màu theo hình nền điện thoại (Android 12+)</string>
+    
+    <!-- Audio & Playback settings -->
+    <string name="feature_settings_impl_audio_equalizer_title">Bộ chỉnh âm &amp; Hiệu ứng</string>
+    <string name="feature_settings_impl_audio_equalizer_desc">Tùy chỉnh âm thanh của bạn</string>
+    <string name="feature_settings_impl_audio_autoplay_section">Cài đặt tự động phát</string>
+    <string name="feature_settings_impl_audio_autoplay_headphone">Tự động phát khi cắm tai nghe</string>
+    <string name="feature_settings_impl_audio_autoplay_bluetooth">Tự động phát khi kết nối Bluetooth</string>
+    <string name="feature_settings_impl_audio_ducking">Audio Ducking (Giảm âm lượng khi có thông báo)</string>
+    <string name="feature_settings_impl_audio_equalizer_unsupported">Thiết bị không hỗ trợ Bộ chỉnh âm (Equalizer)</string>
+
+    <!-- Library & Storage settings -->
+    <string name="feature_settings_impl_library_folders_section">Thư mục truy cập</string>
+    <string name="feature_settings_impl_library_folders_desc">Thư mục bị loại trừ khỏi quá trình quét nhạc</string>
+    <string name="feature_settings_impl_library_no_excluded_folders">Không có thư mục bị chặn</string>
+    <string name="feature_settings_impl_library_add_folder">Thêm thư mục chặn</string>
+    <string name="feature_settings_impl_library_actions_section">Hành động</string>
+    <string name="feature_settings_impl_library_rescan_btn">Quét lại bộ lưu trữ ngay</string>
+    <string name="feature_settings_impl_library_scanning_msg">Đang quét lại bộ lưu trữ…</string>
+    <string name="feature_settings_impl_library_scan_complete_msg">Đã quét xong!</string>
+    <string name="feature_settings_impl_library_data_section">Quản lý dữ liệu</string>
+    <string name="feature_settings_impl_library_clear_history_btn">Xóa lịch sử nghe nhạc &amp; tìm kiếm</string>
+    <string name="feature_settings_impl_library_clear_dialog_title">Xóa lịch sử</string>
+    <string name="feature_settings_impl_library_clear_dialog_msg">Bạn có chắc chắn muốn xóa toàn bộ lịch sử nghe nhạc, hàng đợi và lịch sử tìm kiếm? Hành động này không thể hoàn tác.</string>
+    <string name="feature_settings_impl_library_clear_dialog_confirm">Xóa</string>
+    <string name="feature_settings_impl_library_clear_dialog_cancel">Hủy</string>
+
+    <!-- Language settings -->
+    <string name="feature_settings_impl_language_setting">Cài đặt ngôn ngữ</string>
+    <string name="feature_settings_impl_language_system">Mặc định hệ thống</string>
+    <string name="feature_settings_impl_language_english">English</string>
+    <string name="feature_settings_impl_language_vietnamese">Tiếng Việt</string>
+
+    <!-- Lyrics & Network settings -->
+    <string name="feature_settings_impl_lyrics_network_title">Lời bài hát &amp; Mạng</string>
+    <string name="feature_settings_impl_lyrics_section">Lời bài hát</string>
+    <string name="feature_settings_impl_lyrics_prefer_embedded">Ưu tiên lời bài hát ngoại tuyến</string>
+    <string name="feature_settings_impl_lyrics_default_source">Nguồn lời bài hát mặc định</string>
+    <string name="feature_settings_impl_data_saver_section">Tiết kiệm dữ liệu</string>
+    <string name="feature_settings_impl_data_saver_album_art_wifi_only">Chỉ tải ảnh bìa chất lượng cao qua Wi-Fi</string>
+    <string name="feature_settings_impl_data_saver_fetch_artist_images">Tự động tải ảnh nghệ sĩ còn thiếu</string>
+
+    <!-- Help & FAQ settings -->
+    <string name="feature_settings_impl_help_faq_title">Các câu hỏi thường gặp</string>
+    <string name="feature_settings_impl_help_q1">Làm thế nào để quét lại thư viện nhạc?</string>
+    <string name="feature_settings_impl_help_a1">Bạn vào Cài đặt > Thư viện &amp; Lưu trữ, chọn "Quét lại bộ lưu trữ ngay" để cập nhật các bài hát mới trên thiết bị.</string>
+    <string name="feature_settings_impl_help_q2">Tại sau lời bài hát không hiển thị?</string>
+    <string name="feature_settings_impl_help_a2">Hãy đảm bảo thiết bị có kết nối Internet để Audily tải lời bài hát từ Lrclib.net. Nếu bài hát không có lời, hãy kiểm tra lại thông tin tag (Tên bài hát, ca sĩ).</string>
+    <string name="feature_settings_impl_help_q3">Làm thế nào để bật giao diện AMOLED tối?</string>
+    <string name="feature_settings_impl_help_a3">Bạn vào Cài đặt > Cá nhân hóa, bật tùy chọn "Sử dụng AMOLED đen" để có màu nền tối tuyệt đối trên màn hình OLED/AMOLED.</string>
+    <string name="feature_settings_impl_help_q4">Tôi có thể loại trừ một số thư mục không quét không?</string>
+    <string name="feature_settings_impl_help_a4">Có! Bạn vào Cài đặt > Thư viện &amp; Lưu trữ. Tại mục "Thư mục truy cập", chọn "Thêm thư mục chặn" và chọn thư mục bạn muốn bỏ qua.</string>
+
+    <!-- About settings -->
+    <string name="feature_settings_impl_about_version">Phiên bản %1$s</string>
+    <string name="feature_settings_impl_about_privacy_policy">Chính sách bảo mật</string>
+    <string name="feature_settings_impl_about_terms_of_service">Điều khoản dịch vụ</string>
+    <string name="feature_settings_impl_about_open_source_licenses">Giấy phép nguồn mở</string>
+    <string name="feature_settings_impl_about_send_feedback">Gửi ý kiến phản hồi</string>
+    <string name="feature_settings_impl_about_licenses_title">Giấy phép nguồn mở</string>
+    <string name="feature_settings_impl_about_licenses_close">Đóng</string>
+</resources>

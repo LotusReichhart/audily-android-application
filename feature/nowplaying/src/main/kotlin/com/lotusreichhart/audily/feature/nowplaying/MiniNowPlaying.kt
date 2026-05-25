@@ -52,6 +52,8 @@ internal fun MiniNowPlaying(
     onOpenQueue: () -> Unit,
     onEvent: (NowPlayingUiEvent) -> Unit,
 ) {
+    val useGlassmorphism = uiState.useGlassmorphism
+
     val defaultColor = SurfaceDark
     val vibrantColor by animateColorAsState(
         targetValue = uiState.paletteColors?.vibrant ?: defaultColor,
@@ -64,13 +66,17 @@ internal fun MiniNowPlaying(
         label = "MiniDominantAnimation"
     )
 
-    val backgroundBrush = remember(vibrantColor, dominantColor) {
-        Brush.horizontalGradient(
-            colors = listOf(
-                vibrantColor.copy(alpha = 0.4f),
-                dominantColor.copy(alpha = 0.35f)
+    val backgroundBrush = remember(vibrantColor, dominantColor, useGlassmorphism) {
+        if (useGlassmorphism) {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    vibrantColor.copy(alpha = 0.4f),
+                    dominantColor.copy(alpha = 0.35f)
+                )
             )
-        )
+        } else {
+            null
+        }
     }
 
     val progress = if (uiState.playbackState.duration > 0) {

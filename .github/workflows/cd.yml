@@ -49,7 +49,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_JSON }}
           packageName: com.lotusreichhart.audily
           releaseFiles: app/build/outputs/bundle/prodRelease/*.aab
-          track: internal
+          tracks: internal
           status: completed
 
       - name: Create GitHub Release
