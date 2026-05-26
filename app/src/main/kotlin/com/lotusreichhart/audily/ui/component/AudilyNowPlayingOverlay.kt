@@ -21,6 +21,9 @@ import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.ui.layout.layout
 
+import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSize
+import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AudilyNowPlayingOverlay(
@@ -30,6 +33,9 @@ fun AudilyNowPlayingOverlay(
     navBarVisibilityProgress: Float,
     modifier: Modifier = Modifier
 ) {
+    val windowSize = LocalAudilyWindowSize.current
+    val hasBottomBar = windowSize == AudilyWindowSize.Portrait
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -38,7 +44,7 @@ fun AudilyNowPlayingOverlay(
                 else Modifier.wrapContentHeight()
             )
             .offset {
-                val barOffset = if (appState.bottomBarHeightPx > 0) {
+                val barOffset = if (hasBottomBar && appState.bottomBarHeightPx > 0) {
                     (1f - navBarVisibilityProgress) * appState.bottomBarHeightPx * (1f - appState.expandProgress)
                 } else 0f
 

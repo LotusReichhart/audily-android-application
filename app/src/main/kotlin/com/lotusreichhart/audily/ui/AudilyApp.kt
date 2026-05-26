@@ -302,7 +302,7 @@ internal fun AudilyApp(
             }
         }
 
-        val dynamicPadding = appState.getContentBottomPadding(density)
+        val dynamicPadding = appState.getContentBottomPadding(density, windowSize)
 
         CompositionLocalProvider(
             LocalNavigator provides appState.navigator,

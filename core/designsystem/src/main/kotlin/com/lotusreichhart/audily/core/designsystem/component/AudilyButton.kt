@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.text.style.TextOverflow
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
 /**
@@ -28,6 +30,7 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
  * @param containerColor Màu nền của nút.
  * @param contentColor Màu vủa nội dung (text/icon).
  * @param shape Hình dạng bo góc của nút.
+ * @param contentPadding Padding bên trong nút (mặc định sẽ dùng cấu hình gọn tối ưu).
  */
 @Composable
 fun AudilyButton(
@@ -38,8 +41,15 @@ fun AudilyButton(
     enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
-    shape: Shape = MaterialTheme.shapes.medium
+    shape: Shape = MaterialTheme.shapes.medium,
+    contentPadding: PaddingValues? = null
 ) {
+    val finalPadding = contentPadding ?: if (leadingIcon != null) {
+        PaddingValues(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
+    } else {
+        PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    }
+
     Button(
         onClick = onClick,
         modifier = modifier
@@ -49,7 +59,8 @@ fun AudilyButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor
-        )
+        ),
+        contentPadding = finalPadding
     ) {
         if (leadingIcon != null) {
             Icon(
@@ -61,7 +72,9 @@ fun AudilyButton(
         }
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
