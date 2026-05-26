@@ -5,7 +5,12 @@ import android.content.Intent
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
+import coil3.ImageLoader
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,11 +20,15 @@ class AudilyAudioService : MediaLibraryService() {
     @Inject
     lateinit var playbackManager: PlaybackManager
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
     companion object {
         const val ACTION_OPEN_PLAYER = "com.lotusreichhart.audily.action.OPEN_PLAYER"
     }
 
     private var mediaSession: MediaLibrarySession? = null
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     @UnstableApi
     override fun onCreate() {
@@ -47,6 +56,13 @@ class AudilyAudioService : MediaLibraryService() {
             LibrarySessionCallback()
         )
             .setSessionActivity(pendingIntent)
+            .setBitmapLoader(
+                AudilyBitmapLoader(
+                    context = this,
+                    imageLoader = imageLoader,
+                    scope = serviceScope
+                )
+            )
             .build()
 
         // QUAN TRỌNG: Phải addSession thì Media3 mới tự động hiển thị Notification
@@ -73,6 +89,7 @@ class AudilyAudioService : MediaLibraryService() {
 
     override fun onDestroy() {
         Timber.d("Audily Service Kill - Destroyed")
+        serviceScope.cancel() // Hủy bỏ coroutines đang chạy để nạp ảnh bìa
         playbackManager.onSessionEnded() // Lưu lại trạng thái cuối cùng trước khi hủy hoàn toàn
         mediaSession?.release()
         mediaSession = null
