@@ -41,6 +41,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          AUDILY_PRIVACY_URL: ${{ secrets.AUDILY_PRIVACY_URL }}
+          AUDILY_TERMS_URL: ${{ secrets.AUDILY_TERMS_URL }}
+          AUDILY_FEEDBACK_EMAIL: ${{ secrets.AUDILY_FEEDBACK_EMAIL }}
         run: ./gradlew bundleProdRelease
 
       - name: Upload to Google Play (Internal Track)
