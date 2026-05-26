@@ -3,6 +3,7 @@ package com.lotusreichhart.audily.core.playback.mapper
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.lotusreichhart.audily.core.model.song.Song
+import android.content.ContentUris
 import androidx.core.net.toUri
 
 /**
@@ -10,10 +11,15 @@ import androidx.core.net.toUri
  */
 internal object MediaItemMapper {
     fun toMediaItem(song: Song): MediaItem {
+        val artworkUri = song.basic.artworkUri?.toUri() ?: ContentUris.withAppendedId(
+            "content://media/external/audio/albumart".toUri(),
+            song.basic.albumId
+        )
+
         val metadata = MediaMetadata.Builder()
             .setTitle(song.basic.title)
             .setArtist(song.basic.artist)
-            .setArtworkUri(song.basic.artworkUri?.toUri())
+            .setArtworkUri(artworkUri)
             .build()
 
         return MediaItem.Builder()

@@ -64,10 +64,26 @@ internal fun PortraitAlbumDetailLayout(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
 
     val density = LocalDensity.current
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val minHeaderHeight = 40.dp + statusBarPadding
+
+    val songsCount = uiState.songs.size
+    val songItemHeight = 64.dp
+    val stickyActionsHeight = 80.dp
+    val sectionTitleHeight = 40.dp
+    val contentBelowHeaderHeight = stickyActionsHeight + sectionTitleHeight + (songItemHeight * songsCount)
+
+    val bottomSpacerHeight = remember(screenHeight, minHeaderHeight, contentBelowHeaderHeight) {
+        val requiredHeight = screenHeight - minHeaderHeight
+        if (contentBelowHeaderHeight < requiredHeight) {
+            requiredHeight - contentBelowHeaderHeight
+        } else {
+            0.dp
+        }
+    }
 
     val headerHeightPx = remember(density, screenWidth) { with(density) { screenWidth.toPx() } }
     val minHeaderHeightPx = remember(density) { with(density) { minHeaderHeight.toPx() } }
@@ -260,6 +276,12 @@ internal fun PortraitAlbumDetailLayout(
                         playbackStatus = playbackStatus,
                         isMissing = song.isMissing
                     )
+                }
+            }
+
+            if (bottomSpacerHeight > 0.dp) {
+                item {
+                    Spacer(modifier = Modifier.height(bottomSpacerHeight))
                 }
             }
 

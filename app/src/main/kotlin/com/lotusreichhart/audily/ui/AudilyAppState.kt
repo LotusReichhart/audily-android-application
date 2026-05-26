@@ -125,9 +125,9 @@ class AudilyAppState(
      * Tính toán padding dưới cùng cho nội dung (NavDisplay).
      * Bao gồm: Chiều cao BottomBar (nếu hiện) + Chiều cao MiniPlayer (nếu hiện).
      */
-    fun getContentBottomPadding(density: Density): Dp {
+    fun getContentBottomPadding(density: Density, windowSize: AudilyWindowSize = AudilyWindowSize.Portrait): Dp {
         var totalHeightPx = 0f
-        if (isBottomBarShown && isBottomBarVisible) {
+        if (windowSize == AudilyWindowSize.Portrait && isBottomBarShown && isBottomBarVisible) {
             totalHeightPx += bottomBarHeightPx
         }
         if (isPanelVisible) {
