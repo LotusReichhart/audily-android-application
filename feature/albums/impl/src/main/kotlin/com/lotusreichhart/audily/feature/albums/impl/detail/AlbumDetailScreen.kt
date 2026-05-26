@@ -28,8 +28,12 @@ import com.lotusreichhart.audily.core.ui.LocalGlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.adaptive.AudilyAdaptiveLayout
 import com.lotusreichhart.audily.feature.albums.impl.detail.component.PortraitAlbumDetailLoadingScreen
 import com.lotusreichhart.audily.feature.albums.impl.detail.component.LandscapeAlbumDetailLoadingScreen
+import com.lotusreichhart.audily.feature.albums.impl.detail.component.MediumAlbumDetailLoadingScreen
+import com.lotusreichhart.audily.feature.albums.impl.detail.component.ExpandedAlbumDetailLoadingScreen
 import com.lotusreichhart.audily.feature.albums.impl.detail.layout.LandscapeAlbumDetailLayout
 import com.lotusreichhart.audily.feature.albums.impl.detail.layout.PortraitAlbumDetailLayout
+import com.lotusreichhart.audily.feature.albums.impl.detail.layout.MediumAlbumDetailLayout
+import com.lotusreichhart.audily.feature.albums.impl.detail.layout.ExpandedAlbumDetailLayout
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,9 +179,9 @@ internal fun AlbumDetailScreen(
         },
         medium = {
             if (uiState.isLoading) {
-                PortraitAlbumDetailLoadingScreen()
+                MediumAlbumDetailLoadingScreen(modifier = modifier)
             } else {
-                PortraitAlbumDetailLayout(
+                MediumAlbumDetailLayout(
                     uiState = uiState,
                     onBack = onBack,
                     onMenuClick = onMenuClick,
@@ -189,9 +193,9 @@ internal fun AlbumDetailScreen(
         },
         expanded = {
             if (uiState.isLoading) {
-                PortraitAlbumDetailLoadingScreen()
+                ExpandedAlbumDetailLoadingScreen(modifier = modifier)
             } else {
-                PortraitAlbumDetailLayout(
+                ExpandedAlbumDetailLayout(
                     uiState = uiState,
                     onBack = onBack,
                     onMenuClick = onMenuClick,
