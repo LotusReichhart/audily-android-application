@@ -5,7 +5,6 @@ import com.lotusreichhart.audily.core.domain.usecase.song.GetBasicSongsUseCase
 import com.lotusreichhart.audily.core.model.song.Song
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -18,7 +17,7 @@ class ObserveQueueUseCase @Inject constructor(
     private val getBasicSongs: GetBasicSongsUseCase,
 ) {
     operator fun invoke(): Flow<List<Song>> {
-        val playbackStateFlow = observePlaybackState().filter { it.isInitialized }
+        val playbackStateFlow = observePlaybackState()
 
         // Chỉ tải metadata khi danh sách ID trong hàng đợi thay đổi
         val songsFlow = playbackStateFlow
