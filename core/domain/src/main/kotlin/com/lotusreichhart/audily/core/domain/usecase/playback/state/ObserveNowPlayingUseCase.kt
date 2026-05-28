@@ -25,7 +25,7 @@ class ObserveNowPlayingUseCase @Inject constructor(
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<NowPlayingData> {
-        val playbackStateFlow = observePlaybackState().filter { it.isInitialized }
+        val playbackStateFlow = observePlaybackState()
         val songsFlow = observeQueueUseCase()
         val prefsFlow = getPrefs()
         val paletteFlow = observeCurrentPalette()
