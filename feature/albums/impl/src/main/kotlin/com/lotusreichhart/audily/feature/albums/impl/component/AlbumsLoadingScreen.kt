@@ -49,7 +49,7 @@ internal fun AlbumsLoadingScreen(
                         .padding(bottom = dimensions.paddingExtraSmall)
                 )
             }
-            items(12) {
+            items(20) {
                 AlbumListShimmer()
             }
         }
@@ -67,7 +67,7 @@ internal fun AlbumsLoadingScreen(
             verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall),
             userScrollEnabled = false
         ) {
-            items(12) {
+            items(30) {
                 AlbumGridShimmer()
             }
         }
