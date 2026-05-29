@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AudioFile
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,10 +25,11 @@ import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import com.lotusreichhart.audily.core.ui.R
 
 /**
- * Màn hình yêu cầu cấp quyền truy cập âm nhạc.
+ * Màn hình yêu cầu cấp quyền truy cập âm nhạc hoặc thông báo.
  */
 @Composable
 fun PermissionScreen(
+    isNotification: Boolean,
     shouldShowRationale: Boolean,
     onRequestPermission: () -> Unit,
     modifier: Modifier = Modifier
@@ -41,7 +43,7 @@ fun PermissionScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Rounded.AudioFile,
+            imageVector = if (isNotification) Icons.Rounded.Notifications else Icons.Rounded.AudioFile,
             contentDescription = null,
             modifier = Modifier.size(120.dp),
             tint = MaterialTheme.colorScheme.primary
@@ -49,8 +51,14 @@ fun PermissionScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        val titleKey = if (isNotification) {
+            R.string.core_ui_notification_permission_title
+        } else {
+            R.string.core_ui_storage_permission_title
+        }
+
         Text(
-            text = stringResource(R.string.core_ui_permission_title),
+            text = stringResource(titleKey),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
@@ -58,10 +66,18 @@ fun PermissionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        val descriptionKey = if (shouldShowRationale) {
-            R.string.core_ui_permission_description_rationale
+        val descriptionKey = if (isNotification) {
+            if (shouldShowRationale) {
+                R.string.core_ui_notification_permission_description_rationale
+            } else {
+                R.string.core_ui_notification_permission_description_denied
+            }
         } else {
-            R.string.core_ui_permission_description_denied
+            if (shouldShowRationale) {
+                R.string.core_ui_storage_permission_description_rationale
+            } else {
+                R.string.core_ui_storage_permission_description_denied
+            }
         }
 
         Text(
@@ -73,9 +89,16 @@ fun PermissionScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
+        val buttonTextKey = if (isNotification) {
+            R.string.core_ui_notification_permission_button_text
+        } else {
+            R.string.core_ui_storage_permission_button_text
+        }
+
         AudilyButton(
-            text = stringResource(R.string.core_ui_permission_button_text),
+            text = stringResource(buttonTextKey),
             onClick = onRequestPermission
         )
     }
 }
+
