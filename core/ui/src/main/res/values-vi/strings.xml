@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_ui_permission_title">Yêu cầu quyền truy cập bộ nhớ</string>
-    <string name="core_ui_permission_description_rationale">Audily cần quyền truy cập vào các tệp âm thanh trên thiết bị để bạn có thể nghe nhạc của mình. Vui lòng cấp quyền để tiếp tục.</string>
-    <string name="core_ui_permission_description_denied">Bạn đã từ chối quyền truy cập. Vui lòng bấm \'Cấp quyền\' bên dưới, sau đó chọn mục \'Quyền\' và bật \'Nhạc và âm thanh\' để ứng dụng có thể hoạt động.</string>
-    <string name="core_ui_permission_button_text">Cấp quyền</string>
+    <string name="core_ui_storage_permission_title">Yêu cầu quyền truy cập bộ nhớ</string>
+    <string name="core_ui_storage_permission_description_rationale">Audily cần quyền truy cập vào các tệp âm thanh trên thiết bị để bạn có thể nghe nhạc của mình. Vui lòng cấp quyền để tiếp tục.</string>
+    <string name="core_ui_storage_permission_description_denied">Bạn đã từ chối quyền truy cập. Vui lòng bấm \'Cấp quyền\' bên dưới, sau đó chọn mục \'Quyền\' và bật \'Nhạc và âm thanh\' để ứng dụng có thể hoạt động.</string>
+    <string name="core_ui_storage_permission_button_text">Cấp quyền</string>
+
+    <string name="core_ui_notification_permission_title">Yêu cầu quyền Thông báo</string>
+    <string name="core_ui_notification_permission_description_rationale">Audily cần quyền hiển thị thông báo để bạn có thể dễ dàng điều khiển trình phát nhạc khi ứng dụng chạy ngầm.</string>
+    <string name="core_ui_notification_permission_description_denied">Bạn đã từ chối quyền thông báo. Vui lòng bấm \'Cấp quyền\' bên dưới, sau đó chọn mục \'Quyền\' và bật \'Thông báo\' để có thể điều khiển nhạc từ màn hình khóa hoặc thanh trạng thái.</string>
+    <string name="core_ui_notification_permission_button_text">Cấp quyền</string>
 </resources>

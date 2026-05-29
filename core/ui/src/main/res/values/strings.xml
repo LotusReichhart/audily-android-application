@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_ui_permission_title">Storage Access Request</string>
-    <string name="core_ui_permission_description_rationale">Audily needs access to audio files on your device so you can listen to your music. Please grant permission to continue.</string>
-    <string name="core_ui_permission_description_denied">Access was denied. Please tap \'Grant Permission\' below, then select \'Permissions\' and enable \'Music and audio\' for the app to function.</string>
-    <string name="core_ui_permission_button_text">Grant Permission</string>
+    <string name="core_ui_storage_permission_title">Storage Access Request</string>
+    <string name="core_ui_storage_permission_description_rationale">Audily needs access to audio files on your device so you can listen to your music. Please grant permission to continue.</string>
+    <string name="core_ui_storage_permission_description_denied">Access was denied. Please tap \'Grant Permission\' below, then select \'Permissions\' and enable \'Music and audio\' for the app to function.</string>
+    <string name="core_ui_storage_permission_button_text">Grant Permission</string>
+
+    <string name="core_ui_notification_permission_title">Notification Access</string>
+    <string name="core_ui_notification_permission_description_rationale">Audily needs permission to show notifications so you can easily control your music playback while the app is in the background.</string>
+    <string name="core_ui_notification_permission_description_denied">Notification access was denied. Please tap \'Grant Permission\' below, then select \'Permissions\' and enable \'Notifications\' to control music from your lock screen or status bar.</string>
+    <string name="core_ui_notification_permission_button_text">Grant Permission</string>
 </resources>
