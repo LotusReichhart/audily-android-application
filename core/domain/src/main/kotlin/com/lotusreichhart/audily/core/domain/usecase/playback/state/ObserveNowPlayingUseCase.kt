@@ -5,7 +5,6 @@ import com.lotusreichhart.audily.core.domain.usecase.playback.queue.ObserveQueue
 import com.lotusreichhart.audily.core.domain.usecase.prefs.GetUserPreferencesUseCase
 import com.lotusreichhart.audily.core.model.playback.NowPlayingData
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -23,7 +22,6 @@ class ObserveNowPlayingUseCase @Inject constructor(
     private val observeCurrentPalette: ObserveCurrentPaletteUseCase,
     private val getPrefs: GetUserPreferencesUseCase
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<NowPlayingData> {
         val playbackStateFlow = observePlaybackState()
         val songsFlow = observeQueueUseCase()

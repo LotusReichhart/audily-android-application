@@ -3,6 +3,9 @@ package com.lotusreichhart.audily.feature.songs.impl
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,9 +58,14 @@ internal fun SongsScreen(
     val sheetController = LocalAudilySheetController.current
     val sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant
 
-    // Tự động cuộn lên đầu khi thay đổi sắp xếp
+    // Tự động cuộn lên đầu khi thay đổi sắp xếp (bỏ qua lần đầu khi vào màn hình)
+    var isFirstComposition by remember { mutableStateOf(true) }
     LaunchedEffect(sortOrder, sortType) {
-        screenState.lazyListState.animateScrollToItem(0)
+        if (isFirstComposition) {
+            isFirstComposition = false
+        } else {
+            screenState.lazyListState.animateScrollToItem(0)
+        }
     }
 
     SongsScreen(

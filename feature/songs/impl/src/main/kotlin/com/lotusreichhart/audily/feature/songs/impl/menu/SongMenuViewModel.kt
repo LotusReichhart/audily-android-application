@@ -25,7 +25,6 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import com.lotusreichhart.audily.feature.songs.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,7 +59,6 @@ class SongMenuViewModel @Inject constructor(
     private val _isShowingInfoDialog = MutableStateFlow(false)
     private val _isShowingDeleteDialog = MutableStateFlow(false)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<SongMenuUiState?> = _params
         .flatMapLatest { params ->
             if (params == null) {

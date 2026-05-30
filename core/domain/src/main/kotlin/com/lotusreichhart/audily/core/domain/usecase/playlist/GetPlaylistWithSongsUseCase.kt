@@ -4,7 +4,6 @@ import com.lotusreichhart.audily.core.domain.repository.playlist.PlaylistReposit
 import com.lotusreichhart.audily.core.domain.repository.song.SongRepository
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.song.Song
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -18,7 +17,6 @@ class GetPlaylistWithSongsUseCase @Inject constructor(
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(id: Long): Flow<Pair<Playlist, List<Song>>?> {
         val playlistFlow = playlistRepository.getPlaylistById(id)
         val songsFlow = playlistRepository.getSongIdsInPlaylist(id)

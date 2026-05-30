@@ -16,7 +16,6 @@ import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +56,6 @@ internal class PlaylistDetailViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val _playlistAndSongs: Flow<Pair<Playlist, List<Song>>?> = combine(
         _playlistId,
         _isDataLoadingStarted

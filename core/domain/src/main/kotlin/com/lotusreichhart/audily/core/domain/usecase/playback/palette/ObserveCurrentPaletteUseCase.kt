@@ -4,7 +4,6 @@ import com.lotusreichhart.audily.core.domain.repository.playback.PaletteReposito
 import com.lotusreichhart.audily.core.domain.usecase.playback.state.ObserveCurrentSongIdUseCase
 import com.lotusreichhart.audily.core.domain.usecase.song.GetBasicSongUseCase
 import com.lotusreichhart.audily.core.model.playback.PaletteColors
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -21,7 +20,6 @@ class ObserveCurrentPaletteUseCase @Inject constructor(
     private val getBasicSong: GetBasicSongUseCase,
     private val paletteRepository: PaletteRepository
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<PaletteColors?> {
         return observeCurrentSongId()
             .flatMapLatest { songId ->

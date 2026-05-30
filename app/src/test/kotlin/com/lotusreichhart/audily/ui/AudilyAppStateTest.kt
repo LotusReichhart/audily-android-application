@@ -1,6 +1,5 @@
 package com.lotusreichhart.audily.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -8,15 +7,12 @@ import com.lotusreichhart.audily.core.domain.util.NetworkMonitor
 import com.lotusreichhart.audily.core.navigation.NavigationState
 import com.lotusreichhart.audily.core.navigation.Navigator
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
 class AudilyAppStateTest {
-
     private val testScope = TestScope()
     private lateinit var networkMonitor: NetworkMonitor
     private lateinit var draggableState: AnchoredDraggableState<AudilyPanelState>

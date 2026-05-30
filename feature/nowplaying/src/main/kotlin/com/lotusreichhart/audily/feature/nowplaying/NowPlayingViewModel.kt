@@ -19,7 +19,6 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.playback.RepeatMode
 import com.lotusreichhart.audily.core.designsystem.model.toUiPalette
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -84,7 +83,6 @@ class NowPlayingViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<NowPlayingUiState> = observeNowPlaying()
         .flatMapLatest { data ->
             val songId = data.song?.id ?: -1L

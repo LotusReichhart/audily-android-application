@@ -21,7 +21,6 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SongsViewModel @Inject constructor(
     observePlaybackStateUseCase: ObservePlaybackStateUseCase,

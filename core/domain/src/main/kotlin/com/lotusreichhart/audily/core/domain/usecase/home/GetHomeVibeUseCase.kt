@@ -8,7 +8,6 @@ import com.lotusreichhart.audily.core.model.home.HomeSectionType
 import com.lotusreichhart.audily.core.model.home.HomeVibe
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import com.lotusreichhart.audily.core.model.common.SortOrderType
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -27,7 +26,6 @@ class GetHomeVibeUseCase @Inject constructor(
     private val songRepository: SongRepository,
     private val historyRepository: HistoryRepository
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<HomeVibe> {
         val greetingTypeFlow = flow {
             while (true) {

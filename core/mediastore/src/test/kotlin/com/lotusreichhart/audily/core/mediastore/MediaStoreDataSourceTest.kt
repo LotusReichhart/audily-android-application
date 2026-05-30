@@ -6,17 +6,11 @@ import android.provider.MediaStore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MediaStoreDataSourceTest {
-
     private lateinit var contentResolver: ContentResolver
     private lateinit var dataSource: MediaStoreDataSource
     private val testDispatcher = UnconfinedTestDispatcher()

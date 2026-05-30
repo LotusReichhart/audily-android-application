@@ -14,7 +14,6 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class PlaylistsViewModel @Inject constructor(
     getUserPreferencesUseCase: GetUserPreferencesUseCase,
