@@ -81,7 +81,10 @@ internal fun MiniPlayerContent(
 
                 Spacer(Modifier.width(6.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(LocalDimensions.current.paddingExtraSmall)
+                ) {
                     Text(
                         modifier = Modifier.basicMarquee(
                             iterations = Int.MAX_VALUE,
@@ -126,10 +129,10 @@ internal fun MiniPlayerContent(
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         progress = { progress },
-                        modifier = Modifier.size(40.dp),
+                        modifier = Modifier.size(44.dp),
                         strokeWidth = 2.dp,
                         color = MaterialTheme.colorScheme.primary,
-                        trackColor = OnSurfaceDark.copy(alpha = 0.6f)
+                        trackColor = OnSurfaceDark.copy(alpha = 0.5f)
                     )
                     AudilyIconButton(
                         onClick = onResumePauseClick,
@@ -137,8 +140,8 @@ internal fun MiniPlayerContent(
                             id = if (isPlaying) NowPlayingIcons.Pause else NowPlayingIcons.Resume
                         ),
                         contentDescription = "Play/Pause",
-                        iconSize = 20.dp,
-                        containerSize = 40.dp,
+                        iconSize = 22.dp,
+                        containerSize = 44.dp,
                         tint = OnSurfaceDark
                     )
                 }
