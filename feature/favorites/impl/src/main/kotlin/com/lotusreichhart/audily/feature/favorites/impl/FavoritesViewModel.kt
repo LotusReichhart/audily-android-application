@@ -16,7 +16,6 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +29,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.map
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
     observePlaybackStateUseCase: ObservePlaybackStateUseCase,

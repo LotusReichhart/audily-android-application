@@ -17,9 +17,7 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import com.lotusreichhart.audily.feature.albums.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -61,7 +59,6 @@ internal class AlbumDetailViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val _album = combine(
         _albumId,
         _isDataLoadingStarted
@@ -71,7 +68,6 @@ internal class AlbumDetailViewModel @Inject constructor(
         if (id == null) flowOf(null) else getAlbumUseCase(id)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val _songs = combine(
         _albumId,
         _isDataLoadingStarted

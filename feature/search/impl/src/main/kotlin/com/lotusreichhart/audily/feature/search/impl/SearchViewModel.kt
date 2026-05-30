@@ -15,7 +15,6 @@ import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.feature.search.api.SearchType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SearchViewModel @Inject constructor(
     observePlaybackStateUseCase: ObservePlaybackStateUseCase,
