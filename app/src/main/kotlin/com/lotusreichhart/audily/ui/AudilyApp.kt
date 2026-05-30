@@ -12,7 +12,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -223,12 +225,6 @@ internal fun AudilyApp(
     val uiState by nowPlayingViewModel.uiState.collectAsStateWithLifecycle()
     val hasSong = uiState.currentSong != null
 
-    val navBarVisibilityProgress by animateFloatAsState(
-        targetValue = if (appState.isBottomBarShown) 1f else 0f,
-        animationSpec = spring(stiffness = Spring.StiffnessLow),
-        label = "navBarVisibilityProgress"
-    )
-
     // Giải quyết vấn đề mất MiniPlayer khi xoay màn hình ngoài NAV_BAR_ITEMS
     var isInitialLoadingFinished by rememberSaveable { mutableStateOf(false) }
 
@@ -249,10 +245,32 @@ internal fun AudilyApp(
         }
     }
 
-    LaunchedEffect(hasSong) {
-        if (!hasSong) {
+    val navigationBars = WindowInsets.navigationBars
+    val bottomBarHeightPx =
+        density.run { LocalDimensions.current.bottomBarHeight.toPx() } + navigationBars.getBottom(
+            density
+        )
+    val panelHeightPx = density.run { LocalDimensions.current.miniPlayerHeight.toPx() }
+
+    LaunchedEffect(bottomBarHeightPx) {
+        appState.bottomBarHeightPx = bottomBarHeightPx
+    }
+
+    LaunchedEffect(panelHeightPx, isOverlayVisible) {
+        appState.panelHeightPx = if (isOverlayVisible) panelHeightPx else 0f
+    }
+
+    val navBarVisibilityProgress by animateFloatAsState(
+        targetValue = if (appState.isBottomBarShown) 1f else 0f,
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+        label = "navBarVisibilityProgress"
+    )
+
+    LaunchedEffect(isOverlayVisible) {
+        if (isOverlayVisible) {
+            appState.isPanelVisible = true
+        } else {
             appState.isPanelVisible = false
-            appState.panelHeightPx = 0f
             // Ép buộc đưa trạng thái draggable về COLLAPSED để hiển thị lại BottomBar
             appState.draggableState.snapTo(AudilyPanelState.COLLAPSED)
         }
@@ -314,7 +332,11 @@ internal fun AudilyApp(
             Box(
                 modifier = modifier
                     .fillMaxSize()
-                    .onSizeChanged { fullHeight = it.height }
+                    .onSizeChanged { size ->
+                        if (size.height > 0) {
+                            fullHeight = size.height
+                        }
+                    }
             ) {
                 val navHostContent = @Composable {
                     AudilyNavHost(
@@ -357,7 +379,6 @@ internal fun AudilyApp(
                     navBarVisibilityProgress = navBarVisibilityProgress,
                     expandProgress = progress,
                     bottomBarHeightPx = appState.bottomBarHeightPx,
-                    onBottomBarSizeChanged = { appState.bottomBarHeightPx = it },
                     overlayContent = {
                         nowPlayingOverlayContent(Modifier)
                     }

@@ -54,7 +54,6 @@ fun AudilyNavigationSuiteScaffold(
     navBarVisibilityProgress: Float = 1f,
     expandProgress: Float = 0f,
     bottomBarHeightPx: Float = 0f,
-    onBottomBarSizeChanged: (Float) -> Unit = {},
     overlayContent: @Composable BoxScope.() -> Unit = {},
     content: @Composable (modifier: Modifier) -> Unit
 ) {
@@ -88,7 +87,6 @@ fun AudilyNavigationSuiteScaffold(
                                     IntOffset(x = 0, y = yOffset)
                                 }
                                 .alpha(combinedVisibility)
-                                .onSizeChanged { onBottomBarSizeChanged(it.height.toFloat()) }
                         ) {
                             AudilyNavigationBar(
                                 containerColor = MaterialTheme.colorScheme.background

@@ -20,7 +20,7 @@ data class Dimensions(
 
     // Kích thước phần tử UI
     val buttonHeight: Dp = 48.dp,   // Chuẩn Accessibility
-    val bottomBarHeight: Dp = 60.dp,
+    val bottomBarHeight: Dp = 64.dp,
     val miniPlayerHeight: Dp = 64.dp,
 
     val iconButtonHeight: Dp = 40.dp,

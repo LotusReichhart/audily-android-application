@@ -62,10 +62,6 @@ fun AudilyNowPlayingOverlay(
         // 1. MiniNowPlaying
         MiniNowPlaying(
             modifier = Modifier
-                .onSizeChanged {
-                    appState.panelHeightPx = it.height.toFloat()
-                    appState.isPanelVisible = it.height > 0
-                }
                 .graphicsLayer {
                     alpha = appState.miniPlayerAlpha
                 },
