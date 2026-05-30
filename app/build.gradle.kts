@@ -20,8 +20,8 @@ android {
     namespace = "com.lotusreichhart.audily"
     defaultConfig {
         applicationId = "com.lotusreichhart.audily"
-        versionCode = 8
-        versionName = "1.0.6"
+        versionCode = 9
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
