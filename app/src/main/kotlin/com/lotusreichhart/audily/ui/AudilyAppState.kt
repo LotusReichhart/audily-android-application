@@ -113,6 +113,9 @@ class AudilyAppState(
     var panelHeightPx by mutableFloatStateOf(0f)
         internal set
 
+    var navigationBarsBottomPx by mutableFloatStateOf(0f)
+        internal set
+
     var isBottomBarShown by mutableStateOf(true)
 
     var isBottomBarVisible by mutableStateOf(true)
@@ -127,11 +130,19 @@ class AudilyAppState(
      */
     fun getContentBottomPadding(density: Density, windowSize: AudilyWindowSize = AudilyWindowSize.Portrait): Dp {
         var totalHeightPx = 0f
-        if (windowSize == AudilyWindowSize.Portrait && isBottomBarShown && isBottomBarVisible) {
-            totalHeightPx += bottomBarHeightPx
-        }
-        if (isPanelVisible) {
-            totalHeightPx += panelHeightPx
+        if (windowSize == AudilyWindowSize.Portrait) {
+            val bottomBarHeightOnlyPx = bottomBarHeightPx - navigationBarsBottomPx
+            if (isBottomBarShown && isBottomBarVisible) {
+                totalHeightPx += bottomBarHeightOnlyPx
+            }
+            if (isPanelVisible) {
+                totalHeightPx += panelHeightPx
+            }
+            totalHeightPx += navigationBarsBottomPx
+        } else {
+            if (isPanelVisible) {
+                totalHeightPx += panelHeightPx
+            }
         }
 
         return with(density) { totalHeightPx.toDp() }

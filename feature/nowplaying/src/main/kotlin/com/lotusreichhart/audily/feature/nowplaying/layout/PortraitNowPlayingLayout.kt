@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -75,6 +76,7 @@ internal fun PortraitNowPlayingLayout(
         bottomBar = {
             NowPlayingExtension(
                 modifier = Modifier
+                    .navigationBarsPadding()
                     .padding(horizontal = LocalDimensions.current.paddingMedium)
                     .padding(bottom = LocalDimensions.current.paddingSmall),
                 isLyricsVisible = uiState.isLyricsVisible,

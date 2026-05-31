@@ -24,6 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.layout.onSizeChanged
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDynamicBottomPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -63,8 +68,8 @@ internal fun PortraitAlbumDetailLayout(
     val lazyListState = rememberLazyListState()
 
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
+    var layoutWidthDp by remember { mutableStateOf(configuration.screenWidthDp.dp) }
+    var layoutHeightDp by remember { mutableStateOf(configuration.screenHeightDp.dp) }
 
     val density = LocalDensity.current
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -76,8 +81,9 @@ internal fun PortraitAlbumDetailLayout(
     val sectionTitleHeight = 40.dp
     val contentBelowHeaderHeight = stickyActionsHeight + sectionTitleHeight + (songItemHeight * songsCount)
 
-    val bottomSpacerHeight = remember(screenHeight, minHeaderHeight, contentBelowHeaderHeight) {
-        val requiredHeight = screenHeight - minHeaderHeight
+    val bottomPadding = LocalDynamicBottomPadding.current
+    val bottomSpacerHeight = remember(layoutHeightDp, minHeaderHeight, contentBelowHeaderHeight, bottomPadding) {
+        val requiredHeight = layoutHeightDp - minHeaderHeight - bottomPadding
         if (contentBelowHeaderHeight < requiredHeight) {
             requiredHeight - contentBelowHeaderHeight
         } else {
@@ -85,7 +91,7 @@ internal fun PortraitAlbumDetailLayout(
         }
     }
 
-    val headerHeightPx = remember(density, screenWidth) { with(density) { screenWidth.toPx() } }
+    val headerHeightPx = remember(density, layoutWidthDp) { with(density) { layoutWidthDp.toPx() } }
     val minHeaderHeightPx = remember(density) { with(density) { minHeaderHeight.toPx() } }
     val scrollRangePx = headerHeightPx - minHeaderHeightPx
 
@@ -102,7 +108,14 @@ internal fun PortraitAlbumDetailLayout(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .onSizeChanged { size ->
+                layoutWidthDp = with(density) { size.width.toDp() }
+                layoutHeightDp = with(density) { size.height.toDp() }
+            }
+    ) {
         // Top Bar
         AlbumDetailTopBar(
             title = uiState.album?.title ?: "",
@@ -120,7 +133,7 @@ internal fun PortraitAlbumDetailLayout(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(screenWidth)
+                    .height(layoutWidthDp)
                     .graphicsLayer {
                         // Parallax scrolling translation
                         val offset = if (lazyListState.firstVisibleItemIndex == 0) {
@@ -189,13 +202,14 @@ internal fun PortraitAlbumDetailLayout(
         // Scrollable Content
         LazyColumn(
             state = lazyListState,
+            contentPadding = PaddingValues(bottom = bottomPadding),
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(1f)
         ) {
             // Header spacer pushing down the content
             item {
-                Spacer(modifier = Modifier.height(screenWidth))
+                Spacer(modifier = Modifier.height(layoutWidthDp))
             }
 
             // Sticky actions container (Play & Shuffle buttons)
