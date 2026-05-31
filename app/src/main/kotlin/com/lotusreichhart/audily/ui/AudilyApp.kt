@@ -246,14 +246,17 @@ internal fun AudilyApp(
     }
 
     val navigationBars = WindowInsets.navigationBars
+    val navigationBarsBottom = navigationBars.getBottom(density)
     val bottomBarHeightPx =
-        density.run { LocalDimensions.current.bottomBarHeight.toPx() } + navigationBars.getBottom(
-            density
-        )
+        density.run { LocalDimensions.current.bottomBarHeight.toPx() } + navigationBarsBottom
     val panelHeightPx = density.run { LocalDimensions.current.miniPlayerHeight.toPx() }
 
     LaunchedEffect(bottomBarHeightPx) {
         appState.bottomBarHeightPx = bottomBarHeightPx
+    }
+
+    LaunchedEffect(navigationBarsBottom) {
+        appState.navigationBarsBottomPx = navigationBarsBottom.toFloat()
     }
 
     LaunchedEffect(panelHeightPx, isOverlayVisible) {

@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                 PermissionHandler(
                     onPermissionGranted = {
                         AudilyApp(
-                            modifier = Modifier.navigationBarsPadding(),
+                            modifier = Modifier,
                             appState = appState,
                             globalUiEventBus = globalUiEventBus
                         )

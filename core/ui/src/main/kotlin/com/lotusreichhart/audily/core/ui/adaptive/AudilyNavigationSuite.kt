@@ -29,6 +29,11 @@ import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRai
 import com.lotusreichhart.audily.core.designsystem.component.AudilyNavigationRailItem
 import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.windowInsetsPadding
 
 import kotlin.math.roundToInt
 
@@ -67,7 +72,11 @@ fun AudilyNavigationSuiteScaffold(
 
     val movableOverlayContent = remember(overlayContent) {
         movableContentOf {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+            ) {
                 overlayContent()
             }
         }
@@ -162,6 +171,7 @@ fun AudilyNavigationSuiteScaffold(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
+                            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
                     ) {
                         movableMainContent()
                     }

@@ -23,6 +23,8 @@ import androidx.compose.ui.layout.layout
 
 import com.lotusreichhart.audily.core.designsystem.adaptive.LocalAudilyWindowSize
 import com.lotusreichhart.audily.core.designsystem.adaptive.AudilyWindowSize
+import androidx.compose.ui.platform.LocalDensity
+import com.lotusreichhart.audily.core.designsystem.theme.LocalDimensions
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,6 +38,9 @@ fun AudilyNowPlayingOverlay(
     val windowSize = LocalAudilyWindowSize.current
     val hasBottomBar = windowSize == AudilyWindowSize.Portrait
 
+    val density = LocalDensity.current
+    val bottomBarHeightOnlyPx = density.run { LocalDimensions.current.bottomBarHeight.toPx() }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -44,8 +49,8 @@ fun AudilyNowPlayingOverlay(
                 else Modifier.wrapContentHeight()
             )
             .offset {
-                val barOffset = if (hasBottomBar && appState.bottomBarHeightPx > 0) {
-                    (1f - navBarVisibilityProgress) * appState.bottomBarHeightPx * (1f - appState.expandProgress)
+                val barOffset = if (hasBottomBar && bottomBarHeightOnlyPx > 0) {
+                    (1f - navBarVisibilityProgress) * bottomBarHeightOnlyPx * (1f - appState.expandProgress)
                 } else 0f
 
                 IntOffset(
