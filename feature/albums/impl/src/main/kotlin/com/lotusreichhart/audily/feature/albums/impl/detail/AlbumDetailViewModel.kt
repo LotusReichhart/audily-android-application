@@ -17,7 +17,8 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import com.lotusreichhart.audily.feature.albums.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -45,44 +46,34 @@ internal class AlbumDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _albumId = MutableStateFlow<Long?>(null)
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
     private val _effects = MutableSharedFlow<AlbumDetailUiEffect>()
     val effects: SharedFlow<AlbumDetailUiEffect> = _effects.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            delay(300)
-            _isDataLoadingStarted.value = true
-            delay(500)
-            _isInitialLoading.value = false
-        }
-    }
+    private val _albumResult = _albumId.flatMapLatest { id ->
+        if (id == null) flowOf(Result.Success(null))
+        else getAlbumUseCase(id).asResult()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = Result.Loading
+    )
 
-    private val _album = combine(
-        _albumId,
-        _isDataLoadingStarted
-    ) { id, isStarted ->
-        if (id != null && isStarted) id else null
-    }.flatMapLatest { id ->
-        if (id == null) flowOf(null) else getAlbumUseCase(id)
-    }
-
-    private val _songs = combine(
-        _albumId,
-        _isDataLoadingStarted
-    ) { id, isStarted ->
-        if (id != null && isStarted) id else null
-    }.flatMapLatest { id ->
-        if (id == null) flowOf(emptyList()) else getAlbumSongsUseCase(id)
-    }
+    private val _songsResult = _albumId.flatMapLatest { id ->
+        if (id == null) flowOf(Result.Success(emptyList()))
+        else getAlbumSongsUseCase(id).asResult()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = Result.Loading
+    )
 
     val uiState: StateFlow<AlbumDetailUiState> = combine(
-        _isInitialLoading,
-        _album,
-        _songs,
+        _albumResult,
+        _songsResult,
         observePlaybackStateUseCase()
-    ) { isInitialLoading, album, songs, playback ->
+    ) { albumResult, songsResult, playback ->
+        val album = if (albumResult is Result.Success) albumResult.data else null
+        val songs = if (songsResult is Result.Success) songsResult.data else emptyList()
         AlbumDetailUiState(
             album = album,
             songs = songs,
@@ -91,7 +82,7 @@ internal class AlbumDetailViewModel @Inject constructor(
                 totalDuration = songs.sumOf { it.basic.duration }
             ),
             songIds = songs.map { it.id },
-            isLoading = isInitialLoading,
+            isLoading = albumResult is Result.Loading || songsResult is Result.Loading,
             playbackState = playback
         )
     }.stateIn(

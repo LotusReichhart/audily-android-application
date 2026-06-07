@@ -16,14 +16,12 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,41 +38,23 @@ internal class FavoritesViewModel @Inject constructor(
     private val resumeSongUseCase: ResumeSongUseCase,
     private val pauseSongUseCase: PauseSongUseCase
 ) : ViewModel() {
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
 
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(500)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(1500)
-            _isInitialLoading.value = false
-        }
-    }
+    private val _songs: Flow<PagingData<Song>> = getFavoriteSongsUseCase()
+        .cachedIn(viewModelScope)
 
-    private val _songs: Flow<PagingData<Song>> = _isDataLoadingStarted.flatMapLatest { isStarted ->
-        if (!isStarted) {
-            flowOf(PagingData.empty())
-        } else {
-            getFavoriteSongsUseCase()
-        }
-    }.cachedIn(viewModelScope)
-
-    private val _favoriteSongsList = _isDataLoadingStarted.flatMapLatest { started ->
-        if (started) {
-            getFavoriteSongsSummaryUseCase(limit = Int.MAX_VALUE)
-        } else {
-            flowOf(emptyList())
-        }
-    }
+    private val _favoriteSongsResult = getFavoriteSongsSummaryUseCase(limit = Int.MAX_VALUE)
+        .asResult()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Result.Loading
+        )
 
     val uiState: StateFlow<FavoritesUiState> = combine(
-        _isInitialLoading,
-        _favoriteSongsList,
+        _favoriteSongsResult,
         observePlaybackStateUseCase()
-    ) { isInitialLoading, songsList, playback ->
+    ) { favoriteSongsResult, playback ->
+        val songsList = if (favoriteSongsResult is Result.Success) favoriteSongsResult.data else emptyList()
         val songIds = songsList.map { it.id }
         FavoritesUiState(
             songs = _songs,
@@ -84,7 +64,7 @@ internal class FavoritesViewModel @Inject constructor(
                 totalDuration = songsList.sumOf { it.basic.duration }
             ),
             artworkUris = songsList.take(4).map { it.basic.artworkUri },
-            isLoading = isInitialLoading,
+            isLoading = favoriteSongsResult is Result.Loading,
             playbackState = playback
         )
     }.stateIn(

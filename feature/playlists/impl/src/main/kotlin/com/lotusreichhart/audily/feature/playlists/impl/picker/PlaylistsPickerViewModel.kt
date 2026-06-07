@@ -12,10 +12,10 @@ import com.lotusreichhart.audily.feature.playlists.impl.R
 import com.lotusreichhart.audily.core.model.common.SortOrderType
 import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.playlist.PlaylistSortOrder
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -52,38 +51,22 @@ internal class PlaylistsPickerViewModel @Inject constructor(
     private val _playlistsSelected = MutableStateFlow<Set<Long>>(emptySet())
     private val _isSaving = MutableStateFlow(false)
 
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
-
     private val _uiEffect = MutableSharedFlow<PlaylistsPickerUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(500)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(1500)
-            _isInitialLoading.value = false
-        }
-    }
-
-    private val _playlists: Flow<List<Playlist>> =
-        combine(
-            _debouncedQuery,
-            _sortOrder,
-            _sortType,
-            _isDataLoadingStarted
-        ) { query, order, type, isStarted ->
-            Quadruple(query, order, type, isStarted)
-        }.flatMapLatest { (query, order, type, isStarted) ->
-            if (!isStarted) {
-                flowOf(emptyList())
-            } else {
-                getPlaylistsUseCase(searchQuery = query, sortOrder = order, sortType = type)
-            }
-        }
+    private val _playlistsResult = combine(
+        _debouncedQuery,
+        _sortOrder,
+        _sortType
+    ) { query, order, type ->
+        Triple(query, order, type)
+    }.flatMapLatest { (query, order, type) ->
+        getPlaylistsUseCase(searchQuery = query, sortOrder = order, sortType = type).asResult()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = Result.Loading
+    )
 
     val uiState: StateFlow<PlaylistsPickerUiState> = combine(
         combine(
@@ -91,28 +74,27 @@ internal class PlaylistsPickerViewModel @Inject constructor(
             _sortOrder,
             _sortType
         ) { q, o, t -> Triple(q, o, t) },
-        _playlists,
+        _playlistsResult,
         combine(
             _playlistsSelected,
-            _isSaving,
-            _isInitialLoading
-        ) { selected, saving, loading ->
-            InternalPickerState(selected, saving, loading)
+            _isSaving
+        ) { selected, saving ->
+            selected to saving
         }
-    ) { (query, sortOrder, sortType), playlists, state ->
+    ) { (query, sortOrder, sortType), playlistsResult, (playlistsSelected, isSaving) ->
         PlaylistsPickerUiState(
-            playlists = playlists,
-            playlistsSelected = state.playlistsSelected.toList(),
+            playlists = if (playlistsResult is Result.Success) playlistsResult.data else emptyList(),
+            playlistsSelected = playlistsSelected.toList(),
             query = query,
             sortOrder = sortOrder,
             sortType = sortType,
-            isLoading = state.isLoading,
-            isSaving = state.isSaving
+            isLoading = playlistsResult is Result.Loading,
+            isSaving = isSaving
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = PlaylistsPickerUiState()
+        initialValue = PlaylistsPickerUiState(isLoading = true)
     )
 
     fun onEvent(event: PlaylistsPickerUiEvent) {
@@ -204,12 +186,4 @@ internal class PlaylistsPickerViewModel @Inject constructor(
             }
         }
     }
-
-    private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
-
-    private data class InternalPickerState(
-        val playlistsSelected: Set<Long>,
-        val isSaving: Boolean,
-        val isLoading: Boolean
-    )
 }

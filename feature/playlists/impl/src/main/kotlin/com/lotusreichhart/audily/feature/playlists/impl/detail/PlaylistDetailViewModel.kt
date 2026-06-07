@@ -16,8 +16,8 @@ import com.lotusreichhart.audily.core.model.playlist.Playlist
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongsSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,34 +42,23 @@ internal class PlaylistDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _playlistId = MutableStateFlow<Long?>(null)
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
 
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(500)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(1500)
-            _isInitialLoading.value = false
+    private val _playlistAndSongsResult: StateFlow<Result<Pair<Playlist, List<Song>>?>> = _playlistId
+        .flatMapLatest { id ->
+            if (id == null) flowOf(Result.Success(null))
+            else getPlaylistWithSongsUseCase(id).asResult()
         }
-    }
-
-    private val _playlistAndSongs: Flow<Pair<Playlist, List<Song>>?> = combine(
-        _playlistId,
-        _isDataLoadingStarted
-    ) { id, isStarted ->
-        if (id != null && isStarted) id else null
-    }.flatMapLatest { id ->
-        if (id == null) flowOf(null) else getPlaylistWithSongsUseCase(id)
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Result.Loading
+        )
 
     val uiState: StateFlow<PlaylistDetailUiState> = combine(
-        _isInitialLoading,
-        _playlistAndSongs,
+        _playlistAndSongsResult,
         observePlaybackStateUseCase()
-    ) { isInitialLoading, data, playback ->
+    ) { playlistAndSongsResult, playback ->
+        val data = if (playlistAndSongsResult is Result.Success) playlistAndSongsResult.data else null
         val songs = data?.second ?: emptyList()
         PlaylistDetailUiState(
             playlist = data?.first,
@@ -79,7 +68,7 @@ internal class PlaylistDetailViewModel @Inject constructor(
                 totalDuration = songs.sumOf { it.basic.duration }
             ),
             songIds = songs.map { it.id },
-            isLoading = isInitialLoading,
+            isLoading = playlistAndSongsResult is Result.Loading,
             playbackState = playback
         )
     }.stateIn(

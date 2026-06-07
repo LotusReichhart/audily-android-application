@@ -11,7 +11,6 @@ import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,37 +45,18 @@ internal class SongsPickerViewModel @Inject constructor(
     private val _songsSelected = MutableStateFlow<Set<Long>>(emptySet())
     private val _isSaving = MutableStateFlow(false)
 
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
-
     private val _uiEffect = MutableSharedFlow<SongsPickerUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(500)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(1500)
-            _isInitialLoading.value = false
-        }
-    }
 
     private val _songs: Flow<PagingData<Song>> =
         combine(
             _debouncedQuery,
             _sortOrder,
-            _sortType,
-            _isDataLoadingStarted
-        ) { query, order, type, isStarted ->
-            Quadruple(query, order, type, isStarted)
-        }.flatMapLatest { (query, order, type, isStarted) ->
-            if (!isStarted) {
-                flowOf(PagingData.empty())
-            } else {
-                getSongsPagedUseCase(searchQuery = query, sortOrder = order, sortType = type)
-            }
+            _sortType
+        ) { query, order, type ->
+            Triple(query, order, type)
+        }.flatMapLatest { (query, order, type) ->
+            getSongsPagedUseCase(searchQuery = query, sortOrder = order, sortType = type)
         }.cachedIn(viewModelScope)
 
     val uiState: StateFlow<SongsPickerUiState> = combine(
@@ -86,25 +65,24 @@ internal class SongsPickerViewModel @Inject constructor(
         _sortType,
         combine(
             _songsSelected,
-            _isSaving,
-            _isInitialLoading
-        ) { selected, saving, loading ->
-            InternalPickerState(selected, saving, loading)
+            _isSaving
+        ) { selected, saving ->
+            selected to saving
         }
-    ) { query, sortOrder, sortType, state ->
+    ) { query, sortOrder, sortType, (songsSelected, isSaving) ->
         SongsPickerUiState(
             songs = _songs,
-            songsSelected = state.songsSelected.toList(),
+            songsSelected = songsSelected.toList(),
             query = query,
             sortOrder = sortOrder,
             sortType = sortType,
-            isLoading = state.isLoading,
-            isSaving = state.isSaving
+            isLoading = false,
+            isSaving = isSaving
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = SongsPickerUiState()
+        initialValue = SongsPickerUiState(isLoading = false)
     )
 
     fun onEvent(event: SongsPickerUiEvent) {
@@ -158,12 +136,4 @@ internal class SongsPickerViewModel @Inject constructor(
             }
         }
     }
-
-    private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
-
-    private data class InternalPickerState(
-        val songsSelected: Set<Long>,
-        val isSaving: Boolean,
-        val isLoading: Boolean
-    )
 }

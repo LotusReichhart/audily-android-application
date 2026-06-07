@@ -21,6 +21,9 @@ import com.lotusreichhart.audily.core.model.playback.NowPlayingState
 import com.lotusreichhart.audily.core.model.song.Song
 import com.lotusreichhart.audily.core.model.song.SongSortOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
+import com.lotusreichhart.audily.core.model.song.SongsSummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,8 +33,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,53 +63,36 @@ internal class SongsViewModel @Inject constructor(
     private val _sortOrder = _userPrefs.map { it?.songSortOrder ?: SongsUiState().sortOrder }
     private val _sortType = _userPrefs.map { it?.songSortType ?: SongsUiState().sortType }
 
-    private val _isInitialLoading = MutableStateFlow(true)
     private val _isRefreshing = MutableStateFlow(false)
     private val _wasRefreshed = MutableStateFlow(false)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
 
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(1000)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(2000)
-            _isInitialLoading.value = false
-        }
-    }
+    private val _summaryResult = getSongsSummaryUseCase()
+        .asResult()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Result.Loading
+        )
 
     private val _songs: Flow<PagingData<Song>> =
         combine(
             _sortOrder,
-            _sortType,
-            _isDataLoadingStarted,
-            _isRefreshing
-        ) { order, type, isStarted, isRefreshing ->
-            Quadruple(order, type, isStarted, isRefreshing)
-        }.flatMapLatest { (order, type, isStarted, isRefreshing) ->
-            if (!isStarted || isRefreshing) {
-                flowOf(PagingData.empty())
-            } else {
-                getSongsPagedUseCase(sortOrder = order, sortType = type)
-            }
+            _sortType
+        ) { order, type ->
+            order to type
+        }.flatMapLatest { (order, type) ->
+            getSongsPagedUseCase(sortOrder = order, sortType = type)
         }.cachedIn(viewModelScope)
 
     // Danh sách ID toàn bộ bài hát theo sort hiện tại (dùng cho Queue)
     private val _allSongIds: StateFlow<List<Long>> =
         combine(
             _sortOrder,
-            _sortType,
-            _isDataLoadingStarted,
-            _isRefreshing
-        ) { order, type, isStarted, isRefreshing ->
-            Quadruple(order, type, isStarted, isRefreshing)
-        }.flatMapLatest { (order, type, isStarted, isRefreshing) ->
-            if (!isStarted || isRefreshing) {
-                flowOf(emptyList())
-            } else {
-                getSongIdsUseCase(sortOrder = order, sortType = type)
-            }
+            _sortType
+        ) { order, type ->
+            order to type
+        }.flatMapLatest { (order, type) ->
+            getSongIdsUseCase(sortOrder = order, sortType = type)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -118,27 +102,27 @@ internal class SongsViewModel @Inject constructor(
     val uiState: StateFlow<SongsUiState> = combine(
         _sortOrder,
         _sortType,
-        getSongsSummaryUseCase(),
+        _summaryResult,
         observePlaybackStateUseCase(),
         combine(
             _allSongIds,
-            _isInitialLoading,
             _isRefreshing,
             _wasRefreshed
-        ) { ids, loading, refreshing, refreshed ->
-            RefreshedState(ids, loading, refreshing, refreshed)
+        ) { ids, refreshing, refreshed ->
+            Triple(ids, refreshing, refreshed)
         }
-    ) { sort, type, summary, playback, state ->
+    ) { sort, type, summaryResult, playback, state ->
+        val summary = if (summaryResult is Result.Success) summaryResult.data else SongsSummary()
         SongsUiState(
             songs = _songs,
             summary = summary,
             sortOrder = sort,
             sortType = type,
             playbackState = playback,
-            allSongIds = state.allSongIds,
-            isLoading = state.isLoading,
-            isRefreshing = state.isRefreshing,
-            wasRefreshed = state.wasRefreshed
+            allSongIds = state.first,
+            isLoading = summaryResult is Result.Loading,
+            isRefreshing = state.second,
+            wasRefreshed = state.third
         )
     }.stateIn(
         scope = viewModelScope,
@@ -158,7 +142,6 @@ internal class SongsViewModel @Inject constructor(
                     _isRefreshing.value = true
                     updateSongSortOrderUseCase(SongSortOrder.TITLE)
                     updateSongSortTypeUseCase(SortOrderType.ASC)
-                    delay(2000)
                     _isRefreshing.value = false
                     _wasRefreshed.value = true
                 }
@@ -188,13 +171,4 @@ internal class SongsViewModel @Inject constructor(
 
         playNextUseCase(song)
     }
-
-    private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
-
-    private data class RefreshedState(
-        val allSongIds: List<Long>,
-        val isLoading: Boolean,
-        val isRefreshing: Boolean,
-        val wasRefreshed: Boolean
-    )
 }

@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +30,7 @@ internal class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = combine(
-        getHomeVibeUseCase().onStart { delay(2000) },
+        getHomeVibeUseCase(),
         observePlaybackStateUseCase()
     ) { homeVibe, playbackState ->
         HomeUiState.Success(homeVibe, playbackState) as HomeUiState
