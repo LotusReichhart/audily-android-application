@@ -14,17 +14,15 @@ import com.lotusreichhart.audily.core.ui.GlobalUiEvent
 import com.lotusreichhart.audily.core.ui.GlobalUiEventBus
 import com.lotusreichhart.audily.core.ui.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,62 +43,41 @@ internal class PlaylistsViewModel @Inject constructor(
     private val _uiEffect = MutableSharedFlow<PlaylistsUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(1000)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(2000)
-            _isInitialLoading.value = false
-        }
-    }
-
     private val _librarySettings = getUserPreferencesUseCase()
         .map { it.librarySettings }
         .distinctUntilChanged()
 
-    private val _playlists: Flow<List<Playlist>> = combine(
-        _librarySettings,
-        _isDataLoadingStarted
-    ) { settings, isStarted ->
-        settings to isStarted
-    }.flatMapLatest { (settings, isStarted) ->
-        if (!isStarted) {
-            flowOf(emptyList())
-        } else {
+    private val _playlistsResult: StateFlow<Result<List<Playlist>>> = _librarySettings
+        .flatMapLatest { settings ->
             getPlaylistsUseCase(
                 sortOrder = settings.playlistSortOrder,
                 sortType = settings.playlistSortType
             )
         }
-    }
+        .asResult()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Result.Loading
+        )
 
-    private val _favoriteIds = _isDataLoadingStarted.flatMapLatest { isStarted ->
-        if (!isStarted) flowOf(emptyList()) else getFavoriteIds()
-    }
+    private val _favoriteIds = getFavoriteIds()
 
-    private val _favoriteSummary = _isDataLoadingStarted.flatMapLatest { isStarted ->
-        if (!isStarted) flowOf(emptyList()) else getFavoriteSongsSummaryUseCase(limit = 4)
-    }
+    private val _favoriteSummary = getFavoriteSongsSummaryUseCase(limit = 4)
 
     val uiState: StateFlow<PlaylistsUiState> = combine(
         _librarySettings,
-        _playlists,
+        _playlistsResult,
         _favoriteIds,
-        _favoriteSummary,
-        _isInitialLoading
-    ) { settings, playlists, favoriteIds, favorites, isLoading ->
+        _favoriteSummary
+    ) { settings, playlistsResult, favoriteIds, favorites ->
         PlaylistsUiState(
-            playlists = playlists,
+            playlists = if (playlistsResult is Result.Success) playlistsResult.data else emptyList(),
             favoriteCount = favoriteIds.size,
             favoriteArtworkUris = favorites.map { it.basic.artworkUri },
             sortOrder = settings.playlistSortOrder,
             sortType = settings.playlistSortType,
-            isLoading = isLoading
+            isLoading = playlistsResult is Result.Loading
         )
     }.stateIn(
         scope = viewModelScope,

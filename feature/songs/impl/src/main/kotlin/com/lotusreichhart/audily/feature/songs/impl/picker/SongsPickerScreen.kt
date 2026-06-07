@@ -123,7 +123,7 @@ internal fun SongsPickerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (uiState.isLoading) {
+            if (songs.loadState.refresh is androidx.paging.LoadState.Loading) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     repeat(10) {
                         SongPickerItemShimmer()

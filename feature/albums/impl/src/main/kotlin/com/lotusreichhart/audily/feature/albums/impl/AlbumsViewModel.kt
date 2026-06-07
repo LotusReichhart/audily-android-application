@@ -8,16 +8,14 @@ import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateAlbumGridSizeUs
 import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateAlbumSortOrderUseCase
 import com.lotusreichhart.audily.core.domain.usecase.prefs.UpdateAlbumSortTypeUseCase
 import com.lotusreichhart.audily.core.model.album.Album
+import com.lotusreichhart.audily.core.common.result.Result
+import com.lotusreichhart.audily.core.common.result.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -32,51 +30,34 @@ internal class AlbumsViewModel @Inject constructor(
     private val updateAlbumSortTypeUseCase: UpdateAlbumSortTypeUseCase
 ) : ViewModel() {
 
-    private val _isInitialLoading = MutableStateFlow(true)
-    private val _isDataLoadingStarted = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch {
-            // Chờ animation trượt của BottomBar hoàn tất
-            delay(1000)
-            _isDataLoadingStarted.value = true
-            // Tổng thời gian hiện Shimmer
-            delay(2000)
-            _isInitialLoading.value = false
-        }
-    }
-
     private val _librarySettings = getUserPreferencesUseCase()
         .map { it.librarySettings }
         .distinctUntilChanged()
 
-    private val _albums: Flow<List<Album>> = combine(
-        _librarySettings,
-        _isDataLoadingStarted
-    ) { settings, isStarted ->
-        settings to isStarted
-    }.flatMapLatest { (settings, isStarted) ->
-        if (!isStarted) {
-            flowOf(emptyList())
-        } else {
+    private val _albumsResult: StateFlow<Result<List<Album>>> = _librarySettings
+        .flatMapLatest { settings ->
             getAlbumsUseCase(
                 sortOrder = settings.albumSortOrder,
                 sortType = settings.albumSortType
             )
         }
-    }
+        .asResult()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = Result.Loading
+        )
 
     val uiState: StateFlow<AlbumsUiState> = combine(
         _librarySettings,
-        _albums,
-        _isInitialLoading
-    ) { settings, albums, isLoading ->
+        _albumsResult
+    ) { settings, albumsResult ->
         AlbumsUiState(
-            albums = albums,
+            albums = if (albumsResult is Result.Success) albumsResult.data else emptyList(),
             gridSize = settings.albumGridSize,
             sortOrder = settings.albumSortOrder,
             sortType = settings.albumSortType,
-            isLoading = isLoading
+            isLoading = albumsResult is Result.Loading
         )
     }.stateIn(
         scope = viewModelScope,

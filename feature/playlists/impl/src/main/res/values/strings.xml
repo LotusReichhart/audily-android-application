@@ -32,7 +32,7 @@
     <string name="feature_playlists_impl_playlist_play">Play</string>
     <string name="feature_playlists_impl_songs_count">%1$d songs</string>
     <string name="feature_playlists_impl_unknown_playlist">Unknown playlist</string>
-    <string name="feature_playlists_impl_playlist_empty_description">Your playlist is empty. Add some tracks to set the vibe!</string>
+    <string name="feature_playlists_impl_playlist_empty_description">Your playlist is empty. Add some songs to set the vibe!</string>
 
     <!-- Playlist Picker -->
     <string name="feature_playlists_impl_add_song_to_playlists">The song has been added to the playlist</string>
