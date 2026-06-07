@@ -26,7 +26,7 @@
     <string name="feature_songs_impl_info_close">Close</string>
 
     <string name="feature_songs_impl_empty_title">No melodies here yet</string>
-    <string name="feature_songs_impl_empty_description">Start your musical journey by scanning your device or adding new tracks.</string>
+    <string name="feature_songs_impl_empty_description">Start your musical journey by scanning your device or adding new songs.</string>
     <string name="feature_songs_impl_empty_action_scan">Scan for music</string>
 
     <string name="feature_songs_impl_songs_sort">Sort Songs</string>
@@ -42,14 +42,14 @@
     <string name="feature_songs_impl_sort_order_number_of_songs">Number of Songs</string>
     <string name="feature_songs_impl_sort_order_created_date">Date Created</string>
 
-    <string name="feature_songs_impl_not_found_title">Still no tracks found</string>
+    <string name="feature_songs_impl_not_found_title">Still no songs found</string>
     <string name="feature_songs_impl_not_found_description">We scanned your device but couldn\'t find any audio files. Make sure your music is downloaded directly to your phone.</string>
     <string name="feature_songs_impl_action_refresh">Scan again</string>
 
     <string name="feature_songs_impl_picker_title">Select Songs</string>
     <string name="feature_songs_impl_picker_selected">Selected</string>
     <string name="feature_songs_impl_picker_empty_title">Nothing to select yet</string>
-    <string name="feature_songs_impl_picker_find_placeholder">Find a track…</string>
+    <string name="feature_songs_impl_picker_find_placeholder">Find a song…</string>
     <string name="feature_songs_impl_picker_not_found_title">Couldn\'t find that song</string>
     <string name="feature_songs_impl_menu_delete_confirm_title">Delete Song</string>
     <string name="feature_songs_impl_menu_delete_confirm_text">Are you sure you want to permanently delete \"%1$s\" from your device?</string>

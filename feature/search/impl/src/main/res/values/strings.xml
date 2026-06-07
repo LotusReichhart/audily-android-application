@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_search_impl_all_placeholder">Search for songs, albums…</string>
-    <string name="feature_search_impl_songs_placeholder">Find a track…</string>
+    <string name="feature_search_impl_songs_placeholder">Find a song…</string>
     <string name="feature_search_impl_playlists_placeholder">Search your playlists…</string>
     <string name="feature_search_impl_albums_placeholder">Look for an album…</string>
 
